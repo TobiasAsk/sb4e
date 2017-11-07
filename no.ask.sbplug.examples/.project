@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>sbplug</name>
+	<name>no.ask.sbplug.examples</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -25,11 +25,4 @@
 		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>lib/sbjar</name>
-			<type>2</type>
-			<location>C:/dev/sbjar</location>
-		</link>
-	</linkedResources>
 </projectDescription>

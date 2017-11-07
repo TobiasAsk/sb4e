@@ -4,7 +4,6 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.services.IServiceConstants;
@@ -22,61 +21,21 @@ import javafx.embed.swt.FXCanvas;
 import javafx.scene.Scene;
 import sbplug.editors.FXMLEditor;
 
-public class InspectorView {
+public class InspectorView implements IPartListener {
 	
 	private InspectorPanelController inspectorPanelController;
 	private EditorController defaultEditorController = new EditorController();
-	private boolean closingLastEditor;
+	private boolean anyEditorsOpen;
 
 	@Inject
 	private IPartService partService;
-	
-	@Inject
-	ECommandService commandService;
 	
 	@PostConstruct
 	public void createPartControl(Composite parent) {
 		FXCanvas canvas = new FXCanvas(parent, SWT.NONE);
 		inspectorPanelController = new InspectorPanelController(defaultEditorController);
 		canvas.setScene(new Scene(inspectorPanelController.getPanelRoot()));
-		
-		
-		
-		partService.addPartListener(new IPartListener() {
-			
-			@Override
-			public void partOpened(IWorkbenchPart part) {
-				
-			}
-			
-			@Override
-			public void partDeactivated(IWorkbenchPart part) {
-				if (part instanceof FXMLEditor) {
-					closingLastEditor = true;
-				}
-			}
-			
-			@Override
-			public void partClosed(IWorkbenchPart part) {
-				if (part instanceof FXMLEditor && closingLastEditor) {
-					setInspPanelEditorController(defaultEditorController);	
-				}
-			}
-			
-			@Override
-			public void partBroughtToTop(IWorkbenchPart part) {
-				
-			}
-			
-			@Override
-			public void partActivated(IWorkbenchPart part) {
-				if (part instanceof FXMLEditor) {
-					closingLastEditor = false;
-					EditorController ec = ((FXMLEditor) part).getEditorController();
-					setInspPanelEditorController(ec);
-				}
-			}
-		});
+		partService.addPartListener(this);
 	}
 	
 	private void setInspPanelEditorController(EditorController editorController) {
@@ -85,7 +44,6 @@ public class InspectorView {
 
 	@Focus
 	public void setFocus() {
-//		myLabelInView.setFocus();
 
 	}
 
@@ -147,5 +105,39 @@ public class InspectorView {
 	public void setSelection(@Named(IServiceConstants.ACTIVE_SELECTION) Object[] selectedObjects) {
 
 		// Test if label exists (inject methods are called before PostConstruct)
+	}
+
+	@Override
+	public void partActivated(IWorkbenchPart part) {
+		if (part instanceof FXMLEditor) {
+			anyEditorsOpen = true;
+			EditorController ec = ((FXMLEditor) part).getEditorController();
+			setInspPanelEditorController(ec);
+		}		
+	}
+
+	@Override
+	public void partBroughtToTop(IWorkbenchPart part) {
+		
+	}
+
+	@Override
+	public void partClosed(IWorkbenchPart part) {
+		// async exec her
+		if (part instanceof FXMLEditor && !anyEditorsOpen) {
+			setInspPanelEditorController(defaultEditorController);	
+		}		
+	}
+
+	@Override
+	public void partDeactivated(IWorkbenchPart part) {
+		if (part instanceof FXMLEditor) {
+			anyEditorsOpen = false;
+		}		
+	}
+
+	@Override
+	public void partOpened(IWorkbenchPart part) {
+		
 	}
 }

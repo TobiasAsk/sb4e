@@ -2,7 +2,6 @@ package sbplug.editors;
 
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.actions.ActionFactory;
-import org.eclipse.ui.operations.UndoActionHandler;
 import org.eclipse.ui.part.EditorActionBarContributor;
 
 public class FXMLEditorContributor extends EditorActionBarContributor {

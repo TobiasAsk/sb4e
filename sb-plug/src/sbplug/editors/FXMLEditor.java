@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import org.eclipse.core.commands.operations.IOperationHistory;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.commands.operations.OperationHistoryFactory;
@@ -26,32 +28,111 @@ import org.eclipse.ui.part.FileEditorInput;
 import com.oracle.javafx.scenebuilder.app.selectionbar.SelectionBarController;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
 import com.oracle.javafx.scenebuilder.kit.editor.JobManager;
+import com.oracle.javafx.scenebuilder.kit.editor.job.Job;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.content.ContentPanelController;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.library.LibraryPanelController;
 import com.oracle.javafx.scenebuilder.kit.fxom.FXOMDocument;
 
 import javafx.embed.swt.FXCanvas;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 
 public class FXMLEditor extends EditorPart {
 
-	private ContentPanelController contentPanelController;
-	private FXCanvas canvas;
 	private URL fxmlUrl;
 	private boolean dirty = false;
 	private EditorController editorController;
 	private UndoActionHandler undoActionHandler;
 	private RedoActionHandler redoActionHandler;
+	private IUndoContext undoContext;
+	private IOperationHistory operationHistory;
+	
+	public IAction getUndoActionHandler() {
+		return undoActionHandler;
+	}
+	
+	public IAction getRedoActionHandler() {
+		return redoActionHandler;
+	}
 	
 	public EditorController getEditorController() {
 		return editorController;
 	}
 	
-	public ContentPanelController getContentPanelController() {
-		return contentPanelController;
+	@Override
+	public boolean isDirty() {
+		return dirty;
+	}
+
+	@Override
+	public boolean isSaveAsAllowed() {
+		return false;
+	}
+	
+	@Override
+	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+		setSite(site);
+		setInputWithNotify(input);
+		
+		if (input instanceof FileEditorInput) {
+			FileEditorInput fxmlFile = (FileEditorInput) input;
+			setPartName(fxmlFile.getName());
+			try {
+				fxmlUrl = fxmlFile.getURI().toURL();
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		operationHistory = OperationHistoryFactory.getOperationHistory();
+		undoContext = new ObjectUndoContext(this);
+		undoActionHandler = new UndoActionHandler(site, undoContext);
+		redoActionHandler = new RedoActionHandler(site, undoContext);
+	}
+	
+	@Override
+	public void createPartControl(Composite parent) {
+		// IMPORTANT: instantiate the canvas before the controllers so that the javafx
+		// toolkit is initialized
+		FXCanvas canvas = new FXCanvas(parent, SWT.None);
+		editorController = new EditorController();
+		
+		JobManager jobManager = editorController.getJobManager();
+        jobManager.revisionProperty().addListener((observable, oldValue, newValue) -> {
+        	dirty = jobManager.canUndo();
+        	firePropertyChange(PROP_DIRTY);
+        	if (!jobManager.canRedo()) {
+            	Job currentJob = jobManager.getCurrentJob();
+            	if (isFreshJob(currentJob)) {
+            		String label = currentJob.getDescription();
+            		operationHistory.add(new SceneBuilderOperation(label, jobManager, undoContext));
+            	}
+        	}
+        });
+        
+		ContentPanelController contentPanelController = new ContentPanelController(editorController);
+		LibraryPanelController libPanelController = new LibraryPanelController(editorController);
+        
+		// make sure the other controllers have their references set before setting the input file
+		// for the editor controller so they can react to the update
+        try {
+			editorController.setFxmlTextAndLocation(FXOMDocument
+					.readContentFromURL(fxmlUrl), fxmlUrl);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+        BorderPane editorPanel = new BorderPane(contentPanelController.getPanelRoot());
+        editorPanel.setTop(new SelectionBarController(editorController).getPanelRoot());
+        
+		canvas.setScene(new Scene(new SplitPane(libPanelController.getPanelRoot(), editorPanel)));
+	}
+	
+	private boolean isFreshJob(Job job) {
+    	SceneBuilderOperation topOperation = (SceneBuilderOperation) operationHistory
+    			.getRedoOperation(undoContext);
+    	return topOperation == null || topOperation.getJob() != job;
 	}
 		
 	@Override
@@ -77,83 +158,11 @@ public class FXMLEditor extends EditorPart {
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-		setSite(site);
-		setInputWithNotify(input);
-		
-		if (input instanceof FileEditorInput) {
-			FileEditorInput fxmlFile = (FileEditorInput) input;
-			setPartName(fxmlFile.getName());
-			try {
-				fxmlUrl = fxmlFile.getURI().toURL();
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	@Override
-	public boolean isDirty() {
-		return dirty;
-	}
-
-	@Override
-	public boolean isSaveAsAllowed() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
-	public void createPartControl(Composite parent) {
-		canvas = new FXCanvas(parent, SWT.None);
-		editorController = new EditorController();
-		contentPanelController = new ContentPanelController(editorController);
-		LibraryPanelController libPanelController = new LibraryPanelController(editorController);
-		
-		JobManager jobManager = editorController.getJobManager();
-				
-        try {
-			editorController.setFxmlTextAndLocation(FXOMDocument.readContentFromURL(fxmlUrl), fxmlUrl);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-        
-		IUndoContext undoContext = new ObjectUndoContext(this);
-		undoActionHandler = new UndoActionHandler(getSite(), undoContext);
-		redoActionHandler = new RedoActionHandler(getSite(), undoContext);
-						
-        jobManager.revisionProperty().addListener((o, oV, nV) -> {
-        	dirty = jobManager.canUndo();
-        	firePropertyChange(PROP_DIRTY);
-        	if (jobManager.getCurrentJob() != null) {
-            	SceneBuilderOperation op = new SceneBuilderOperation(jobManager.getCurrentJob().getDescription(), jobManager);
-            	op.addContext(undoContext);
-            	OperationHistoryFactory.getOperationHistory().add(op);
-        	}
-        });
-        
-        BorderPane editorPanel = new BorderPane(contentPanelController.getPanelRoot());
-        editorPanel.setTop(new SelectionBarController(editorController).getPanelRoot());
-                
-		canvas.setScene(new Scene(new SplitPane(libPanelController.getPanelRoot(), editorPanel)));
-		Parent root = canvas.getScene().getRoot();
-		int e = 2;
-	}
 	
 	@Override
 	public void setFocus() {
 		// TODO Auto-generated method stub
 		
-	}
-
-	public IAction getUndoActionHandler() {
-		return undoActionHandler;
-	}
-	
-	public IAction getRedoActionHandler() {
-		return redoActionHandler;
 	}
 
 }
