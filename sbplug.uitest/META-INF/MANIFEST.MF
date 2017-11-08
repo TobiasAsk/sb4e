@@ -11,5 +11,7 @@ Require-Bundle: org.eclipse.swtbot.go,
  sbplug
 Import-Package: com.oracle.javafx.scenebuilder.kit.editor,
  com.oracle.javafx.scenebuilder.kit.editor.panel.content,
+ com.oracle.javafx.scenebuilder.kit.editor.panel.inspector,
+ com.oracle.javafx.scenebuilder.kit.editor.panel.util,
  com.oracle.javafx.scenebuilder.kit.fxom,
  org.eclipse.core.resources

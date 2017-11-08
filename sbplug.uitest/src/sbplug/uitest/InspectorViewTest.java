@@ -7,7 +7,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -21,10 +20,14 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import javafx.embed.swt.FXCanvas;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
+import sbplug.editors.FXMLEditor;
+import sbplug.views.InspectorView;
+
+import static org.junit.Assert.*;
 
 public class InspectorViewTest {
 	
@@ -32,7 +35,6 @@ public class InspectorViewTest {
 	private static final String PROJECT_NAME = "prj1";
 	private static final String FILE_NAME = "some.fxml";
 	private Button button;
-	private StackPane libraryPanel;
 
 	@BeforeClass
 	public static void setUp() {
@@ -50,31 +52,39 @@ public class InspectorViewTest {
 		SWTBotEditor editor = openEditor();
 		SWTBotView view = openView();
 		
-		ChildrenControlFinder finder = new ChildrenControlFinder(editor.getWidget());
-		List<Canvas> canvases = finder.findControls(WidgetOfType.widgetOfType(Canvas.class));
-		final FXCanvas canvas = (FXCanvas) canvases.get(0);
+		ChildrenControlFinder editorFinder = new ChildrenControlFinder(editor.getWidget());
+		final FXCanvas editorCanvas = editorFinder.findControls(WidgetOfType
+				.widgetOfType(FXCanvas.class)).get(0);
 		final JavaFxButtonFinder buttonFinder = new JavaFxButtonFinder();
 				
 		Display.getDefault().syncExec(new Runnable() {
 			@Override
 			public void run() {
-				button = buttonFinder.findButton(canvas, "Button");
-				libraryPanel = buttonFinder.findLibraryPanel(canvas);
+				button = buttonFinder.findButton(editorCanvas, "Button");
 			}
 		});
-		button.localtosc
-		int buttonX = (int) (button.getLayoutX() + libraryPanel.getWidth());
-		SWTBotCanvas botCanvas = new SWTBotCanvas(canvas);
-		botCanvas.click(buttonX, (int) button.getLayoutY());
 		
-		ChildrenControlFinder finderForView = new ChildrenControlFinder(view.getWidget());
+		Point2D btnCoords = getButtonCoordinates(button);
+		new SWTBotCanvas(editorCanvas).click((int) btnCoords.getX(), (int) btnCoords.getY());
+		
+		InspectorView inspectorView = (InspectorView) view.getReference().getView(false);
+		FXMLEditor fxmlEditor = (FXMLEditor) editor.getReference().getEditor(false);
+		assertEquals(fxmlEditor.getEditorController(),
+				inspectorView.getInspectorPanelController().getEditorController());
+	}
+	
+	private Point2D getButtonCoordinates(Button button) {
+		Bounds bounds = button.localToScene(button.getBoundsInLocal(), true);
+		double buttonX = (bounds.getMinX() + bounds.getMaxX()) / 2;
+		double buttonY = (bounds.getMinY() + bounds.getMaxY()) / 2;
+		return new Point2D(buttonX, buttonY);
 	}
 	
 	private SWTBotView openView() {
 		bot.menu("Window").menu("Show View").menu("Other...").click();
 		SWTBotShell showView = bot.shell("Show View");
 		showView.activate();
-		bot.tree().expandNode("Sb").select("Inspector View");
+		bot.tree().expandNode("Scene Builder").select("Inspector View");
 		bot.button("Open").click();
 		return bot.viewByTitle("Inspector View");
 	}

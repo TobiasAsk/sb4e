@@ -7,7 +7,6 @@ Bundle-Activator: sbplug.Activator
 Require-Bundle: javax.inject,
  org.eclipse.osgi,
  org.eclipse.jface,
- org.eclipse.e4.ui.model.workbench,
  org.eclipse.e4.ui.di,
  org.eclipse.e4.ui.services,
  org.eclipse.e4.core.di.annotations,
@@ -37,4 +36,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Export-Package: sbplug,
  sbplug.editors,
- sbplug.parts
+ sbplug.views

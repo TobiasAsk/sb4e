@@ -103,6 +103,7 @@ public class FXMLEditor extends EditorPart {
         	dirty = jobManager.canUndo();
         	firePropertyChange(PROP_DIRTY);
         	if (!jobManager.canRedo()) {
+        		// only add unique, previously unseen jobs to the operation history
             	Job currentJob = jobManager.getCurrentJob();
             	if (isFreshJob(currentJob)) {
             		String label = currentJob.getDescription();
