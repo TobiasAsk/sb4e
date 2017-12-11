@@ -96,13 +96,12 @@ public class MavenPreferences {
     }
     
     private List<String> getArtifactsJarsDependencies() {
-        return recordArtifacts.values()
+        Stream<String> deps = recordArtifacts.values()
                 .stream()
                 .map(p -> p.getMavenArtifact().getDependencies())
                 .filter(d -> d != null && !d.isEmpty())
-                .flatMap(d -> Stream.of(d.split(":")))
-                .distinct()
-                .collect(Collectors.toList());
+                .flatMap(d -> Stream.of(d.split(":")));
+		return deps.distinct().collect(Collectors.toList());
     }
     
     public List<File> getArtifactsFiles() {
@@ -137,13 +136,12 @@ public class MavenPreferences {
     }
     
     public List<String> getArtifactsFilter() {
-        return recordArtifacts.values()
+        Stream<String> filters = recordArtifacts.values()
                 .stream()
                 .map(p -> p.getMavenArtifact().getFilter())
                 .filter(f -> f != null && !f.isEmpty())
-                .flatMap(f -> Stream.of(f.split(":")))
-                .distinct()
-                .collect(Collectors.toList());
+                .flatMap(f -> Stream.of(f.split(":")));
+		return filters.distinct().collect(Collectors.toList());
     }
     
     public List<String> getArtifactsCoordinates() {
