@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="no.tobask.sb4e.editors.FXMLEditor"
+            contributorClass="no.tobask.sb4e.editors.FXMLEditorContributor"
+            default="false"
+            extensions="fxml"
+            id="sb4e.editors.FXMLEditor"
+            name="SB FXML Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="sb4e.scenebuilder"
+            class="no.tobask.sb4e.views.InspectorView"
+            id="sb4e.views.InspectorView"
+            name="Inspector View"
+            restorable="false">
+      </view>
+      <category
+            id="sb4e.scenebuilder"
+            name="Scene Builder">
+      </category>
+   </extension>
+
+</plugin>
