@@ -59,6 +59,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.WeakHashMap;
 
@@ -264,6 +265,15 @@ public class Metadata {
     private final PropertyName rotationAxisName = 
             new PropertyName("rotationAxis");
 
+    private void addMetadataFromSpi() {
+    	ServiceLoader<IComponentClassMetadataProvider> loader =
+    			ServiceLoader.load(IComponentClassMetadataProvider.class);
+    	Iterator<IComponentClassMetadataProvider> providers = loader.iterator();
+    	while (providers.hasNext()) {
+    		componentClassMap.putAll(providers.next().getMetadata());
+    	}
+    }
+    
     private void addMetadataFromProvider(IComponentClassMetadataProvider provider) {
     	SafeRunner.run(() -> componentClassMap.putAll(provider.getMetadata()));
     }
@@ -285,8 +295,7 @@ public class Metadata {
     }
 
     private Metadata() {
-    	addMetadataFromExtensions();
-    	
+    	addMetadataFromSpi();
         // Populates hiddenProperties
         hiddenProperties.add(new PropertyName("activated"));
         hiddenProperties.add(new PropertyName("alignWithContentOrigin"));
