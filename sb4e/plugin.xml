@@ -27,5 +27,10 @@
             name="Scene Builder">
       </category>
    </extension>
+   <extension
+         point="com.oracle.javafx.scenebuilder.metadataprovider">
+      <client
+            class="no.tobask.sb4e.JavaFxComponentClassMetadataProvider"></client>
+   </extension>
 
 </plugin>

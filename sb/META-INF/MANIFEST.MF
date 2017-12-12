@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scenebuilder
-Bundle-SymbolicName: com.oracle.javafx.scenebuilder
+Bundle-SymbolicName: com.oracle.javafx.scenebuilder;singleton:=true
 Bundle-Version: 0.0.1.qualifier
 Bundle-ClassPath: lib/javax.json-api-1.0.jar,
  lib/plexus-utils-2.1.jar,
@@ -15,7 +15,16 @@ Export-Package: com.oracle.javafx.scenebuilder.app,
  com.oracle.javafx.scenebuilder.kit.editor.panel.library,
  com.oracle.javafx.scenebuilder.kit.editor.panel.util,
  com.oracle.javafx.scenebuilder.kit.editor.selection,
- com.oracle.javafx.scenebuilder.kit.fxom
+ com.oracle.javafx.scenebuilder.kit.fxom,
+ com.oracle.javafx.scenebuilder.kit.metadata,
+ com.oracle.javafx.scenebuilder.kit.metadata.klass,
+ com.oracle.javafx.scenebuilder.kit.metadata.property,
+ com.oracle.javafx.scenebuilder.kit.metadata.property.value,
+ com.oracle.javafx.scenebuilder.kit.metadata.property.value.effect,
+ com.oracle.javafx.scenebuilder.kit.metadata.property.value.keycombination,
+ com.oracle.javafx.scenebuilder.kit.metadata.property.value.list,
+ com.oracle.javafx.scenebuilder.kit.metadata.property.value.paint,
+ com.oracle.javafx.scenebuilder.kit.metadata.util
 Import-Package: org.apache.commons.codec.binary;version="1.9.0",
  org.apache.commons.lang3;version="3.1.0",
  org.apache.http;version="4.4.6",
@@ -29,3 +38,5 @@ Import-Package: org.apache.commons.codec.binary;version="1.9.0",
  org.eclipse.aether.transport.http;version="1.0.3",
  org.eclipse.aether.util;version="1.0.3"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.eclipse.e4.core.di;bundle-version="1.6.100",
+ org.eclipse.core.runtime;bundle-version="3.13.0"
