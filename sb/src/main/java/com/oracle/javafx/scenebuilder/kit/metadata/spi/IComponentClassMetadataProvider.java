@@ -1,4 +1,4 @@
-package com.oracle.javafx.scenebuilder.kit.metadata;
+package com.oracle.javafx.scenebuilder.kit.metadata.spi;
 
 import java.util.Map;
 

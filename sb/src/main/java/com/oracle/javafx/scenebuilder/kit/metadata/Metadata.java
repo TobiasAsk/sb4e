@@ -43,6 +43,7 @@ import com.oracle.javafx.scenebuilder.kit.metadata.klass.ComponentClassMetadata;
 import com.oracle.javafx.scenebuilder.kit.metadata.property.ComponentPropertyMetadata;
 import com.oracle.javafx.scenebuilder.kit.metadata.property.PropertyMetadata;
 import com.oracle.javafx.scenebuilder.kit.metadata.property.ValuePropertyMetadata;
+import com.oracle.javafx.scenebuilder.kit.metadata.spi.IComponentClassMetadataProvider;
 import com.oracle.javafx.scenebuilder.kit.metadata.util.InspectorPathComparator;
 import com.oracle.javafx.scenebuilder.kit.metadata.util.PropertyName;
 import org.eclipse.core.runtime.CoreException;
@@ -59,6 +60,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -266,11 +268,15 @@ public class Metadata {
             new PropertyName("rotationAxis");
 
     private void addMetadataFromSpi() {
-    	ServiceLoader<IComponentClassMetadataProvider> loader =
-    			ServiceLoader.load(IComponentClassMetadataProvider.class);
-    	Iterator<IComponentClassMetadataProvider> providers = loader.iterator();
-    	while (providers.hasNext()) {
-    		componentClassMap.putAll(providers.next().getMetadata());
+    	try {
+        	ServiceLoader<IComponentClassMetadataProvider> loader =
+        			ServiceLoader.load(IComponentClassMetadataProvider.class);
+        	Iterator<IComponentClassMetadataProvider> providers = loader.iterator();
+        	while (providers.hasNext()) {
+        		componentClassMap.putAll(providers.next().getMetadata());
+        	}	
+    	} catch (ServiceConfigurationError e) {
+    		e.printStackTrace();
     	}
     }
     

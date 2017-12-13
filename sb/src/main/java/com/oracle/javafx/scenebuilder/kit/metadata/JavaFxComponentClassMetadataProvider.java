@@ -1,4 +1,4 @@
-package no.tobask.sb4e;
+package com.oracle.javafx.scenebuilder.kit.metadata;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.oracle.javafx.scenebuilder.kit.fxom.FXOMIntrinsic;
-import com.oracle.javafx.scenebuilder.kit.metadata.IComponentClassMetadataProvider;
 import com.oracle.javafx.scenebuilder.kit.metadata.klass.ComponentClassMetadata;
 import com.oracle.javafx.scenebuilder.kit.metadata.property.ComponentPropertyMetadata;
 import com.oracle.javafx.scenebuilder.kit.metadata.property.ValuePropertyMetadata;
@@ -40,6 +39,7 @@ import com.oracle.javafx.scenebuilder.kit.metadata.property.value.list.StringLis
 import com.oracle.javafx.scenebuilder.kit.metadata.property.value.list.TickMarkListPropertyMetadata;
 import com.oracle.javafx.scenebuilder.kit.metadata.property.value.paint.ColorPropertyMetadata;
 import com.oracle.javafx.scenebuilder.kit.metadata.property.value.paint.PaintPropertyMetadata;
+import com.oracle.javafx.scenebuilder.kit.metadata.spi.IComponentClassMetadataProvider;
 import com.oracle.javafx.scenebuilder.kit.metadata.util.InspectorPath;
 import com.oracle.javafx.scenebuilder.kit.metadata.util.PropertyName;
 
