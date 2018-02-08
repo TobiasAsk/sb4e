@@ -46,11 +46,6 @@ import com.oracle.javafx.scenebuilder.kit.metadata.property.ValuePropertyMetadat
 import com.oracle.javafx.scenebuilder.kit.metadata.spi.IComponentClassMetadataProvider;
 import com.oracle.javafx.scenebuilder.kit.metadata.util.InspectorPathComparator;
 import com.oracle.javafx.scenebuilder.kit.metadata.util.PropertyName;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.SafeRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,8 +78,6 @@ public class Metadata {
     public final InspectorPathComparator INSPECTOR_PATH_COMPARATOR
             = new InspectorPathComparator(sectionNames, subSectionMap);
     
-    private static final String METADATA_PROVIDER_ID = "com.oracle.javafx.scenebuilder.metadataprovider";
-
     public static synchronized Metadata getMetadata() {
         if (metadata == null) {
             metadata = new Metadata();
@@ -268,9 +261,9 @@ public class Metadata {
             new PropertyName("rotationAxis");
 
     private void addMetadataFromSpi() {
+    	ServiceLoader<IComponentClassMetadataProvider> loader =
+    			ServiceLoader.load(IComponentClassMetadataProvider.class);
     	try {
-        	ServiceLoader<IComponentClassMetadataProvider> loader =
-        			ServiceLoader.load(IComponentClassMetadataProvider.class);
         	Iterator<IComponentClassMetadataProvider> providers = loader.iterator();
         	while (providers.hasNext()) {
         		componentClassMap.putAll(providers.next().getMetadata());
@@ -280,26 +273,6 @@ public class Metadata {
     	}
     }
     
-    private void addMetadataFromProvider(IComponentClassMetadataProvider provider) {
-    	SafeRunner.run(() -> componentClassMap.putAll(provider.getMetadata()));
-    }
-    
-    private void addMetadataFromExtensions() {
-    	IExtensionRegistry registry = Platform.getExtensionRegistry();
-    	IConfigurationElement[] configElements =
-    			registry.getConfigurationElementsFor(METADATA_PROVIDER_ID);
-    	try {
-    		for (IConfigurationElement configElement : configElements) {
-    			Object instance = configElement.createExecutableExtension("class");
-    			if (instance instanceof IComponentClassMetadataProvider) {
-    				addMetadataFromProvider((IComponentClassMetadataProvider) instance);
-    			}
-    		}
-    	} catch (CoreException e) {
-    		e.printStackTrace();
-    	}
-    }
-
     private Metadata() {
     	addMetadataFromSpi();
         // Populates hiddenProperties

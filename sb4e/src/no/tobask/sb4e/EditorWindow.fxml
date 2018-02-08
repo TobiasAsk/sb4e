@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<SplitPane dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.151" xmlns:fx="http://javafx.com/fxml/1">
+  <items>
+      <SplitPane fx:id="libraryDocumentSplitPane" dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+        <items>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <HBox prefHeight="100.0" prefWidth="200.0" />
+                  <StackPane fx:id="libraryPanelHost" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
+               </children>
+            </VBox>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <HBox prefHeight="100.0" prefWidth="200.0" />
+                  <Accordion>
+                    <panes>
+                      <TitledPane animated="false" text="untitled 1">
+                           <content>
+                              <StackPane fx:id="hierarchyPanelHost" prefHeight="150.0" prefWidth="200.0" />
+                           </content>
+                      </TitledPane>
+                      <TitledPane animated="false" text="untitled 2">
+                           <content>
+                              <StackPane fx:id="infoPanelHost" prefHeight="150.0" prefWidth="200.0" />
+                           </content>
+                      </TitledPane>
+                    </panes>
+                  </Accordion>
+               </children>
+            </VBox>
+        </items>
+      </SplitPane>
+      <BorderPane prefHeight="200.0" prefWidth="200.0">
+         <center>
+            <StackPane fx:id="contentPanelHost" prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+         </center>
+         <top>
+            <StackPane fx:id="selectionBarHost" prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+         </top></BorderPane>
+  </items>
+</SplitPane>

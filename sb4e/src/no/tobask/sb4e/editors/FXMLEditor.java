@@ -11,9 +11,15 @@ import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.commands.operations.OperationHistoryFactory;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaModel;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -37,6 +43,8 @@ import javafx.embed.swt.FXCanvas;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
+import no.tobask.sb4e.EditorWindowController;
+import no.tobask.sb4e.JavaProjectGlossary;
 
 public class FXMLEditor extends EditorPart {
 
@@ -91,13 +99,7 @@ public class FXMLEditor extends EditorPart {
 		redoActionHandler = new RedoActionHandler(site, undoContext);
 	}
 	
-	@Override
-	public void createPartControl(Composite parent) {
-		// IMPORTANT: instantiate the canvas before the controllers so that the javafx
-		// toolkit is initialized
-		FXCanvas canvas = new FXCanvas(parent, SWT.None);
-		editorController = new EditorController();
-		
+	private void setupUndoRedo() {
 		JobManager jobManager = editorController.getJobManager();
         jobManager.revisionProperty().addListener((observable, oldValue, newValue) -> {
         	dirty = jobManager.canUndo();
@@ -111,23 +113,26 @@ public class FXMLEditor extends EditorPart {
             	}
         	}
         });
-        
-		ContentPanelController contentPanelController = new ContentPanelController(editorController);
-		LibraryPanelController libPanelController = new LibraryPanelController(editorController);
-        
+	}
+	
+	@Override
+	public void createPartControl(Composite parent) {
+		// IMPORTANT: instantiate the canvas before the controllers so that the javafx
+		// toolkit is initialized
+		FXCanvas canvas = new FXCanvas(parent, SWT.None);
+		editorController = new EditorController();
+		editorController.setGlossary(new JavaProjectGlossary());
+		setupUndoRedo();
+		EditorWindowController editorWindowController = new EditorWindowController(editorController);
 		// make sure the other controllers have their references set before setting the input file
 		// for the editor controller so they can react to the update
-        try {
+		try {
 			editorController.setFxmlTextAndLocation(FXOMDocument
 					.readContentFromURL(fxmlUrl), fxmlUrl);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-        
-        BorderPane editorPanel = new BorderPane(contentPanelController.getPanelRoot());
-        editorPanel.setTop(new SelectionBarController(editorController).getPanelRoot());
-        
-		canvas.setScene(new Scene(new SplitPane(libPanelController.getPanelRoot(), editorPanel)));
+		canvas.setScene(editorWindowController.getScene());
 	}
 	
 	private boolean isFreshJob(Job job) {

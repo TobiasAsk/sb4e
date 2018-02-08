@@ -1,5 +1,5 @@
 package no.ask.sbplug.examples;
 
-public class Code {
+public class GreatFxmlController {
 
 }

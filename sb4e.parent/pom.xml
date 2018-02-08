@@ -60,7 +60,9 @@
 	</build>
 
 	<modules>
-		<module>../sb4e</module>
 		<module>../sb</module>
+		<module>../sb4e</module>
+		<module>../sb4e.feature</module>
+		<module>../sb4e.repository</module>
 	</modules>
 </project>

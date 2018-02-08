@@ -6,8 +6,8 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: Tobias
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: org.eclipse.swtbot.go,
- org.eclipse.swt
+Require-Bundle: org.eclipse.swt,
+ org.eclipse.swtbot.go;bundle-version="2.6.0"
 Import-Package: com.oracle.javafx.scenebuilder.kit.editor,
  com.oracle.javafx.scenebuilder.kit.editor.panel.content,
  com.oracle.javafx.scenebuilder.kit.editor.panel.inspector,

@@ -20,17 +20,12 @@
             class="no.tobask.sb4e.views.InspectorView"
             id="sb4e.views.InspectorView"
             name="Inspector View"
-            restorable="false">
+            restorable="true">
       </view>
       <category
             id="sb4e.scenebuilder"
             name="Scene Builder">
       </category>
-   </extension>
-   <extension
-         point="com.oracle.javafx.scenebuilder.metadataprovider">
-      <client
-            class="no.tobask.sb4e.JavaFxComponentClassMetadataProvider"></client>
    </extension>
 
 </plugin>
