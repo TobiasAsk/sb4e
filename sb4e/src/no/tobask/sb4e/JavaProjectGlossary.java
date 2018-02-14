@@ -109,31 +109,27 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 	private Collection<IPackageFragment> getAllMatchingPackages(String packageName,
 			IJavaProject project) {
 		Collection<IPackageFragment> packages = new ArrayList<>();
+		for (IPackageFragmentRoot folder : getSourceFolders(project)) {
+			IPackageFragment pkg = folder.getPackageFragment(packageName);
+			if (pkg.exists()) {
+				packages.add(pkg);
+			}
+		}
+		return packages;
+	}
+
+	private List<IPackageFragmentRoot> getSourceFolders(IJavaProject project) {
+		List<IPackageFragmentRoot> sourceFolders = new ArrayList<>();
 		try {
-			IPackageFragmentRoot[] projectRoots = project.getAllPackageFragmentRoots();
-			for (IPackageFragmentRoot folder : getSourceFolders(projectRoots)) {
-				IPackageFragment pkg = folder.getPackageFragment(packageName);
-				if (pkg.exists()) {
-					packages.add(pkg);
+			for (IPackageFragmentRoot root : project.getAllPackageFragmentRoots()) {
+				if (root.getKind() == IPackageFragmentRoot.K_SOURCE) {
+					sourceFolders.add(root);
 				}
 			}
 		} catch (JavaModelException e) {
 			e.printStackTrace();
 		}
-		return packages;
-	}
-
-	private List<IPackageFragmentRoot> getSourceFolders(IPackageFragmentRoot[] roots) {
-		List<IPackageFragmentRoot> allRoots = new ArrayList<>(Arrays.asList(roots));
-		Stream<IPackageFragmentRoot> filtered = allRoots.stream().filter(r -> {
-			try {
-				return r.getKind() == IPackageFragmentRoot.K_SOURCE;
-			} catch (JavaModelException e) {
-				e.printStackTrace();
-				return false;
-			}
-		});
-		return filtered.collect(Collectors.toList());
+		return sourceFolders;
 	}
 
 	private Collection<ICompilationUnit> getCandidateControllers(IPackageFragment pkg,
