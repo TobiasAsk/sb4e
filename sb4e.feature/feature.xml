@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="no.tobask.sb4e.feature"
-      label="sb4e Feature"
+      label="sb4e - Scene Builder integration for Eclipse"
       version="0.0.1.qualifier"
       provider-name="Tobias Ask">
 
    <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+      sb4e integrates the UI designer tool Scene Builder into the Eclipse IDE.
    </description>
 
    <copyright url="http://www.example.com/copyright">
