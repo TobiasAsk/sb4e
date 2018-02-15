@@ -10,7 +10,7 @@
             default="false"
             extensions="fxml"
             id="sb4e.editors.FXMLEditor"
-            name="SB FXML Editor">
+            name="Scene Builder FXML Editor">
       </editor>
    </extension>
    <extension
