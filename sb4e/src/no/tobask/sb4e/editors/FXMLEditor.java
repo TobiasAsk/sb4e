@@ -43,6 +43,8 @@ import javafx.embed.swt.FXCanvas;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
+import no.tobask.sb4e.CustomClassLoaderLibrary;
+import no.tobask.sb4e.EclipseProjectsClassLoader;
 import no.tobask.sb4e.EditorWindowController;
 import no.tobask.sb4e.JavaProjectGlossary;
 
@@ -122,6 +124,7 @@ public class FXMLEditor extends EditorPart {
 		FXCanvas canvas = new FXCanvas(parent, SWT.None);
 		editorController = new EditorController();
 		editorController.setGlossary(new JavaProjectGlossary());
+		editorController.setLibrary(new CustomClassLoaderLibrary(new EclipseProjectsClassLoader()));
 		setupUndoRedo();
 		EditorWindowController editorWindowController = new EditorWindowController(editorController);
 		// make sure the other controllers have their references set before setting the input file
