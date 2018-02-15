@@ -119,7 +119,7 @@ public class BuiltinLibrary extends Library {
      * Private
      */
     
-    private BuiltinLibrary() {
+    protected BuiltinLibrary() {
         // Gluon
 //        addCustomizedItem(com.gluonhq.charm.glisten.control.AppBar.class, TAG_GLUON);
 //        addCustomizedItem(com.gluonhq.charm.glisten.control.AutoCompleteTextField.class, TAG_GLUON);
