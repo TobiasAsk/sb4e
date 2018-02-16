@@ -10,6 +10,7 @@ import com.oracle.javafx.scenebuilder.kit.editor.panel.library.LibraryPanelContr
 import com.oracle.javafx.scenebuilder.kit.editor.panel.util.AbstractFxmlWindowController;
 import com.oracle.javafx.scenebuilder.kit.editor.search.SearchController;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.layout.StackPane;
 import javafx.stage.WindowEvent;
@@ -63,6 +64,21 @@ public class EditorWindowController extends AbstractFxmlWindowController {
 
 	@Override
 	public void onCloseRequest(WindowEvent event) {
+		
+	}
+	
+	@FXML
+	private void onHierarchyShowInfo(ActionEvent event) {
+		
+	}
+	
+	@FXML
+	private void onHierarchyShowFxId(ActionEvent event) {
+		
+	}
+	
+	@FXML
+	private void onHierarchyShowNodeId(ActionEvent event) {
 		
 	}
 	
