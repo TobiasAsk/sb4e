@@ -8,6 +8,7 @@ Bundle-ClassPath: lib/javax.json-api-1.0.jar,
  .
 Export-Package: com.oracle.javafx.scenebuilder.app,
  com.oracle.javafx.scenebuilder.app.info,
+ com.oracle.javafx.scenebuilder.app.message,
  com.oracle.javafx.scenebuilder.app.selectionbar,
  com.oracle.javafx.scenebuilder.kit.editor,
  com.oracle.javafx.scenebuilder.kit.editor.i18n,
