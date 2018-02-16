@@ -14,7 +14,7 @@ sb4e is an integration of [Scene Builder](http://gluonhq.com/products/scene-buil
 ### Installing
 Extensions can be installed into Eclipse using the "Install New Software" wizard, accessible from the Help menu as shown below:
 
-![](access_wizard.png) 
+![](accesswizard.png) 
 
 sb4e is hosted at http://files.idi.ntnu.no/publish/sb4e-SNAPSHOT/repository/, so enter this in the "Work with" field of the wizard and press enter. sb4e should appear, perhaps after some time, as the only item. Check it, and follow the wizard until completion. A restart of Eclipse is needed when the installation is complete.
 ![](install_wizard.png)
