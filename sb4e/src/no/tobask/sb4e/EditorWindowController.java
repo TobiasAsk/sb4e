@@ -8,6 +8,7 @@ import com.oracle.javafx.scenebuilder.kit.editor.panel.content.ContentPanelContr
 import com.oracle.javafx.scenebuilder.kit.editor.panel.hierarchy.HierarchyPanelController;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.library.LibraryPanelController;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.util.AbstractFxmlWindowController;
+import com.oracle.javafx.scenebuilder.kit.editor.search.SearchController;
 
 import javafx.fxml.FXML;
 import javafx.scene.layout.StackPane;
@@ -21,6 +22,7 @@ public class EditorWindowController extends AbstractFxmlWindowController {
 	SelectionBarController selectionBarController;
 	HierarchyPanelController hierarchyPanelController;
 	InfoPanelController infoPanelController;
+	SearchController librarySearchController;
 	
 	@FXML
 	StackPane libraryPanelHost;
@@ -32,6 +34,8 @@ public class EditorWindowController extends AbstractFxmlWindowController {
 	StackPane hierarchyPanelHost;
 	@FXML
 	StackPane infoPanelHost;
+	@FXML
+	StackPane librarySearchPanelHost;
 
 	public EditorWindowController(EditorController editorController) {
 		super(EditorWindowController.class.getResource("EditorWindow.fxml"), I18N.getBundle(), false);
@@ -41,6 +45,7 @@ public class EditorWindowController extends AbstractFxmlWindowController {
 		selectionBarController = new SelectionBarController(editorController);
 		hierarchyPanelController = new HierarchyPanelController(editorController);
 		infoPanelController = new InfoPanelController(editorController);
+		librarySearchController = new SearchController(editorController);
 	}
 	
 	@Override
@@ -50,6 +55,10 @@ public class EditorWindowController extends AbstractFxmlWindowController {
 		selectionBarHost.getChildren().add(selectionBarController.getPanelRoot());
 		hierarchyPanelHost.getChildren().add(hierarchyPanelController.getPanelRoot());
 		infoPanelHost.getChildren().add(infoPanelController.getPanelRoot());
+		librarySearchPanelHost.getChildren().add(librarySearchController.getPanelRoot());
+		
+		librarySearchController.textProperty().addListener((ov, oldStr, newStr) ->
+			libraryPanelController.setSearchPattern(newStr));
 	}
 
 	@Override
