@@ -12,6 +12,7 @@ import com.oracle.javafx.scenebuilder.kit.editor.panel.inspector.InspectorPanelC
 
 import javafx.embed.swt.FXCanvas;
 import javafx.scene.Scene;
+import no.tobask.sb4e.InspectorViewController;
 import no.tobask.sb4e.editors.FXMLEditor;
 
 public class InspectorView extends ViewPart implements IPartListener {
@@ -26,7 +27,9 @@ public class InspectorView extends ViewPart implements IPartListener {
 	public void createPartControl(Composite parent) {
 		FXCanvas canvas = new FXCanvas(parent, SWT.NONE);
 		inspectorPanelController = new InspectorPanelController(defaultEditorController);
-		canvas.setScene(new Scene(inspectorPanelController.getPanelRoot()));
+		InspectorViewController inspectorViewController =
+				new InspectorViewController(defaultEditorController, inspectorPanelController);
+		canvas.setScene(inspectorViewController.getScene());
 		getSite().getWorkbenchWindow().getPartService().addPartListener(this);
 	}
 	
