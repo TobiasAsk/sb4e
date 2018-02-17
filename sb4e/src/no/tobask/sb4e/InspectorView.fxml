@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" maxWidth="450.0"
+	minWidth="280.0" styleClass="theme-presets">
+	<children>
+		<HBox id="InspectorPanelHeader" alignment="CENTER" spacing="0.0"
+			styleClass="panel-header" VBox.vgrow="NEVER">
+			<children>
+				<Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+					minWidth="-Infinity" text="%inspector" HBox.hgrow="NEVER" />
+				<StackPane fx:id="inspectorSearchPanelHost" prefHeight="-1.0"
+					prefWidth="30.0" HBox.hgrow="ALWAYS" />
+				<MenuButton fx:id="InspectorMenu" contentDisplay="GRAPHIC_ONLY"
+					mnemonicParsing="false" text="" HBox.hgrow="NEVER">
+					<items>
+						<RadioMenuItem mnemonicParsing="false"
+							onAction="#onInspectorShowAllAction" selected="true"
+							text="%inspector.show.all">
+							<toggleGroup>
+								<ToggleGroup fx:id="showTg" />
+							</toggleGroup>
+						</RadioMenuItem>
+						<RadioMenuItem disable="false" mnemonicParsing="false"
+							onAction="#onInspectorShowEditedAction" text="%inspector.show.edited"
+							toggleGroup="$showTg" />
+						<SeparatorMenuItem mnemonicParsing="false" />
+						<RadioMenuItem mnemonicParsing="false"
+							onAction="#onInspectorViewSectionsAction" selected="true"
+							text="%inspector.view.sections">
+							<toggleGroup>
+								<ToggleGroup fx:id="viewTg" />
+							</toggleGroup>
+						</RadioMenuItem>
+						<RadioMenuItem mnemonicParsing="false"
+							onAction="#onInspectorViewByPropertyNameAction" text="%inspector.by.property.name"
+							toggleGroup="$viewTg" />
+						<RadioMenuItem mnemonicParsing="false"
+							onAction="#onInspectorViewByPropertyTypeAction" text="%inspector.by.property.type"
+							toggleGroup="$viewTg" />
+					</items>
+					<graphic>
+						<Region prefHeight="10.0" prefWidth="10.0" styleClass="cog-shape" />
+					</graphic>
+				</MenuButton>
+			</children>
+		</HBox>
+		<StackPane fx:id="inspectorPanelHost" VBox.vgrow="ALWAYS" />
+	</children>
+	<stylesheets>
+		<URL value="/com/oracle/javafx/scenebuilder/app/css/DocumentWindow.css" />
+	</stylesheets>
+</VBox>
+

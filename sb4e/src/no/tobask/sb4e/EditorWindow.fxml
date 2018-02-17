@@ -1,50 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Accordion?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TitledPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
+<?import java.net.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<SplitPane dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.151" xmlns:fx="http://javafx.com/fxml/1">
-  <items>
-      <SplitPane fx:id="libraryDocumentSplitPane" dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
-        <items>
-            <VBox prefHeight="200.0" prefWidth="100.0">
-               <children>
-                  <HBox prefHeight="100.0" prefWidth="200.0" />
-                  <StackPane fx:id="libraryPanelHost" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
-               </children>
-            </VBox>
-            <VBox prefHeight="200.0" prefWidth="100.0">
-               <children>
-                  <HBox prefHeight="100.0" prefWidth="200.0" />
-                  <Accordion>
-                    <panes>
-                      <TitledPane animated="false" text="untitled 1">
-                           <content>
-                              <StackPane fx:id="hierarchyPanelHost" prefHeight="150.0" prefWidth="200.0" />
-                           </content>
-                      </TitledPane>
-                      <TitledPane animated="false" text="untitled 2">
-                           <content>
-                              <StackPane fx:id="infoPanelHost" prefHeight="150.0" prefWidth="200.0" />
-                           </content>
-                      </TitledPane>
-                    </panes>
-                  </Accordion>
-               </children>
-            </VBox>
-        </items>
-      </SplitPane>
-      <BorderPane prefHeight="200.0" prefWidth="200.0">
-         <center>
-            <StackPane fx:id="contentPanelHost" prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-         </center>
-         <top>
-            <StackPane fx:id="selectionBarHost" prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-         </top></BorderPane>
-  </items>
+<SplitPane id="MainWindow" dividerPositions="0.2, 0.8"
+	prefHeight="-1.0" prefWidth="-1.0" xmlns="http://javafx.com/javafx/8.0.151"
+	xmlns:fx="http://javafx.com/fxml/1" styleClass="theme-presets">
+	<items>
+		<SplitPane fx:id="libraryDocumentSplitPane"
+			dividerPositions="0.5" orientation="VERTICAL" maxWidth="450.0"
+			minWidth="280.0" SplitPane.resizableWithParent="false">
+			<items>
+				<VBox id="Library" prefHeight="200.0" prefWidth="100.0">
+					<children>
+						<HBox id="LibraryPanelHeader" alignment="CENTER" spacing="0.0"
+							styleClass="panel-header">
+							<children>
+								<Label maxHeight="-Infinity" maxWidth="-Infinity"
+									minHeight="-Infinity" minWidth="-Infinity" text="Library"
+									HBox.hgrow="NEVER" />
+								<StackPane fx:id="librarySearchPanelHost" maxHeight="-1.0"
+									maxWidth="-1.0" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0"
+									prefWidth="-1.0" style="" HBox.hgrow="ALWAYS" />
+								<MenuButton fx:id="libraryMenuButton"
+									mnemonicParsing="false" HBox.hgrow="NEVER">
+									<items>
+										<MenuItem mnemonicParsing="false" text="Action 1" />
+										<MenuItem mnemonicParsing="false" text="Action 2" />
+									</items>
+									<graphic>
+										<Region prefHeight="10.0" prefWidth="10.0" styleClass="cog-shape" />
+									</graphic>
+								</MenuButton>
+							</children>
+						</HBox>
+						<StackPane fx:id="libraryPanelHost" prefHeight="-1.0"
+							prefWidth="-1.0" VBox.vgrow="ALWAYS" />
+					</children>
+				</VBox>
+				<VBox minHeight="50.0" prefHeight="200.0" prefWidth="100.0">
+					<children>
+						<HBox id="DocumentHeader" styleClass="panel-header"
+							alignment="CENTER" spacing="0.0" VBox.vgrow="NEVER">
+							<children>
+								<Label maxHeight="-Infinity" maxWidth="-Infinity"
+									minHeight="-Infinity" minWidth="-Infinity" text="Document"
+									HBox.hgrow="NEVER" />
+								<Pane maxWidth="1.7976931348623157E308" prefHeight="-1.0"
+									prefWidth="-1.0" HBox.hgrow="ALWAYS" />
+								<MenuButton contentDisplay="GRAPHIC_ONLY"
+									mnemonicParsing="false" text="" HBox.hgrow="NEVER">
+									<items>
+										<Menu mnemonicParsing="false" text="%hierarchy.displays">
+											<items>
+												<RadioMenuItem fx:id="showInfoMenuItem"
+													mnemonicParsing="false" onAction="#onHierarchyShowInfo"
+													selected="true" text="%hierarchy.displayoption.info">
+													<toggleGroup>
+														<ToggleGroup fx:id="hierarchyDisplayOptionTG" />
+													</toggleGroup>
+												</RadioMenuItem>
+												<RadioMenuItem fx:id="showFxIdMenuItem"
+													mnemonicParsing="false" onAction="#onHierarchyShowFxId"
+													text="%hierarchy.displayoption.fxid" toggleGroup="$hierarchyDisplayOptionTG" />
+												<RadioMenuItem fx:id="showNodeIdMenuItem"
+													mnemonicParsing="false" onAction="#onHierarchyShowNodeId"
+													text="%hierarchy.displayoption.nodeid" toggleGroup="$hierarchyDisplayOptionTG" />
+											</items>
+										</Menu>
+									</items>
+									<graphic>
+										<Region prefHeight="10.0" prefWidth="10.0" styleClass="cog-shape" />
+									</graphic>
+								</MenuButton>
+							</children>
+						</HBox>
+						<Accordion maxHeight="-1.0" VBox.vgrow="ALWAYS">
+							<panes>
+								<TitledPane animated="true" text="%hierarchy">
+									<content>
+										<StackPane fx:id="hierarchyPanelHost" maxHeight="-1.0"
+											style="-fx-padding: 0;" />
+									</content>
+								</TitledPane>
+								<TitledPane animated="true" text="%controller">
+									<content>
+										<StackPane fx:id="infoPanelHost" maxHeight="-1.0"
+											style="-fx-padding: 0;" />
+									</content>
+								</TitledPane>
+							</panes>
+						</Accordion>
+					</children>
+				</VBox>
+			</items>
+		</SplitPane>
+		<StackPane id="ContentStackPane" minWidth="0.0">
+			<children>
+				<StackPane fx:id="contentPanelHost" style="" />
+				<StackPane fx:id="messageBarHost" maxHeight="-Infinity"
+					minHeight="10.0" minWidth="0.0" style="" styleClass="selection-bar-container"
+					StackPane.alignment="TOP_CENTER">
+				</StackPane>
+			</children>
+		</StackPane>
+	</items>
+	<stylesheets>
+		<URL value="/com/oracle/javafx/scenebuilder/app/css/DocumentWindow.css" />
+	</stylesheets>
 </SplitPane>
