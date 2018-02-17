@@ -6,15 +6,16 @@
 
 <SplitPane id="MainWindow" dividerPositions="0.2, 0.8"
 	prefHeight="-1.0" prefWidth="-1.0" xmlns="http://javafx.com/javafx/8.0.151"
-	xmlns:fx="http://javafx.com/fxml/1">
+	xmlns:fx="http://javafx.com/fxml/1" styleClass="theme-presets">
 	<items>
 		<SplitPane fx:id="libraryDocumentSplitPane"
 			dividerPositions="0.5" orientation="VERTICAL" maxWidth="450.0"
 			minWidth="280.0" SplitPane.resizableWithParent="false">
 			<items>
-				<VBox prefHeight="200.0" prefWidth="100.0">
+				<VBox id="Library" prefHeight="200.0" prefWidth="100.0">
 					<children>
-						<HBox alignment="CENTER" spacing="0.0">
+						<HBox id="LibraryPanelHeader" alignment="CENTER" spacing="0.0"
+							styleClass="panel-header">
 							<children>
 								<Label maxHeight="-Infinity" maxWidth="-Infinity"
 									minHeight="-Infinity" minWidth="-Infinity" text="Library"
@@ -28,6 +29,9 @@
 										<MenuItem mnemonicParsing="false" text="Action 1" />
 										<MenuItem mnemonicParsing="false" text="Action 2" />
 									</items>
+									<graphic>
+										<Region prefHeight="10.0" prefWidth="10.0" styleClass="cog-shape" />
+									</graphic>
 								</MenuButton>
 							</children>
 						</HBox>
@@ -35,16 +39,17 @@
 							prefWidth="-1.0" VBox.vgrow="ALWAYS" />
 					</children>
 				</VBox>
-				<VBox prefHeight="200.0" prefWidth="100.0">
+				<VBox minHeight="50.0" prefHeight="200.0" prefWidth="100.0">
 					<children>
-						<HBox alignment="CENTER" spacing="0.0" VBox.vgrow="NEVER">
+						<HBox id="DocumentHeader" styleClass="panel-header"
+							alignment="CENTER" spacing="0.0" VBox.vgrow="NEVER">
 							<children>
 								<Label maxHeight="-Infinity" maxWidth="-Infinity"
 									minHeight="-Infinity" minWidth="-Infinity" text="Document"
 									HBox.hgrow="NEVER" />
 								<Pane maxWidth="1.7976931348623157E308" prefHeight="-1.0"
 									prefWidth="-1.0" HBox.hgrow="ALWAYS" />
-								<MenuButton fx:id="" contentDisplay="GRAPHIC_ONLY"
+								<MenuButton contentDisplay="GRAPHIC_ONLY"
 									mnemonicParsing="false" text="" HBox.hgrow="NEVER">
 									<items>
 										<Menu mnemonicParsing="false" text="%hierarchy.displays">
@@ -97,11 +102,11 @@
 				<StackPane fx:id="messageBarHost" maxHeight="-Infinity"
 					minHeight="10.0" minWidth="0.0" style="" styleClass="selection-bar-container"
 					StackPane.alignment="TOP_CENTER">
-					<stylesheets>
-						<URL value="@../../../com/oracle/javafx/scenebuilder/app/css/DocumentWindow.css" />
-					</stylesheets>
 				</StackPane>
 			</children>
 		</StackPane>
 	</items>
+	<stylesheets>
+		<URL value="/com/oracle/javafx/scenebuilder/app/css/DocumentWindow.css" />
+	</stylesheets>
 </SplitPane>
