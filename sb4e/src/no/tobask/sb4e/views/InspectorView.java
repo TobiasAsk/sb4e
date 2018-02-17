@@ -3,7 +3,9 @@ package no.tobask.sb4e.views;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 
@@ -11,7 +13,6 @@ import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.inspector.InspectorPanelController;
 
 import javafx.embed.swt.FXCanvas;
-import javafx.scene.Scene;
 import no.tobask.sb4e.InspectorViewController;
 import no.tobask.sb4e.editors.FXMLEditor;
 
@@ -37,16 +38,14 @@ public class InspectorView extends ViewPart implements IPartListener {
 	}
 	
 	private boolean anyFxmlEditorsVisible() {
-//		IWorkbenchPage activePage = getSite().getWorkbenchWindow().getActivePage();
-//		for (IEditorReference editorReference : activePage.getEditorReferences()) {
-//			IWorkbenchPart part = editorReference.getPart(false);
-//			if (part instanceof FXMLEditor && activePage.isPartVisible(part)) {
-//				return true;
-//			}
-//		}
-//		return false;
-		return getSite().getWorkbenchWindow().getActivePage().getActiveEditor()
-				instanceof FXMLEditor;
+		IWorkbenchPage activePage = getSite().getWorkbenchWindow().getActivePage();
+		for (IEditorReference editorReference : activePage.getEditorReferences()) {
+			IWorkbenchPart part = editorReference.getPart(false);
+			if (part instanceof FXMLEditor && activePage.isPartVisible(part)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
