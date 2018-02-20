@@ -31,3 +31,7 @@ integrationtest-job:
     - build-job
   script:
     - "mvn verify -f sb4e.parent/pom.xml $MAVEN_CLI_OPTS"
+  artifacts:
+    paths:
+    - sb4e.repository/target/repository
+    expire_in: 1 week
