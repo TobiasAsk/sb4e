@@ -35,6 +35,8 @@ import org.eclipse.jdt.core.Signature;
 
 import com.oracle.javafx.scenebuilder.kit.glossary.Glossary;
 
+import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 
 public class JavaProjectGlossary extends Glossary implements IElementChangedListener {
@@ -215,19 +217,36 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 	}
 
 	private boolean isEventHandler(IMethod method) {
-		boolean isFxmlAnnotated = method.getAnnotation("FXML").exists();
+		String fxml = FXML.class.getSimpleName();
 		try {
-			boolean returnsVoid = method.getReturnType().equals("V");
-			ILocalVariable firstParameter = method.getParameters()[0];
-			IType declaringType = method.getDeclaringType();
-			String typeSignature = firstParameter.getTypeSignature();
-			String simpleName = Signature.getSignatureSimpleName(typeSignature);
-			String[][] resolvedNames = declaringType.resolveType(simpleName);
-			String qualifiedName = Signature.toQualifiedName(resolvedNames[0]);
+			boolean isFxmlAnnotated = method.getAnnotation(fxml).exists();
+			boolean returnsVoid = method.getReturnType().equals(Signature.SIG_VOID);
+			if (isFxmlAnnotated && returnsVoid) {
+				// valid ones are:
+				// 1) zero parameters
+				// 2) one parameter of javafx.event type
+				// 3) three parameters, where the first one is of ObservableValue type
+				ILocalVariable[] parameters = method.getParameters();
+				if (parameters.length == 0) {
+					return true;
+				} else if (parameters.length == 1) {
+					return isSubclass(parameters[0], Event.class);
+				} else if (parameters.length == 3) {
+					return isSubclass(parameters[0], ObservableValue.class);
+				}
+			}
 		} catch (JavaModelException e) {
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	private boolean isSubclass(ILocalVariable parameter, Class<?> clazz) throws JavaModelException {
+		String simpleName = Signature.getSignatureSimpleName(parameter.getTypeSignature());
+		IType declaringType = parameter.getDeclaringMember().getDeclaringType();
+		String[][] resolvedNames = declaringType.resolveType(simpleName);
+		String superClassName = resolvedNames[0][0];
+		return superClassName.equals(Signature.getQualifier(clazz.getName()));
 	}
 
 	private Map<String, List<String>> getFxIds(ICompilationUnit controller) {
