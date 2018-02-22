@@ -35,6 +35,8 @@ import org.eclipse.jdt.core.Signature;
 
 import com.oracle.javafx.scenebuilder.kit.glossary.Glossary;
 
+import javafx.fxml.FXML;
+
 public class JavaProjectGlossary extends Glossary implements IElementChangedListener {
 
 	private String controllerClassName;
@@ -147,9 +149,39 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 	}
 
 	private boolean isCandidateControllerClass(ICompilationUnit javaClass, URL fxmlLocation) {
-		return true;
+		IType type = javaClass.findPrimaryType();
+		return hasNoOrEmptyConstructor(type) && hasFxmlAnnotatedMembers(type);
+	}
+	
+	private boolean hasFxmlAnnotatedMembers(IType type) {
+		String fxml = FXML.class.getSimpleName();
+		try {
+			List<IMethod> methods = new ArrayList<>(Arrays.asList(type.getMethods()));
+			List<IField> fields = new ArrayList<>(Arrays.asList(type.getFields()));
+			boolean anyMethodsAnnotated = methods.stream().anyMatch(m ->
+					m.getAnnotation(fxml).exists());
+			boolean anyFieldsAnnotated = fields.stream().anyMatch(f -> 
+					f.getAnnotation(fxml).exists());
+			return anyFieldsAnnotated || anyMethodsAnnotated;
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
+	private boolean hasNoOrEmptyConstructor(IType type) {
+		try {
+			for (IMethod method : type.getMethods()) {
+				if (method.isConstructor()) {
+					return method.getParameters().length == 0;
+				}
+			}
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+		}
+		return true;
+	}
+		
 	private ICompilationUnit discoverController(URL fxmlLocation, String controllerName) {
 		String packageName = getPackageContainingFile(fxmlLocation).getElementName();
 		IJavaProject project = getJavaProjectFromUrl(fxmlLocation);
