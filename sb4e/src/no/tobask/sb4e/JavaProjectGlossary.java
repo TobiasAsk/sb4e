@@ -44,6 +44,7 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 	private String controllerClassName;
 	private Map<String, List<String>> fxIds;
 	private List<String> eventHandlers;
+	private static final String FXML_ANNOTATION = FXML.class.getSimpleName();
 
 	public JavaProjectGlossary() {
 		JavaCore.addElementChangedListener(this, ElementChangedEvent.POST_CHANGE);
@@ -156,14 +157,13 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 	}
 	
 	private boolean hasFxmlAnnotatedMembers(IType type) {
-		String fxml = FXML.class.getSimpleName();
 		try {
 			List<IMethod> methods = new ArrayList<>(Arrays.asList(type.getMethods()));
 			List<IField> fields = new ArrayList<>(Arrays.asList(type.getFields()));
 			boolean anyMethodsAnnotated = methods.stream().anyMatch(m ->
-					m.getAnnotation(fxml).exists());
+					m.getAnnotation(FXML_ANNOTATION).exists());
 			boolean anyFieldsAnnotated = fields.stream().anyMatch(f -> 
-					f.getAnnotation(fxml).exists());
+					f.getAnnotation(FXML_ANNOTATION).exists());
 			return anyFieldsAnnotated || anyMethodsAnnotated;
 		} catch (JavaModelException e) {
 			e.printStackTrace();
@@ -217,9 +217,8 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 	}
 
 	private boolean isEventHandler(IMethod method) {
-		String fxml = FXML.class.getSimpleName();
 		try {
-			boolean isFxmlAnnotated = method.getAnnotation(fxml).exists();
+			boolean isFxmlAnnotated = method.getAnnotation(FXML_ANNOTATION).exists();
 			boolean returnsVoid = method.getReturnType().equals(Signature.SIG_VOID);
 			if (isFxmlAnnotated && returnsVoid) {
 				// valid ones are:
@@ -254,7 +253,7 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 		IType type = controller.findPrimaryType();
 		try {
 			for (IField field : type.getFields()) {
-				if (field.getAnnotation("FXML").exists()) {
+				if (field.getAnnotation(FXML_ANNOTATION).exists()) {
 					addToIds(ids, field);
 				}
 			}
