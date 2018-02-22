@@ -6,7 +6,7 @@
   <parent>
   	<groupId>no.tobask.sb4e</groupId>
   	<artifactId>no.tobask.sb4e.parent</artifactId>
-  	<version>0.0.1-SNAPSHOT</version>
+  	<version>0.9.0</version>
   	<relativePath>../sb4e.parent</relativePath>
   </parent>
 </project>

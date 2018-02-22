@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/no.tobask.sb4e.feature_0.0.1.qualifier.jar" id="no.tobask.sb4e.feature" version="0.0.1.qualifier">
+   <feature url="features/no.tobask.sb4e.feature_0.9.0.jar" id="no.tobask.sb4e.feature" version="0.9.0">
       <category name="no.tobask.sb4e"/>
    </feature>
    <category-def name="no.tobask.sb4e" label="no.tobask.sb4e"/>
