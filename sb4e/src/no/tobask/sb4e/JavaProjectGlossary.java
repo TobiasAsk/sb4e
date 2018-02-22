@@ -35,11 +35,16 @@ import org.eclipse.jdt.core.Signature;
 
 import com.oracle.javafx.scenebuilder.kit.glossary.Glossary;
 
+import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
+import javafx.fxml.FXML;
+
 public class JavaProjectGlossary extends Glossary implements IElementChangedListener {
 
 	private String controllerClassName;
 	private Map<String, List<String>> fxIds;
 	private List<String> eventHandlers;
+	private static final String FXML_ANNOTATION = FXML.class.getSimpleName();
 
 	public JavaProjectGlossary() {
 		JavaCore.addElementChangedListener(this, ElementChangedEvent.POST_CHANGE);
@@ -63,9 +68,9 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 		}
 		if (fxIds == null) {
 			ICompilationUnit controller = discoverController(fxmlLocation, controllerClass);
-			fxIds = controller == null ? getFxIds(controller) : new HashMap<>();
+			fxIds = controller == null ? new HashMap<>() : getFxIds(controller);
 		}
-		return fxIds.getOrDefault(getClassName(targetType), new ArrayList<>());
+		return fxIds.getOrDefault(Signature.getSimpleName(targetType.getName()), new ArrayList<>());
 	}
 
 	@Override
@@ -76,7 +81,7 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 		if (eventHandlers == null) {
 			ICompilationUnit controller = discoverController(fxmlLocation, controllerClass);
 			eventHandlers = controller == null ?
-					getEventHandlers(controller) : new ArrayList<>();
+					new ArrayList<>() : getEventHandlers(controller);
 		}
 		return eventHandlers;
 	}
@@ -147,9 +152,38 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 	}
 
 	private boolean isCandidateControllerClass(ICompilationUnit javaClass, URL fxmlLocation) {
-		return true;
+		IType type = javaClass.findPrimaryType();
+		return hasNoOrEmptyConstructor(type) && hasFxmlAnnotatedMembers(type);
+	}
+	
+	private boolean hasFxmlAnnotatedMembers(IType type) {
+		try {
+			List<IMethod> methods = new ArrayList<>(Arrays.asList(type.getMethods()));
+			List<IField> fields = new ArrayList<>(Arrays.asList(type.getFields()));
+			boolean anyMethodsAnnotated = methods.stream().anyMatch(m ->
+					m.getAnnotation(FXML_ANNOTATION).exists());
+			boolean anyFieldsAnnotated = fields.stream().anyMatch(f -> 
+					f.getAnnotation(FXML_ANNOTATION).exists());
+			return anyFieldsAnnotated || anyMethodsAnnotated;
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
+	private boolean hasNoOrEmptyConstructor(IType type) {
+		try {
+			for (IMethod method : type.getMethods()) {
+				if (method.isConstructor()) {
+					return method.getParameters().length == 0;
+				}
+			}
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+		}
+		return true;
+	}
+		
 	private ICompilationUnit discoverController(URL fxmlLocation, String controllerName) {
 		String packageName = getPackageContainingFile(fxmlLocation).getElementName();
 		IJavaProject project = getJavaProjectFromUrl(fxmlLocation);
@@ -160,11 +194,6 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 			}
 		}
 		return null;
-	}
-
-	private String getClassName(Class<?> clas) {
-		int classNameStartIdx = clas.getName().lastIndexOf(".") + 1;
-		return clas.getName().substring(classNameStartIdx);
 	}
 
 	private List<String> getEventHandlers(ICompilationUnit controller) {
@@ -183,19 +212,35 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 	}
 
 	private boolean isEventHandler(IMethod method) {
-		boolean isFxmlAnnotated = method.getAnnotation("FXML").exists();
 		try {
-			boolean returnsVoid = method.getReturnType().equals("V");
-			ILocalVariable firstParameter = method.getParameters()[0];
-			IType declaringType = method.getDeclaringType();
-			String typeSignature = firstParameter.getTypeSignature();
-			String simpleName = Signature.getSignatureSimpleName(typeSignature);
-			String[][] resolvedNames = declaringType.resolveType(simpleName);
-			String qualifiedName = Signature.toQualifiedName(resolvedNames[0]);
+			boolean isFxmlAnnotated = method.getAnnotation(FXML_ANNOTATION).exists();
+			boolean returnsVoid = method.getReturnType().equals(Signature.SIG_VOID);
+			if (isFxmlAnnotated && returnsVoid) {
+				// valid ones are:
+				// 1) zero parameters
+				// 2) one parameter of javafx.event type
+				// 3) three parameters, where the first one is of ObservableValue type
+				ILocalVariable[] parameters = method.getParameters();
+				if (parameters.length == 0) {
+					return true;
+				} else if (parameters.length == 1) {
+					return isSubclass(parameters[0], Event.class);
+				} else if (parameters.length == 3) {
+					return isSubclass(parameters[0], ObservableValue.class);
+				}
+			}
 		} catch (JavaModelException e) {
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	private boolean isSubclass(ILocalVariable parameter, Class<?> clazz) throws JavaModelException {
+		String simpleName = Signature.getSignatureSimpleName(parameter.getTypeSignature());
+		IType declaringType = parameter.getDeclaringMember().getDeclaringType();
+		String[][] resolvedNames = declaringType.resolveType(simpleName);
+		String superClassName = resolvedNames[0][0];
+		return superClassName.equals(Signature.getQualifier(clazz.getName()));
 	}
 
 	private Map<String, List<String>> getFxIds(ICompilationUnit controller) {
@@ -203,7 +248,7 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 		IType type = controller.findPrimaryType();
 		try {
 			for (IField field : type.getFields()) {
-				if (field.getAnnotation("FXML").exists()) {
+				if (field.getAnnotation(FXML_ANNOTATION).exists()) {
 					addToIds(ids, field);
 				}
 			}
@@ -215,8 +260,7 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 
 	private void addToIds(Map<String, List<String>> ids, IField field) {
 		try {
-			String typeName = field.getTypeSignature();
-			typeName = typeName.substring(1, typeName.length()-1);
+			String typeName = Signature.getSignatureSimpleName(field.getTypeSignature());
 			String fieldName = field.getElementName();
 			List<String> existingIds = ids.putIfAbsent(typeName,
 					new ArrayList<>(Arrays.asList(fieldName)));
