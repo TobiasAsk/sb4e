@@ -11,4 +11,5 @@
 		<relativePath>../sb4e.parent</relativePath>
 	</parent>
 
+	<version>8.0.0</version>
 </project>
