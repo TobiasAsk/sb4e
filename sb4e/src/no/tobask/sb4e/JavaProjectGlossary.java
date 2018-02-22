@@ -63,7 +63,7 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 		}
 		if (fxIds == null) {
 			ICompilationUnit controller = discoverController(fxmlLocation, controllerClass);
-			fxIds = controller == null ? getFxIds(controller) : new HashMap<>();
+			fxIds = controller == null ? new HashMap<>() : getFxIds(controller);
 		}
 		return fxIds.getOrDefault(getClassName(targetType), new ArrayList<>());
 	}
@@ -76,7 +76,7 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 		if (eventHandlers == null) {
 			ICompilationUnit controller = discoverController(fxmlLocation, controllerClass);
 			eventHandlers = controller == null ?
-					getEventHandlers(controller) : new ArrayList<>();
+					new ArrayList<>() : getEventHandlers(controller);
 		}
 		return eventHandlers;
 	}
