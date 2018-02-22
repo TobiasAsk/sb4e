@@ -70,7 +70,7 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 			ICompilationUnit controller = discoverController(fxmlLocation, controllerClass);
 			fxIds = controller == null ? new HashMap<>() : getFxIds(controller);
 		}
-		return fxIds.getOrDefault(getClassName(targetType), new ArrayList<>());
+		return fxIds.getOrDefault(Signature.getSimpleName(targetType.getName()), new ArrayList<>());
 	}
 
 	@Override
@@ -196,11 +196,6 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 		return null;
 	}
 
-	private String getClassName(Class<?> clas) {
-		int classNameStartIdx = clas.getName().lastIndexOf(".") + 1;
-		return clas.getName().substring(classNameStartIdx);
-	}
-
 	private List<String> getEventHandlers(ICompilationUnit controller) {
 		List<String> eventHandlers = new ArrayList<>();
 		IType type = controller.findPrimaryType();
@@ -265,8 +260,7 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 
 	private void addToIds(Map<String, List<String>> ids, IField field) {
 		try {
-			String typeName = field.getTypeSignature();
-			typeName = typeName.substring(1, typeName.length()-1);
+			String typeName = Signature.getSignatureSimpleName(field.getTypeSignature());
 			String fieldName = field.getElementName();
 			List<String> existingIds = ids.putIfAbsent(typeName,
 					new ArrayList<>(Arrays.asList(fieldName)));
