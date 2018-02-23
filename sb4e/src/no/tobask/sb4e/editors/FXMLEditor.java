@@ -11,15 +11,24 @@ import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.commands.operations.OperationHistoryFactory;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IField;
+import org.eclipse.jdt.core.ISourceRange;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.operations.RedoActionHandler;
 import org.eclipse.ui.operations.UndoActionHandler;
 import org.eclipse.ui.part.EditorPart;
@@ -29,11 +38,14 @@ import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
 import com.oracle.javafx.scenebuilder.kit.editor.JobManager;
 import com.oracle.javafx.scenebuilder.kit.editor.job.Job;
 import com.oracle.javafx.scenebuilder.kit.fxom.FXOMDocument;
+import com.oracle.javafx.scenebuilder.kit.fxom.FXOMObject;
 
+import javafx.beans.value.ChangeListener;
 import javafx.embed.swt.FXCanvas;
 import no.tobask.sb4e.CustomClassLoaderLibrary;
 import no.tobask.sb4e.EclipseProjectsClassLoader;
 import no.tobask.sb4e.EditorWindowController;
+import no.tobask.sb4e.JavaModelUtils;
 import no.tobask.sb4e.JavaProjectGlossary;
 
 public class FXMLEditor extends EditorPart {
@@ -45,6 +57,7 @@ public class FXMLEditor extends EditorPart {
 	private RedoActionHandler redoActionHandler;
 	private IUndoContext undoContext;
 	private IOperationHistory operationHistory;
+	private ICompilationUnit controllerClass;
 	
 	public IAction getUndoActionHandler() {
 		return undoActionHandler;
@@ -124,6 +137,75 @@ public class FXMLEditor extends EditorPart {
 			e.printStackTrace();
 		}
 		canvas.setScene(editorWindowController.getScene());
+		editorController.getSelection().revisionProperty().addListener(editorSelectionListener);
+	}
+	
+	private ChangeListener<Number> editorSelectionListener = (oV, oldNum, newNum) -> {
+		String controllerName = editorController.getFxomDocument().getFxomRoot().getFxController();
+		if (controllerName == null) {
+			return;
+		}
+		if (controllerClass == null || !controllerClass.getElementName().equals(controllerName)) {
+			controllerClass = JavaModelUtils.getClass(fxmlUrl, controllerName);
+			if (controllerClass == null) {
+				return;
+			}
+		}
+		IEditorPart editor = getEditorEditingController();
+		if (editor != null) {
+			try {
+				FXOMObject selectedObject = editorController.getSelection().getHitItem();
+				if (selectedObject != null) {
+					String fxId = selectedObject.getFxId();
+					if (fxId != null) {
+						int[] location = getLocation(fxId, controllerClass);
+						if (location != null) {
+							IFile file = ((FileEditorInput) editor.getEditorInput())
+									.getFile();
+							IDE.gotoMarker(editor, createMarker(file, location));
+						}
+					}
+				}
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+	};
+	
+	private IMarker createMarker(IFile file, int[] location) throws CoreException {
+		IMarker marker = file.createMarker(IMarker.TEXT);
+		marker.setAttribute(IMarker.CHAR_START, location[0]);
+		marker.setAttribute(IMarker.CHAR_END, location[1]);
+		return marker;
+	}
+	
+	private IEditorPart getEditorEditingController() {
+		for (IEditorReference editorRef : getSite().getPage().getEditorReferences()) {
+			IEditorPart editor = editorRef.getEditor(false);
+			if (editor.getEditorInput() instanceof FileEditorInput) {
+				IFile file = ((FileEditorInput) editor.getEditorInput()).getFile();
+				if (file.getName().equals(controllerClass.getElementName())) {
+					return editor;
+				}
+			}
+		}
+		return null;
+	}
+	
+	private int[] getLocation(String fxId, ICompilationUnit controllerClass) {
+		IType type = controllerClass.findPrimaryType();
+		IField field = type.getField(fxId);
+		if (field.exists()) {
+			try {
+				ISourceRange sourceRange = field.getSourceRange();
+				int end = sourceRange.getOffset() + sourceRange.getLength();
+				int start = end - fxId.length();
+				return new int[] {start-1, end-1};
+			} catch (JavaModelException e) {
+				e.printStackTrace();
+			}			
+		}
+		return null;
 	}
 	
 	private boolean isFreshJob(Job job) {
@@ -131,7 +213,7 @@ public class FXMLEditor extends EditorPart {
     			.getRedoOperation(undoContext);
     	return topOperation == null || topOperation.getJob() != job;
 	}
-		
+
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		IFile file = ((FileEditorInput) getEditorInput()).getFile();
