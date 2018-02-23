@@ -211,26 +211,22 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 		return eventHandlers;
 	}
 
-	private boolean isEventHandler(IMethod method) {
-		try {
-			boolean isFxmlAnnotated = method.getAnnotation(FXML_ANNOTATION).exists();
-			boolean returnsVoid = method.getReturnType().equals(Signature.SIG_VOID);
-			if (isFxmlAnnotated && returnsVoid) {
-				// valid ones are:
-				// 1) zero parameters
-				// 2) one parameter of javafx.event type
-				// 3) three parameters, where the first one is of ObservableValue type
-				ILocalVariable[] parameters = method.getParameters();
-				if (parameters.length == 0) {
-					return true;
-				} else if (parameters.length == 1) {
-					return isSubclass(parameters[0], Event.class);
-				} else if (parameters.length == 3) {
-					return isSubclass(parameters[0], ObservableValue.class);
-				}
+	private boolean isEventHandler(IMethod method) throws JavaModelException {
+		boolean isFxmlAnnotated = method.getAnnotation(FXML_ANNOTATION).exists();
+		boolean returnsVoid = method.getReturnType().equals(Signature.SIG_VOID);
+		if (isFxmlAnnotated && returnsVoid) {
+			// valid ones are:
+			// 1) zero parameters
+			// 2) one parameter of javafx.event type
+			// 3) three parameters, where the first one is of ObservableValue type
+			ILocalVariable[] parameters = method.getParameters();
+			if (parameters.length == 0) {
+				return true;
+			} else if (parameters.length == 1) {
+				return isSubclass(parameters[0], Event.class);
+			} else if (parameters.length == 3) {
+				return isSubclass(parameters[0], ObservableValue.class);
 			}
-		} catch (JavaModelException e) {
-			e.printStackTrace();
 		}
 		return false;
 	}
@@ -258,17 +254,13 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 		return ids;
 	}
 
-	private void addToIds(Map<String, List<String>> ids, IField field) {
-		try {
-			String typeName = Signature.getSignatureSimpleName(field.getTypeSignature());
-			String fieldName = field.getElementName();
-			List<String> existingIds = ids.putIfAbsent(typeName,
-					new ArrayList<>(Arrays.asList(fieldName)));
-			if (existingIds != null) {
-				existingIds.add(fieldName);
-			}
-		} catch (JavaModelException e) {
-			e.printStackTrace();
+	private void addToIds(Map<String, List<String>> ids, IField field) throws JavaModelException {
+		String typeName = Signature.getSignatureSimpleName(field.getTypeSignature());
+		String fieldName = field.getElementName();
+		List<String> existingIds = ids.putIfAbsent(typeName,
+				new ArrayList<>(Arrays.asList(fieldName)));
+		if (existingIds != null) {
+			existingIds.add(fieldName);
 		}
 	}
 
