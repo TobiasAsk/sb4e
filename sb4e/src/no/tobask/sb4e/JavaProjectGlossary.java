@@ -11,12 +11,6 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.ElementChangedEvent;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IElementChangedListener;
@@ -27,7 +21,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -52,10 +45,10 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 
 	@Override
 	public List<String> queryControllerClasses(URL fxmlLocation) {
-		IJavaProject project = getJavaProjectFromUrl(fxmlLocation);
-		String packageName = getPackageContainingFile(fxmlLocation).getElementName();
+		IJavaProject project = JavaModelUtils.getJavaProjectFromUrl(fxmlLocation);
+		String packageName = JavaModelUtils.getPackageContainingFile(fxmlLocation).getElementName();
 		List<ICompilationUnit> candidates = new ArrayList<>();
-		for (IPackageFragment pkg : getAllMatchingPackages(packageName, project)) {
+		for (IPackageFragment pkg : JavaModelUtils.getAllMatchingPackages(packageName, project)) {
 			candidates.addAll(getCandidateControllers(pkg, fxmlLocation));
 		}
 		return candidates.stream().map(c -> c.getElementName()).collect(Collectors.toList());
@@ -67,7 +60,7 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 			controllerClassName = controllerClass;
 		}
 		if (fxIds == null) {
-			ICompilationUnit controller = discoverController(fxmlLocation, controllerClass);
+			ICompilationUnit controller = JavaModelUtils.getClass(fxmlLocation, controllerClass);
 			fxIds = controller == null ? new HashMap<>() : getFxIds(controller);
 		}
 		return fxIds.getOrDefault(Signature.getSimpleName(targetType.getName()), new ArrayList<>());
@@ -79,7 +72,7 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 			controllerClassName = controllerClass;
 		}
 		if (eventHandlers == null) {
-			ICompilationUnit controller = discoverController(fxmlLocation, controllerClass);
+			ICompilationUnit controller = JavaModelUtils.getClass(fxmlLocation, controllerClass);
 			eventHandlers = controller == null ?
 					new ArrayList<>() : getEventHandlers(controller);
 		}
@@ -95,46 +88,6 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 				eventHandlers = getEventHandlers(controllerClass);
 			}
 		}
-	}
-
-	private IJavaProject getJavaProjectFromUrl(URL url) {
-		IPath path = new Path(url.getPath());
-		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-		IFile file = workspaceRoot.getFileForLocation(path);
-		return JavaCore.create(file.getProject());
-	}
-
-	private IPackageFragment getPackageContainingFile(URL fxmlLocation) {
-		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-		IPath path = new Path(fxmlLocation.getPath()).removeLastSegments(1);
-		IFolder folder = (IFolder) workspaceRoot.getContainerForLocation(path);
-		return (IPackageFragment) JavaCore.create(folder);
-	}
-
-	private Collection<IPackageFragment> getAllMatchingPackages(String packageName,
-			IJavaProject project) {
-		Collection<IPackageFragment> packages = new ArrayList<>();
-		for (IPackageFragmentRoot folder : getSourceFolders(project)) {
-			IPackageFragment pkg = folder.getPackageFragment(packageName);
-			if (pkg.exists()) {
-				packages.add(pkg);
-			}
-		}
-		return packages;
-	}
-
-	private List<IPackageFragmentRoot> getSourceFolders(IJavaProject project) {
-		List<IPackageFragmentRoot> sourceFolders = new ArrayList<>();
-		try {
-			for (IPackageFragmentRoot root : project.getAllPackageFragmentRoots()) {
-				if (root.getKind() == IPackageFragmentRoot.K_SOURCE) {
-					sourceFolders.add(root);
-				}
-			}
-		} catch (JavaModelException e) {
-			e.printStackTrace();
-		}
-		return sourceFolders;
 	}
 
 	private Collection<ICompilationUnit> getCandidateControllers(IPackageFragment pkg,
@@ -184,18 +137,6 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 		return true;
 	}
 		
-	private ICompilationUnit discoverController(URL fxmlLocation, String controllerName) {
-		String packageName = getPackageContainingFile(fxmlLocation).getElementName();
-		IJavaProject project = getJavaProjectFromUrl(fxmlLocation);
-		for (IPackageFragment pkg : getAllMatchingPackages(packageName, project)) {
-			ICompilationUnit clazz = pkg.getCompilationUnit(controllerName);
-			if (clazz.exists()) {
-				return clazz;
-			}
-		}
-		return null;
-	}
-
 	private List<String> getEventHandlers(ICompilationUnit controller) {
 		List<String> eventHandlers = new ArrayList<>();
 		IType type = controller.findPrimaryType();
