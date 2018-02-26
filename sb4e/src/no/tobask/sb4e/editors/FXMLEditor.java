@@ -46,11 +46,11 @@ import javafx.beans.value.ChangeListener;
 import javafx.embed.swt.FXCanvas;
 import no.tobask.sb4e.CustomClassLoaderLibrary;
 import no.tobask.sb4e.EclipseProjectsClassLoader;
-import no.tobask.sb4e.EditorWindowController;
 import no.tobask.sb4e.JavaModelUtils;
 import no.tobask.sb4e.JavaProjectGlossary;
-import no.tobask.sb4e.SceneBuilderControlActionHandler;
-import no.tobask.sb4e.SceneBuilderEditActionHandler;
+import no.tobask.sb4e.handlers.SceneBuilderControlActionHandler;
+import no.tobask.sb4e.handlers.SceneBuilderEditActionHandler;
+import no.tobask.sb4e.handlers.SceneBuilderOperation;
 
 public class FXMLEditor extends EditorPart {
 

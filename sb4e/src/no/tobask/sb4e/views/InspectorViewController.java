@@ -1,4 +1,4 @@
-package no.tobask.sb4e;
+package no.tobask.sb4e.views;
 
 import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
 import com.oracle.javafx.scenebuilder.kit.editor.i18n.I18N;

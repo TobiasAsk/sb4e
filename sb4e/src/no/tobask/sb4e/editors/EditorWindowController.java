@@ -1,4 +1,4 @@
-package no.tobask.sb4e;
+package no.tobask.sb4e.editors;
 
 import com.oracle.javafx.scenebuilder.app.info.InfoPanelController;
 import com.oracle.javafx.scenebuilder.app.message.MessageBarController;

@@ -1,4 +1,4 @@
-package no.tobask.sb4e;
+package no.tobask.sb4e.handlers;
 
 import org.eclipse.jface.action.Action;
 

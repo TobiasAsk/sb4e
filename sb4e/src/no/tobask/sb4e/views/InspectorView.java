@@ -13,7 +13,6 @@ import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.inspector.InspectorPanelController;
 
 import javafx.embed.swt.FXCanvas;
-import no.tobask.sb4e.InspectorViewController;
 import no.tobask.sb4e.editors.FXMLEditor;
 
 public class InspectorView extends ViewPart implements IPartListener {

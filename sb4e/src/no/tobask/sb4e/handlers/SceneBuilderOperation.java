@@ -1,4 +1,4 @@
-package no.tobask.sb4e.editors;
+package no.tobask.sb4e.handlers;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
