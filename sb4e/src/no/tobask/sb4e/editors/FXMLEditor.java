@@ -36,6 +36,8 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
 import com.oracle.javafx.scenebuilder.kit.editor.JobManager;
+import com.oracle.javafx.scenebuilder.kit.editor.EditorController.ControlAction;
+import com.oracle.javafx.scenebuilder.kit.editor.EditorController.EditAction;
 import com.oracle.javafx.scenebuilder.kit.editor.job.Job;
 import com.oracle.javafx.scenebuilder.kit.fxom.FXOMDocument;
 import com.oracle.javafx.scenebuilder.kit.fxom.FXOMObject;
@@ -47,6 +49,8 @@ import no.tobask.sb4e.EclipseProjectsClassLoader;
 import no.tobask.sb4e.EditorWindowController;
 import no.tobask.sb4e.JavaModelUtils;
 import no.tobask.sb4e.JavaProjectGlossary;
+import no.tobask.sb4e.SceneBuilderControlActionHandler;
+import no.tobask.sb4e.SceneBuilderEditActionHandler;
 
 public class FXMLEditor extends EditorPart {
 
@@ -58,7 +62,10 @@ public class FXMLEditor extends EditorPart {
 	private IUndoContext undoContext;
 	private IOperationHistory operationHistory;
 	private ICompilationUnit controllerClass;
-	
+	private IAction copyHandler;
+	private IAction cutHandler;
+	private IAction pasteHandler;
+
 	public IAction getUndoActionHandler() {
 		return undoActionHandler;
 	}
@@ -67,6 +74,18 @@ public class FXMLEditor extends EditorPart {
 		return redoActionHandler;
 	}
 	
+	public IAction getCopyHandler() {
+		return copyHandler;
+	}
+	
+	public IAction getCutHandler() {
+		return cutHandler;
+	}
+
+	public IAction getPasteHandler() {
+		return pasteHandler;
+	}
+
 	public EditorController getEditorController() {
 		return editorController;
 	}
@@ -138,6 +157,10 @@ public class FXMLEditor extends EditorPart {
 		}
 		canvas.setScene(editorWindowController.getScene());
 		editorController.getSelection().revisionProperty().addListener(editorSelectionListener);
+		
+		copyHandler = new SceneBuilderControlActionHandler(editorController, ControlAction.COPY);
+		cutHandler = new SceneBuilderEditActionHandler(editorController, EditAction.CUT);
+		pasteHandler = new SceneBuilderEditActionHandler(editorController, EditAction.PASTE);
 	}
 	
 	private ChangeListener<Number> editorSelectionListener = (oV, oldNum, newNum) -> {
