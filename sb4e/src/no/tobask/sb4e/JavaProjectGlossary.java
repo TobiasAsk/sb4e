@@ -39,7 +39,8 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 	private List<String> eventHandlers;
 	private static final String FXML_ANNOTATION = FXML.class.getSimpleName();
 
-	public JavaProjectGlossary() {
+	public JavaProjectGlossary(String controllerClassName) {
+		this.controllerClassName = controllerClassName;
 		JavaCore.addElementChangedListener(this, ElementChangedEvent.POST_CHANGE);
 	}
 

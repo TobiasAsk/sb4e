@@ -143,7 +143,6 @@ public class FXMLEditor extends EditorPart {
 		// toolkit is initialized
 		FXCanvas canvas = new FXCanvas(parent, SWT.None);
 		editorController = new EditorController();
-		editorController.setGlossary(new JavaProjectGlossary());
 		editorController.setLibrary(new CustomClassLoaderLibrary(new EclipseProjectsClassLoader()));
 		setupUndoRedo();
 		EditorWindowController editorWindowController = new EditorWindowController(editorController);
@@ -155,6 +154,8 @@ public class FXMLEditor extends EditorPart {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		String controllerName = editorController.getFxomDocument().getFxomRoot().getFxController();
+		editorController.setGlossary(new JavaProjectGlossary(controllerName));
 		canvas.setScene(editorWindowController.getScene());
 		editorController.getSelection().revisionProperty().addListener(editorSelectionListener);
 		
