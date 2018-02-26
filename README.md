@@ -16,7 +16,7 @@ Extensions can be installed into Eclipse using the "Install New Software" wizard
 
 ![](sb4e.parent/documentation/access_wizard.png) 
 
-sb4e is hosted at http://files.idi.ntnu.no/publish/sb4e-SNAPSHOT/repository/, so enter this in the "Work with" field of the wizard and press enter. sb4e should appear, perhaps after some time, as the only item. Check it, and follow the wizard until completion. A restart of Eclipse is needed when the installation is complete.
+sb4e is hosted here on GitLab. Version 0.9 is available [here]( https://gitlab.stud.iie.ntnu.no/tobiaas/scene-builder-plugin/-/jobs/7997/artifacts/raw/sb4e.repository/target/repository/). The latest version is always available [here]( https://gitlab.stud.iie.ntnu.no/tobiaas/scene-builder-plugin/-/jobs/artifacts/master/raw/sb4e.repository/target/repository?job=integrationtest-job). Enter the URL in the "Work with" field of the wizard and press enter. sb4e should appear, perhaps after some time, as the only item. Check it, and follow the wizard until completion. A restart of Eclipse is needed when the installation is complete.
 ![](sb4e.parent/documentation/install_wizard.png)
 
 ## Usage
