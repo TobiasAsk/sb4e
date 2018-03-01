@@ -1876,7 +1876,7 @@ public class InspectorPanelController extends AbstractFxmlPanelController {
             }
         } else if (editorClass == EffectPopupEditor.class) {
             if (createdPropertyEditor != null) {
-                ((EffectPopupEditor) createdPropertyEditor).reset(propMeta, selectedClasses);
+                ((EffectPopupEditor) createdPropertyEditor).reset(propMeta, selectedClasses, getEditorController());
             } else {
                 createdPropertyEditor = new EffectPopupEditor(propMeta, selectedClasses, getEditorController());
             }
@@ -1888,7 +1888,7 @@ public class InspectorPanelController extends AbstractFxmlPanelController {
             }
         } else if (editorClass == PaintPopupEditor.class) {
             if (createdPropertyEditor != null) {
-                ((PaintPopupEditor) createdPropertyEditor).reset(propMeta, selectedClasses);
+                ((PaintPopupEditor) createdPropertyEditor).reset(propMeta, selectedClasses, getEditorController());
             } else {
                 createdPropertyEditor = new PaintPopupEditor(propMeta, selectedClasses, getEditorController());
             }
