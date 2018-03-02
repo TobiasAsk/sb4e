@@ -205,10 +205,11 @@ public class FXMLEditor extends EditorPart {
 	
 	private IEditorPart getEditorEditingController() {
 		for (IEditorReference editorRef : getSite().getPage().getEditorReferences()) {
-			IEditorPart editor = editorRef.getEditor(false);
-			if (editor.getEditorInput() instanceof FileEditorInput) {
+			IEditorPart editor = editorRef.getEditor(true);
+			if (editor != null && editor.getEditorInput() instanceof FileEditorInput) {
 				IFile file = ((FileEditorInput) editor.getEditorInput()).getFile();
-				if (file.getName().equals(controllerClass.getElementName())) {
+				if (file.getName().equals(controllerClass.getElementName()) &&
+						getSite().getPage().isPartVisible(editor)) {
 					return editor;
 				}
 			}
