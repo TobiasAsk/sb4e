@@ -1,0 +1,43 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>no.tobask.sb4e.test</artifactId>
+	<packaging>eclipse-test-plugin</packaging>
+
+	<parent>
+		<groupId>no.tobask.sb4e</groupId>
+		<artifactId>no.tobask.sb4e.parent</artifactId>
+		<version>0.9.0</version>
+		<relativePath>../sb4e.parent</relativePath>
+	</parent>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<name>BestSolution e(fx)clipse releases</name>
+			<id>efxclipse-releases</id>
+			<url>http://maven.bestsolution.at/efxclipse-releases/</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-surefire-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<argLine>-Dorg.osgi.framework.bundle.parent=ext
+						-Dosgi.framework.extensions=org.eclipse.fx.osgi</argLine>
+					<useUIHarness>true</useUIHarness>
+					<frameworkExtensions>
+						<frameworkExtension>
+							<groupId>at.bestsolution.efxclipse.rt</groupId>
+							<artifactId>org.eclipse.fx.osgi</artifactId>
+							<version>3.1.0</version>
+						</frameworkExtension>
+					</frameworkExtensions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

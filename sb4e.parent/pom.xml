@@ -14,6 +14,11 @@
 
 	<repositories>
 		<repository>
+			<id>orbit-oxygen</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/tools/orbit/downloads/drops/R20180206163158/repository</url>
+		</repository>
+		<repository>
 			<id>eclipse-oxygen</id>
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/releases/oxygen</url>
@@ -21,20 +26,19 @@
 	</repositories>
 
 	<build>
-		<pluginManagement>
 		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-compiler-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
-<!--  
-					<compilerArgument>-warn:+discouraged,forbidden</compilerArgument>
--->                
-	                <compilerArgument>-warn:none</compilerArgument>     
-	                <compilerArgument>-err:none</compilerArgument>      
-	                <useProjectSettings>false</useProjectSettings>
 					<extraClasspathElements>
 						<extraClasspathElement>
 							<groupId>com.oracle</groupId>
@@ -46,15 +50,30 @@
 					</extraClasspathElements>
 				</configuration>
 			</plugin>
-		</plugins>
-		</pluginManagement>
-	
-		<plugins>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-maven-plugin</artifactId>
+				<artifactId>target-platform-configuration</artifactId>
 				<version>${tycho-version}</version>
-				<extensions>true</extensions>
+				<configuration>
+					<pomDependencies>consider</pomDependencies>
+					<executionEnvironment>JavaSE-1.8</executionEnvironment>
+					<target>
+						<artifact>
+							<groupId>no.tobask.sb4e</groupId>
+							<artifactId>no.tobask.sb4e.target</artifactId>
+							<version>0.9.0</version>
+						</artifact>
+					</target>
+					<dependency-resolution>
+						<extraRequirements>
+							<requirement>
+								<type>eclipse-plugin</type>
+								<id>org.hamcrest</id>
+								<versionRange>0.0.0</versionRange>
+							</requirement>
+						</extraRequirements>
+					</dependency-resolution>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -64,5 +83,7 @@
 		<module>../sb4e</module>
 		<module>../sb4e.feature</module>
 		<module>../sb4e.repository</module>
+		<module>../sb4e.test</module>
+		<module>../sb4e.target</module>
 	</modules>
 </project>

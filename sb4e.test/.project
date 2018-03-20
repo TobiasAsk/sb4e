@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>no.tobask.sb4e</name>
+	<name>no.tobask.sb4e.test</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -22,11 +22,6 @@
 		</buildCommand>
 		<buildCommand>
 			<name>org.eclipse.m2e.core.maven2Builder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>org.eclipse.pde.ds.core.builder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>

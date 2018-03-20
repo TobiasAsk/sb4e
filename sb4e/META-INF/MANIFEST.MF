@@ -7,7 +7,8 @@ Bundle-Activator: no.tobask.sb4e.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui;bundle-version="3.109.0",
  org.eclipse.ui.ide;bundle-version="3.13.0",
- com.oracle.javafx.scenebuilder;bundle-version="8.0.0"
+ com.oracle.javafx.scenebuilder;bundle-version="8.0.0",
+ org.eclipse.e4.tools.compat;bundle-version="4.7.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: com.oracle.javafx.scenebuilder.app.selectionbar,
  com.oracle.javafx.scenebuilder.kit.editor,
@@ -18,6 +19,10 @@ Import-Package: com.oracle.javafx.scenebuilder.app.selectionbar,
  com.oracle.javafx.scenebuilder.kit.editor.panel.util,
  com.oracle.javafx.scenebuilder.kit.fxom,
  org.eclipse.core.resources,
+ org.eclipse.e4.core.contexts;version="1.6.0",
+ org.eclipse.e4.core.di,
+ org.eclipse.e4.core.di.annotations;version="1.6.0",
+ org.eclipse.e4.ui.di,
  org.eclipse.jdt.core,
  org.eclipse.jdt.launching
 Bundle-ActivationPolicy: lazy
@@ -25,3 +30,5 @@ Bundle-ClassPath: .
 Export-Package: no.tobask.sb4e,
  no.tobask.sb4e.editors,
  no.tobask.sb4e.views
+Service-Component: OSGI-INF/controllerCreator.xml,
+ OSGI-INF/workbenchAccessorCreator.xml

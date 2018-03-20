@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.8"?><target name="Oxygen runtime" sequenceNumber="249">
+<locations>
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
+<unit id="org.eclipse.e4.core.tools.feature.source.feature.group" version="4.7.0.v20170515-1617"/>
+<unit id="org.eclipse.jdt.feature.group" version="3.13.2.v20171130-0906"/>
+<unit id="org.eclipse.platform.feature.group" version="4.7.2.v20171130-0510"/>
+<repository location="http://download.eclipse.org/releases/oxygen"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
+<unit id="org.hamcrest" version="1.1.0.v20090501071000"/>
+<unit id="org.mockito" version="1.9.5.v201605172210"/>
+<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20180206163158/repository"/>
+</location>
+</locations>
+<environment>
+<os>win32</os>
+<ws>win32</ws>
+<arch>x86</arch>
+<nl>en_US</nl>
+</environment>
+<targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+</target>

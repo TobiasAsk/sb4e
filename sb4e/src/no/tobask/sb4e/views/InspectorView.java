@@ -1,54 +1,52 @@
 package no.tobask.sb4e.views;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
+import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPartListener;
-import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.part.ViewPart;
-
 import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.inspector.InspectorPanelController;
 
 import javafx.embed.swt.FXCanvas;
 import no.tobask.sb4e.editors.FXMLEditor;
 
-public class InspectorView extends ViewPart implements IPartListener {
+public class InspectorView implements IPartListener {
 	
-	private InspectorPanelController inspectorPanelController;
-	private EditorController defaultEditorController = new EditorController();
+	private EditorController dummyEditorController = new EditorController();
+	private InspectorViewController inspectorViewController;
+	private IWorkbenchAccessor workbenchAccessor;
+	private Composite parent;
+	private IPartService partService;
 	
-	public InspectorPanelController getInspectorPanelController() {
-		return inspectorPanelController;
+	@Inject
+	public InspectorView(InspectorViewController inspectorViewController,
+			IWorkbenchAccessor workbenchAccessor, Composite parent, IPartService partService) {
+		this.inspectorViewController = inspectorViewController;
+		this.workbenchAccessor = workbenchAccessor;
+		this.parent = parent;
+		this.partService = partService;
 	}
 	
-	public void createPartControl(Composite parent) {
+	@PostConstruct
+	public void createGui() {
 		FXCanvas canvas = new FXCanvas(parent, SWT.NONE);
-		inspectorPanelController = new InspectorPanelController(defaultEditorController);
-		InspectorViewController inspectorViewController =
-				new InspectorViewController(defaultEditorController, inspectorPanelController);
 		canvas.setScene(inspectorViewController.getScene());
-		getSite().getWorkbenchWindow().getPartService().addPartListener(this);
+		partService.addPartListener(this);
 	}
 	
+	@Focus
 	public void setFocus() {
 	}
 	
-	private boolean anyFxmlEditorsVisible() {
-		IWorkbenchPage activePage = getSite().getWorkbenchWindow().getActivePage();
-		for (IEditorReference editorReference : activePage.getEditorReferences()) {
-			IWorkbenchPart part = editorReference.getPart(false);
-			if (part instanceof FXMLEditor && activePage.isPartVisible(part)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	@Override
 	public void partActivated(IWorkbenchPart part) {
+		InspectorPanelController inspectorPanelController = inspectorViewController
+				.getInspectorPanelController();
 		EditorController currentController = inspectorPanelController.getEditorController();
 		if (part instanceof FXMLEditor) {
 			EditorController partController = ((FXMLEditor) part).getEditorController();
@@ -56,8 +54,9 @@ public class InspectorView extends ViewPart implements IPartListener {
 				inspectorPanelController.setEditorController(partController);
 			}
 		} else {
-			if (!anyFxmlEditorsVisible() && currentController != defaultEditorController) {
-				inspectorPanelController.setEditorController(defaultEditorController);
+			if (!workbenchAccessor.anyFxmlEditorsVisible() &&
+					currentController != dummyEditorController) {
+				inspectorPanelController.setEditorController(dummyEditorController);
 			}
 		}
 	}
@@ -69,10 +68,10 @@ public class InspectorView extends ViewPart implements IPartListener {
 
 	@Override
 	public void partClosed(IWorkbenchPart part) {
-		IEditorPart activeEditor = getSite().getWorkbenchWindow().getActivePage()
-				.getActiveEditor();
-		if (!(activeEditor instanceof FXMLEditor)) {
-			inspectorPanelController.setEditorController(defaultEditorController);
+		if (!workbenchAccessor.hasActiveFxmlEditor()) {
+			InspectorPanelController inspectorPanelController = inspectorViewController
+					.getInspectorPanelController();
+			inspectorPanelController.setEditorController(dummyEditorController);
 		}
 	}
 

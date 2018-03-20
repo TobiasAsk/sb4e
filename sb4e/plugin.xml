@@ -17,7 +17,7 @@
          point="org.eclipse.ui.views">
       <view
             category="sb4e.scenebuilder"
-            class="no.tobask.sb4e.views.InspectorView"
+            class="no.tobask.sb4e.views.InspectorViewWrapper"
             id="sb4e.views.InspectorView"
             name="Inspector View"
             restorable="true">

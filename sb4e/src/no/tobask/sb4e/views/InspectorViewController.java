@@ -1,11 +1,16 @@
 package no.tobask.sb4e.views;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+
 import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
 import com.oracle.javafx.scenebuilder.kit.editor.i18n.I18N;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.inspector.InspectorPanelController;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.util.AbstractFxmlWindowController;
 import com.oracle.javafx.scenebuilder.kit.editor.search.SearchController;
 
+import javafx.embed.swt.FXCanvas;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.layout.StackPane;
@@ -13,19 +18,24 @@ import javafx.stage.WindowEvent;
 
 public class InspectorViewController extends AbstractFxmlWindowController {
 
-	InspectorPanelController inspectorPanelController;
-	SearchController inspectorSearchController;
+	private InspectorPanelController inspectorPanelController;
+	private SearchController inspectorSearchController;
 
 	@FXML
-	StackPane inspectorSearchPanelHost;
+	private StackPane inspectorSearchPanelHost;
 	@FXML
-	StackPane inspectorPanelHost;
+	private StackPane inspectorPanelHost;
 
-	public InspectorViewController(EditorController editorController,
-			InspectorPanelController inspectorPanelController) {
+	public InspectorViewController() {
 		super(InspectorViewController.class.getResource("InspectorView.fxml"), I18N.getBundle(), false);
-		this.inspectorPanelController = inspectorPanelController;
-		inspectorSearchController = new SearchController(editorController);
+		EditorController dummyEdtCtrl = new EditorController();
+		new FXCanvas(new Shell(Display.getDefault()), SWT.NONE); // hack to initialize javafx toolkit
+		inspectorPanelController = new InspectorPanelController(dummyEdtCtrl);
+		inspectorSearchController = new SearchController(dummyEdtCtrl);
+	}
+	
+	public InspectorPanelController getInspectorPanelController() {
+		return inspectorPanelController;
 	}
 
 	@Override
