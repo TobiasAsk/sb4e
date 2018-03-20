@@ -1,5 +1,8 @@
-image: kaiwinter/docker-java8-maven
+# image: kaiwinter/docker-java8-maven
 # image: maven:3.3.9-jdk-8
+# in MAVEN_OPTS: "-Djava.awt.headless=true"
+
+image: https://github.com/thorstenwagner/docker-java8-maven
 
 # most of this taken from https://stackoverflow.com/questions/37785154/how-to-enable-maven-artifact-caching-for-gitlab-ci-runner
 
@@ -8,8 +11,6 @@ cache:
     - .m2/repository
   # keep cache across branch
   key: "$CI_BUILD_REF_NAME"
-
-# "-Djava.awt.headless=true"
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
@@ -31,6 +32,9 @@ integrationtest-job:
   stage: test
   dependencies:
     - build-job
+  before_script:
+    - "Xvfb :99 &"
+    - "export DISPLAY=:99"
   script:
     - "mvn verify -f sb4e.parent/pom.xml $MAVEN_CLI_OPTS"
   artifacts:
