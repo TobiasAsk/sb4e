@@ -9,8 +9,10 @@ cache:
   # keep cache across branch
   key: "$CI_BUILD_REF_NAME"
 
+# "-Djava.awt.headless=true"
+
 variables:
-  MAVEN_OPTS: "-Djava.awt.headless=true -Dmaven.repo.local=.m2/repository"
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -Dgitlab-ci=true"
 
 build-job:
