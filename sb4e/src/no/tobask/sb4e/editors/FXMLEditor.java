@@ -155,7 +155,8 @@ public class FXMLEditor extends EditorPart {
 			e.printStackTrace();
 		}
 		String controllerName = editorController.getFxomDocument().getFxomRoot().getFxController();
-		editorController.setGlossary(new JavaProjectGlossary(controllerName));
+		editorController.setGlossary(new JavaProjectGlossary(controllerName, fxmlUrl,
+				editorWindowController.infoPanelController));
 		canvas.setScene(editorWindowController.getScene());
 		editorController.getSelection().revisionProperty().addListener(editorSelectionListener);
 		

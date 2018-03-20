@@ -24,6 +24,7 @@ Import-Package: com.oracle.javafx.scenebuilder.app.selectionbar,
  org.eclipse.e4.core.di.annotations;version="1.6.0",
  org.eclipse.e4.ui.di,
  org.eclipse.jdt.core,
+ org.eclipse.jdt.core.dom,
  org.eclipse.jdt.launching
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
