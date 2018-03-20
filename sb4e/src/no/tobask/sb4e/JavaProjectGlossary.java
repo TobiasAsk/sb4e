@@ -3,14 +3,10 @@ package no.tobask.sb4e;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.eclipse.jdt.core.ElementChangedEvent;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IElementChangedListener;
@@ -25,7 +21,10 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
-
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import com.oracle.javafx.scenebuilder.app.info.InfoPanelController;
 import com.oracle.javafx.scenebuilder.kit.glossary.Glossary;
 
 import javafx.beans.value.ObservableValue;
@@ -34,25 +33,35 @@ import javafx.fxml.FXML;
 
 public class JavaProjectGlossary extends Glossary implements IElementChangedListener {
 
+	private static final String FXML_ANNOTATION = FXML.class.getSimpleName();
+	
 	private String controllerClassName;
+	private URL fxmlLocation;
+	private InfoPanelController infoPanelController;
+
 	private Map<String, List<String>> fxIds;
 	private List<String> eventHandlers;
-	private static final String FXML_ANNOTATION = FXML.class.getSimpleName();
+	private List<ICompilationUnit> candidateControllers;
 
-	public JavaProjectGlossary(String controllerClassName) {
+	public JavaProjectGlossary(String controllerClassName, URL fxmlLocation,
+			InfoPanelController infoPanelController) {
 		this.controllerClassName = controllerClassName;
-		JavaCore.addElementChangedListener(this, ElementChangedEvent.POST_CHANGE);
+		this.fxmlLocation = fxmlLocation;
+		this.infoPanelController = infoPanelController;
+		JavaCore.addElementChangedListener(this);
 	}
 
 	@Override
 	public List<String> queryControllerClasses(URL fxmlLocation) {
-		IJavaProject project = JavaModelUtils.getJavaProjectFromUrl(fxmlLocation);
-		String packageName = JavaModelUtils.getPackageContainingFile(fxmlLocation).getElementName();
-		List<ICompilationUnit> candidates = new ArrayList<>();
-		for (IPackageFragment pkg : JavaModelUtils.getAllMatchingPackages(packageName, project)) {
-			candidates.addAll(getCandidateControllers(pkg, fxmlLocation));
+		if (candidateControllers == null) {
+			IJavaProject project = JavaModelUtils.getJavaProjectFromUrl(fxmlLocation);
+			String packageName = JavaModelUtils.getPackageContainingFile(fxmlLocation).getElementName();
+			candidateControllers = new ArrayList<>();
+			for (IPackageFragment pkg : JavaModelUtils.getAllMatchingPackages(packageName, project)) {
+				candidateControllers.addAll(getCandidateControllers(pkg));
+			}
 		}
-		return candidates.stream().map(c -> c.getElementName()).collect(Collectors.toList());
+		return candidateControllers.stream().map(c -> c.getElementName()).collect(Collectors.toList());
 	}
 
 	@Override
@@ -82,62 +91,83 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 
 	@Override
 	public void elementChanged(ElementChangedEvent event) {
-		if (controllerClassName != null) {
-			ICompilationUnit controllerClass = getControllerClass(event);
-			if (controllerClass != null) {
-				fxIds = getFxIds(controllerClass);
-				eventHandlers = getEventHandlers(controllerClass);
+		IJavaElementDelta delta = getClassChangedDelta(event.getDelta());
+		if (delta != null) {
+			ICompilationUnit affectedClass = (ICompilationUnit) delta.getElement();
+			if (fxmlLocation != null && inSameProject(affectedClass)) {
+				if (updateControllerCandidates(delta)) {
+					infoPanelController.resetSuggestedControllerClasses(fxmlLocation);
+				}
+				
+				if (controllerClassName != null && affectedClass.getElementName()
+						.equals(controllerClassName) && delta.getKind() != IJavaElementDelta.REMOVED) {
+					fxIds = getFxIds(affectedClass);
+					eventHandlers = getEventHandlers(affectedClass);
+				}
 			}
 		}
 	}
+	
+	private boolean updateControllerCandidates(IJavaElementDelta delta) {
+		boolean updated = false;
+		ICompilationUnit compUnit = (ICompilationUnit) delta.getElement();
+		if (delta.getKind() == IJavaElementDelta.REMOVED) {
+			if (candidateControllers.contains(compUnit)) {
+				candidateControllers.remove(compUnit);
+				updated = true;
+			}
+		} else {
+			CompilationUnit ast = delta.getCompilationUnitAST();
+			CompilationUnit clazz = ast != null ? ast : getAst(compUnit);
+			ControllerCandidateChecker checker = new ControllerCandidateChecker();
+			clazz.accept(checker);
+			boolean isCandidateController = checker.visitedCandidate();
+			if (candidateControllers.contains(compUnit)) {
+				if (!isCandidateController) {
+					candidateControllers.remove(compUnit);
+					updated = true;
+				}
+			} else if (isCandidateController) {
+				candidateControllers.add(compUnit);
+				updated = true;
+			}
+		}
+		return updated;
+	}
+			
+	private CompilationUnit getAst(ICompilationUnit source) {
+		ASTParser parser = ASTParser.newParser(AST.JLS9);
+		parser.setSource(source);
+		return (CompilationUnit) parser.createAST(null);
+	}
 
-	private Collection<ICompilationUnit> getCandidateControllers(IPackageFragment pkg,
-			URL fxmlLocation) {
+	private IJavaElementDelta getClassChangedDelta(IJavaElementDelta rootDelta) {
+		IJavaElementDelta delta = rootDelta;
+		IJavaElement element = delta.getElement();
+		while (delta.getAffectedChildren().length > 0 &&
+				!(element.getElementType() == IJavaElement.COMPILATION_UNIT)) {
+			delta = delta.getAffectedChildren()[0];
+			element = delta.getElement();
+		}
+		return element.getElementType() == IJavaElement.COMPILATION_UNIT ? delta : null;
+	}
+	
+	private boolean inSameProject(ICompilationUnit clazz) {
+		return clazz.getJavaProject().equals(JavaModelUtils.getJavaProjectFromUrl(fxmlLocation));
+	}
+		
+	private List<ICompilationUnit> getCandidateControllers(IPackageFragment pkg) {
+		ASTParser parser = ASTParser.newParser(AST.JLS9);
+		Requestor requestor = new Requestor();
 		try {
-			List<ICompilationUnit> allUnits = new ArrayList<>(Arrays.asList(pkg.
-					getCompilationUnits()));
-			Stream<ICompilationUnit> matches = allUnits.stream().filter(u
-					-> isCandidateControllerClass(u, fxmlLocation));
-			return matches.collect(Collectors.toList());
+			parser.createASTs(pkg.getCompilationUnits(), null, requestor, null);
+			return requestor.getCandidates();
 		} catch (JavaModelException e) {
 			e.printStackTrace();
 			return new ArrayList<>();
 		}
 	}
-
-	private boolean isCandidateControllerClass(ICompilationUnit javaClass, URL fxmlLocation) {
-		IType type = javaClass.findPrimaryType();
-		return hasNoOrEmptyConstructor(type) && hasFxmlAnnotatedMembers(type);
-	}
-	
-	private boolean hasFxmlAnnotatedMembers(IType type) {
-		try {
-			List<IMethod> methods = new ArrayList<>(Arrays.asList(type.getMethods()));
-			List<IField> fields = new ArrayList<>(Arrays.asList(type.getFields()));
-			boolean anyMethodsAnnotated = methods.stream().anyMatch(m ->
-					m.getAnnotation(FXML_ANNOTATION).exists());
-			boolean anyFieldsAnnotated = fields.stream().anyMatch(f -> 
-					f.getAnnotation(FXML_ANNOTATION).exists());
-			return anyFieldsAnnotated || anyMethodsAnnotated;
-		} catch (JavaModelException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	private boolean hasNoOrEmptyConstructor(IType type) {
-		try {
-			for (IMethod method : type.getMethods()) {
-				if (method.isConstructor()) {
-					return method.getParameters().length == 0;
-				}
-			}
-		} catch (JavaModelException e) {
-			e.printStackTrace();
-		}
-		return true;
-	}
-		
+			
 	private List<String> getEventHandlers(ICompilationUnit controller) {
 		List<String> eventHandlers = new ArrayList<>();
 		IType type = controller.findPrimaryType();
@@ -204,24 +234,6 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 		if (existingIds != null) {
 			existingIds.add(fieldName);
 		}
-	}
-
-	private ICompilationUnit getControllerClass(ElementChangedEvent event) {
-		IJavaElementDelta rootDelta = event.getDelta();
-		Stack<IJavaElementDelta> queue = new Stack<>();
-		queue.push(rootDelta);
-		while (!queue.isEmpty()) {
-			IJavaElementDelta delta = queue.pop();
-			IJavaElement element = delta.getElement();
-			if (element instanceof ICompilationUnit &&
-					((ICompilationUnit) element).getElementName().equals(controllerClassName)) {
-				return (ICompilationUnit) element;
-			}
-			for (IJavaElementDelta childDelta : delta.getAffectedChildren()) {
-				queue.push(childDelta);
-			}
-		}
-		return null;
 	}
 
 }
