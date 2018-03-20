@@ -10,6 +10,7 @@
 		<tycho-version>1.0.0</tycho-version>
 		<maven.compile.source>1.8</maven.compile.source>
 		<maven.compile.target>1.8</maven.compile.target>
+		<xvfb-maven-plugin.version>1.4.0</xvfb-maven-plugin.version>
 	</properties>
 
 	<repositories>
@@ -74,6 +75,20 @@
 						</extraRequirements>
 					</dependency-resolution>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.zetten</groupId>
+				<artifactId>xvfb-maven-plugin</artifactId>
+				<version>${xvfb-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>wrap-tests</id>
+						<goals>
+							<goal>run</goal>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

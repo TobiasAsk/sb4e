@@ -29,6 +29,9 @@
 					<argLine>-Dorg.osgi.framework.bundle.parent=ext
 						-Dosgi.framework.extensions=org.eclipse.fx.osgi</argLine>
 					<useUIHarness>true</useUIHarness>
+					<environmentVariables>
+						<DISPLAY>${xvfb.display}</DISPLAY>
+					</environmentVariables>
 					<frameworkExtensions>
 						<frameworkExtension>
 							<groupId>at.bestsolution.efxclipse.rt</groupId>
