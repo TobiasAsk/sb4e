@@ -1,4 +1,4 @@
-image: tobask/java-maven-xvfb
+image: tobask/java-maven-xvfb:from-ubuntu
 # in MAVEN_OPTS: -Djava.awt.headless=true
 
 # most of this taken from https://stackoverflow.com/questions/37785154/how-to-enable-maven-artifact-caching-for-gitlab-ci-runner
