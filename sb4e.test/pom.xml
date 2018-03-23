@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>no.tobask.sb4e.test</artifactId>
@@ -40,6 +41,20 @@
 						</frameworkExtension>
 					</frameworkExtensions>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.zetten</groupId>
+				<artifactId>xvfb-maven-plugin</artifactId>
+				<version>${xvfb-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>wrap-tests</id>
+						<goals>
+							<goal>run</goal>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
