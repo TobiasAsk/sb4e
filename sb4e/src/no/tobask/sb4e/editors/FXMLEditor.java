@@ -166,7 +166,11 @@ public class FXMLEditor extends EditorPart {
 	}
 	
 	private ChangeListener<Number> editorSelectionListener = (oV, oldNum, newNum) -> {
-		String controllerName = editorController.getFxomDocument().getFxomRoot().getFxController();
+		FXOMObject fxomRoot = editorController.getFxomDocument().getFxomRoot();
+		if (fxomRoot == null) {
+			return;
+		}
+		String controllerName = fxomRoot.getFxController();
 		if (controllerName == null) {
 			return;
 		}
