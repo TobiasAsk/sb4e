@@ -61,7 +61,8 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 				candidateControllers.addAll(getCandidateControllers(pkg));
 			}
 		}
-		return candidateControllers.stream().map(c -> c.getElementName()).collect(Collectors.toList());
+		return candidateControllers.stream().map(c ->
+			getSuggestionName(c)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -106,6 +107,17 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 				}
 			}
 		}
+	}
+	
+	private String getSuggestionName(ICompilationUnit compilationUnit) {
+		try {
+			String packageName = compilationUnit.getPackageDeclarations()[0].getElementName();
+			String className = compilationUnit.getElementName().split("\\.")[0];
+			return packageName + "." + className;
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+		}
+		return "";
 	}
 	
 	private boolean updateControllerCandidates(IJavaElementDelta delta) {
