@@ -35,17 +35,17 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 
 	private static final String FXML_ANNOTATION = FXML.class.getSimpleName();
 	
-	private String controllerClassName;
+	private String qualifiedControllerName;
 	private URL fxmlLocation;
 	private InfoPanelController infoPanelController;
 
-	private Map<String, List<String>> fxIds;
-	private List<String> eventHandlers;
+	private Map<String, Map<String, List<String>>> fxIds = new HashMap<>();
+	private Map<String, List<String>> eventHandlers = new HashMap<>();
 	private List<ICompilationUnit> candidateControllers;
 
 	public JavaProjectGlossary(String controllerClassName, URL fxmlLocation,
 			InfoPanelController infoPanelController) {
-		this.controllerClassName = controllerClassName;
+		this.qualifiedControllerName = controllerClassName;
 		this.fxmlLocation = fxmlLocation;
 		this.infoPanelController = infoPanelController;
 		JavaCore.addElementChangedListener(this);
@@ -62,32 +62,39 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 			}
 		}
 		return candidateControllers.stream().map(c ->
-			getSuggestionName(c)).collect(Collectors.toList());
+			JavaModelUtils.getQualifiedName(c)).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<String> queryFxIds(URL fxmlLocation, String controllerClass, Class<?> targetType) {
-		if (controllerClassName == null) {
-			controllerClassName = controllerClass;
+		if (qualifiedControllerName == null || !qualifiedControllerName.equals(controllerClass)) {
+			qualifiedControllerName = controllerClass;
 		}
-		if (fxIds == null) {
-			ICompilationUnit controller = JavaModelUtils.getClass(fxmlLocation, controllerClass);
-			fxIds = controller == null ? new HashMap<>() : getFxIds(controller);
+		Map<String, List<String>> controllerFxIds = fxIds.get(qualifiedControllerName);
+		if (controllerFxIds == null) {
+			ICompilationUnit controller = JavaModelUtils.getClass(fxmlLocation, qualifiedControllerName);
+			controllerFxIds = controller == null ?
+					new HashMap<>() : getFxIds(controller);
+			fxIds.put(qualifiedControllerName, controllerFxIds);
 		}
-		return fxIds.getOrDefault(Signature.getSimpleName(targetType.getName()), new ArrayList<>());
+		String typeName = Signature.getSimpleName(targetType.getName());
+		List<String> ids = controllerFxIds.getOrDefault(typeName, new ArrayList<>());
+		return new ArrayList<>(ids);
 	}
 
 	@Override
 	public List<String> queryEventHandlers(URL fxmlLocation, String controllerClass) {
-		if (controllerClassName == null) {
-			controllerClassName = controllerClass;
+		if (qualifiedControllerName == null || !qualifiedControllerName.equals(controllerClass)) {
+			qualifiedControllerName = controllerClass;
 		}
-		if (eventHandlers == null) {
-			ICompilationUnit controller = JavaModelUtils.getClass(fxmlLocation, controllerClass);
-			eventHandlers = controller == null ?
+		List<String> controllerEventHandlers = eventHandlers.get(qualifiedControllerName);
+		if (controllerEventHandlers == null) {
+			ICompilationUnit controller = JavaModelUtils.getClass(fxmlLocation, qualifiedControllerName);
+			controllerEventHandlers = controller == null ?
 					new ArrayList<>() : getEventHandlers(controller);
+			eventHandlers.put(qualifiedControllerName, controllerEventHandlers);
 		}
-		return eventHandlers;
+		return new ArrayList<>(controllerEventHandlers);
 	}
 
 	@Override
@@ -100,26 +107,15 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 					infoPanelController.resetSuggestedControllerClasses(fxmlLocation);
 				}
 				
-				if (controllerClassName != null && affectedClass.getElementName()
-						.equals(controllerClassName) && delta.getKind() != IJavaElementDelta.REMOVED) {
-					fxIds = getFxIds(affectedClass);
-					eventHandlers = getEventHandlers(affectedClass);
+				if (qualifiedControllerName != null && JavaModelUtils.getQualifiedName(affectedClass)
+						.equals(qualifiedControllerName) && delta.getKind() != IJavaElementDelta.REMOVED) {
+					fxIds.put(qualifiedControllerName, getFxIds(affectedClass));
+					eventHandlers.put(qualifiedControllerName, getEventHandlers(affectedClass));
 				}
 			}
 		}
 	}
-	
-	private String getSuggestionName(ICompilationUnit compilationUnit) {
-		try {
-			String packageName = compilationUnit.getPackageDeclarations()[0].getElementName();
-			String className = compilationUnit.getElementName().split("\\.")[0];
-			return packageName + "." + className;
-		} catch (JavaModelException e) {
-			e.printStackTrace();
-		}
-		return "";
-	}
-	
+		
 	private boolean updateControllerCandidates(IJavaElementDelta delta) {
 		boolean updated = false;
 		ICompilationUnit compUnit = (ICompilationUnit) delta.getElement();

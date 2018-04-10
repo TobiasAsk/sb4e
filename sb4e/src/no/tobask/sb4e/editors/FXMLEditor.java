@@ -174,7 +174,7 @@ public class FXMLEditor extends EditorPart {
 		if (controllerName == null) {
 			return;
 		}
-		if (controllerClass == null || !controllerClass.getElementName().equals(controllerName)) {
+		if (controllerClass == null || !JavaModelUtils.getQualifiedName(controllerClass).equals(controllerName)) {
 			controllerClass = JavaModelUtils.getClass(fxmlUrl, controllerName);
 			if (controllerClass == null) {
 				return;

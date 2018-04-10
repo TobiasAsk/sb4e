@@ -23,8 +23,9 @@ public class JavaModelUtils {
 	public static ICompilationUnit getClass(URL rootLocation, String className) {
 		String packageName = getPackageContainingFile(rootLocation).getElementName();
 		IJavaProject project = getJavaProjectFromUrl(rootLocation);
+		String simpleName = toSimpleName(className);
 		for (IPackageFragment pkg : getAllMatchingPackages(packageName, project)) {
-			ICompilationUnit clazz = pkg.getCompilationUnit(className);
+			ICompilationUnit clazz = pkg.getCompilationUnit(simpleName);
 			if (clazz.exists()) {
 				return clazz;
 			}
@@ -57,6 +58,17 @@ public class JavaModelUtils {
 		}
 		return packages;
 	}
+	
+	public static String getQualifiedName(ICompilationUnit compilationUnit) {
+		try {
+			String packageName = compilationUnit.getPackageDeclarations()[0].getElementName();
+			String className = compilationUnit.getElementName().split("\\.")[0];
+			return packageName + "." + className;
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
 
 	private static List<IPackageFragmentRoot> getSourceFolders(IJavaProject project) {
 		List<IPackageFragmentRoot> sourceFolders = new ArrayList<>();
@@ -70,6 +82,11 @@ public class JavaModelUtils {
 			e.printStackTrace();
 		}
 		return sourceFolders;
+	}
+		
+	private static String toSimpleName(String qualifiedName) {
+		String[] parts = qualifiedName.split("\\.");
+		return parts[parts.length-1] + ".java";
 	}
 
 }
