@@ -42,20 +42,20 @@
 					</frameworkExtensions>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>com.github.zetten</groupId>
-				<artifactId>xvfb-maven-plugin</artifactId>
-				<version>${xvfb-maven-plugin.version}</version>
-				<executions>
-					<execution>
-						<id>wrap-tests</id>
-						<goals>
-							<goal>run</goal>
-							<goal>stop</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+<!-- 			<plugin> -->
+<!-- 				<groupId>com.github.zetten</groupId> -->
+<!-- 				<artifactId>xvfb-maven-plugin</artifactId> -->
+<!-- 				<version>${xvfb-maven-plugin.version}</version> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<id>wrap-tests</id> -->
+<!-- 						<goals> -->
+<!-- 							<goal>run</goal> -->
+<!-- 							<goal>stop</goal> -->
+<!-- 						</goals> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
 		</plugins>
 	</build>
 </project>
