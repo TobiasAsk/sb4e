@@ -215,8 +215,12 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 		String simpleName = Signature.getSignatureSimpleName(parameter.getTypeSignature());
 		IType declaringType = parameter.getDeclaringMember().getDeclaringType();
 		String[][] resolvedNames = declaringType.resolveType(simpleName);
-		String superClassName = resolvedNames[0][0];
-		return superClassName.equals(Signature.getQualifier(clazz.getName()));
+		if (resolvedNames.length > 0) {
+			String superClassName = resolvedNames[0][0];
+			return superClassName.equals(Signature.getQualifier(clazz.getName()));
+		} else {
+			return false;
+		}
 	}
 
 	private Map<String, List<String>> getFxIds(ICompilationUnit controller) {
