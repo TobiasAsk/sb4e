@@ -65,6 +65,7 @@ public class FXMLEditor extends EditorPart {
 	private IAction copyHandler;
 	private IAction cutHandler;
 	private IAction pasteHandler;
+	private IAction deleteHandler;
 
 	public IAction getUndoActionHandler() {
 		return undoActionHandler;
@@ -84,6 +85,10 @@ public class FXMLEditor extends EditorPart {
 
 	public IAction getPasteHandler() {
 		return pasteHandler;
+	}
+
+	public IAction getDeleteHandler() {
+		return deleteHandler;
 	}
 
 	public EditorController getEditorController() {
@@ -163,6 +168,7 @@ public class FXMLEditor extends EditorPart {
 		copyHandler = new SceneBuilderControlActionHandler(editorController, ControlAction.COPY);
 		cutHandler = new SceneBuilderEditActionHandler(editorController, EditAction.CUT);
 		pasteHandler = new SceneBuilderEditActionHandler(editorController, EditAction.PASTE);
+		deleteHandler = new SceneBuilderEditActionHandler(editorController, EditAction.DELETE);
 	}
 	
 	private ChangeListener<Number> editorSelectionListener = (oV, oldNum, newNum) -> {
