@@ -107,8 +107,8 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 					infoPanelController.resetSuggestedControllerClasses(fxmlLocation);
 				}
 				
-				if (qualifiedControllerName != null && JavaModelUtils.getQualifiedName(affectedClass)
-						.equals(qualifiedControllerName) && delta.getKind() != IJavaElementDelta.REMOVED) {
+				if (delta.getKind() != IJavaElementDelta.REMOVED && qualifiedControllerName != null
+						&& JavaModelUtils.getQualifiedName(affectedClass).equals(qualifiedControllerName)) {
 					fxIds.put(qualifiedControllerName, getFxIds(affectedClass));
 					eventHandlers.put(qualifiedControllerName, getEventHandlers(affectedClass));
 				}
