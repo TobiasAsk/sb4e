@@ -20,6 +20,7 @@ public class FXMLEditorContributor extends EditorActionBarContributor {
 			actionBars.setGlobalActionHandler(ActionFactory.COPY.getId(), editor.getCopyHandler());
 			actionBars.setGlobalActionHandler(ActionFactory.CUT.getId(), editor.getCutHandler());
 			actionBars.setGlobalActionHandler(ActionFactory.PASTE.getId(), editor.getPasteHandler());
+			actionBars.setGlobalActionHandler(ActionFactory.DELETE.getId(), editor.getDeleteHandler());
 			actionBars.updateActionBars();
 		}
 	}
