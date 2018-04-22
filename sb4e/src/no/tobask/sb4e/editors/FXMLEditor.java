@@ -159,6 +159,7 @@ public class FXMLEditor extends EditorPart {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		editorController.startFileWatching();
 		String controllerName = editorController.getFxomDocument().getFxomRoot().getFxController();
 		editorController.setGlossary(new JavaProjectGlossary(controllerName, fxmlUrl,
 				editorWindowController.infoPanelController));
