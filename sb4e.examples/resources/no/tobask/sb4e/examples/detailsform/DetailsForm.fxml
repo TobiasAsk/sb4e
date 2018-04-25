@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.151" xmlns:fx="http://javafx.com/fxml/1" fx:controller="no.tobask.sb4e.examples.detailsform.DetailsFormController">
+   <children>
+      <Label layoutX="244.0" layoutY="61.0" text="User details">
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Label>
+      <TextField layoutX="207.0" layoutY="125.0" promptText="Username" />
+      <TextField layoutX="207.0" layoutY="200.0" promptText="E-mail" />
+      <PasswordField fx:id="passwordField" layoutX="207.0" layoutY="277.0" promptText="Password" />
+      <Button fx:id="okButton" layoutX="457.0" layoutY="355.0" mnemonicParsing="false" onAction="#onOkButtonClicked" text="OK" />
+      <Button layoutX="522.0" layoutY="355.0" mnemonicParsing="false" onAction="#onCancelButtonClicked" text="Cancel" />
+   </children>
+</AnchorPane>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="192.0" prefWidth="425.0" xmlns="http://javafx.com/javafx/8.0.151" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ToggleButton layoutX="266.0" layoutY="87.0" mnemonicParsing="false" text="ToggleButton" />
+      <Pagination layoutX="41.0" layoutY="36.0" prefHeight="121.0" prefWidth="166.0" />
+   </children>
+</AnchorPane>
