@@ -142,7 +142,11 @@ public class FXMLEditor extends EditorPart {
 					.readContentFromURL(fxmlUrl), fxmlUrl);
 			editorController.setLibrary(new CustomClassLoaderLibrary(new EclipseProjectsClassLoader()));
 			
-			String controllerName = editorController.getFxomDocument().getFxomRoot().getFxController();
+			FXOMObject root = editorController.getFxomDocument().getFxomRoot();
+			String controllerName = null;
+			if (root != null) {
+				controllerName = root.getFxController();
+			}
 			glossary = new JavaProjectGlossary(controllerName, fxmlUrl,
 					editorWindowController.infoPanelController);
 			editorController.setGlossary(glossary);
