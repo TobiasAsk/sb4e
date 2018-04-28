@@ -19,6 +19,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.SWT;
@@ -59,6 +60,7 @@ public class FXMLEditor extends EditorPart {
 	private URL fxmlUrl;
 	private ICompilationUnit controllerClass;
 	private boolean dirty = false;
+	private JavaProjectGlossary glossary;
 	
 	private IUndoContext undoContext;
 	private IOperationHistory operationHistory;
@@ -132,28 +134,31 @@ public class FXMLEditor extends EditorPart {
 		// toolkit is initialized
 		canvas = new FXCanvas(parent, SWT.None);
 		editorController = new EditorController();
-		editorController.setLibrary(new CustomClassLoaderLibrary(new EclipseProjectsClassLoader()));
-		setupUndoRedo();
 		EditorWindowController editorWindowController = new EditorWindowController(editorController);
 		// make sure the other controllers have their references set before setting the input file
 		// for the editor controller so they can react to the update
 		try {
 			editorController.setFxmlTextAndLocation(FXOMDocument
 					.readContentFromURL(fxmlUrl), fxmlUrl);
+			editorController.setLibrary(new CustomClassLoaderLibrary(new EclipseProjectsClassLoader()));
+			
+			String controllerName = editorController.getFxomDocument().getFxomRoot().getFxController();
+			glossary = new JavaProjectGlossary(controllerName, fxmlUrl,
+					editorWindowController.infoPanelController);
+			editorController.setGlossary(glossary);
+			
+			copyHandler = new SceneBuilderControlActionHandler(editorController, ControlAction.COPY);
+			cutHandler = new SceneBuilderEditActionHandler(editorController, EditAction.CUT);
+			pasteHandler = new SceneBuilderEditActionHandler(editorController, EditAction.PASTE);
+			deleteHandler = new SceneBuilderEditActionHandler(editorController, EditAction.DELETE);
+			
+			setupUndoRedo();
+			editorController.startFileWatching();
+			editorController.getSelection().revisionProperty().addListener(editorSelectionListener);
+			canvas.setScene(editorWindowController.getScene());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		editorController.startFileWatching();
-		String controllerName = editorController.getFxomDocument().getFxomRoot().getFxController();
-		editorController.setGlossary(new JavaProjectGlossary(controllerName, fxmlUrl,
-				editorWindowController.infoPanelController));
-		canvas.setScene(editorWindowController.getScene());
-		editorController.getSelection().revisionProperty().addListener(editorSelectionListener);
-		
-		copyHandler = new SceneBuilderControlActionHandler(editorController, ControlAction.COPY);
-		cutHandler = new SceneBuilderEditActionHandler(editorController, EditAction.CUT);
-		pasteHandler = new SceneBuilderEditActionHandler(editorController, EditAction.PASTE);
-		deleteHandler = new SceneBuilderEditActionHandler(editorController, EditAction.DELETE);
 	}
 	
 	@Override
@@ -201,6 +206,9 @@ public class FXMLEditor extends EditorPart {
 		super.dispose();
 		if (canvas != null) {
 			canvas.dispose();
+		}
+		if (glossary != null) {
+			JavaCore.removeElementChangedListener(glossary);
 		}
 	}
 
