@@ -22,6 +22,7 @@ public class InspectorView implements IPartListener {
 	private IWorkbenchAccessor workbenchAccessor;
 	private Composite parent;
 	private IPartService partService;
+	private FXCanvas canvas;
 	
 	@Inject
 	public InspectorView(InspectorViewController inspectorViewController,
@@ -34,13 +35,20 @@ public class InspectorView implements IPartListener {
 	
 	@PostConstruct
 	public void createGui() {
-		FXCanvas canvas = new FXCanvas(parent, SWT.NONE);
+		canvas = new FXCanvas(parent, SWT.NONE);
 		canvas.setScene(inspectorViewController.getScene());
 		partService.addPartListener(this);
 	}
 	
 	@Focus
 	public void setFocus() {
+	}
+	
+	public void dispose() {
+		if (canvas != null) {
+			canvas.dispose();
+		}
+		partService.removePartListener(this);
 	}
 	
 	@Override
