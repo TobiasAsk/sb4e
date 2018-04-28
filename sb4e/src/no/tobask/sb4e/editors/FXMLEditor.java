@@ -66,6 +66,7 @@ public class FXMLEditor extends EditorPart {
 	private IAction cutHandler;
 	private IAction pasteHandler;
 	private IAction deleteHandler;
+	private FXCanvas canvas;
 
 	public IAction getUndoActionHandler() {
 		return undoActionHandler;
@@ -146,7 +147,7 @@ public class FXMLEditor extends EditorPart {
 	public void createPartControl(Composite parent) {
 		// IMPORTANT: instantiate the canvas before the controllers so that the javafx
 		// toolkit is initialized
-		FXCanvas canvas = new FXCanvas(parent, SWT.None);
+		canvas = new FXCanvas(parent, SWT.None);
 		editorController = new EditorController();
 		editorController.setLibrary(new CustomClassLoaderLibrary(new EclipseProjectsClassLoader()));
 		setupUndoRedo();
@@ -267,6 +268,14 @@ public class FXMLEditor extends EditorPart {
 		}
 		dirty = false;
 		firePropertyChange(PROP_DIRTY);
+	}
+	
+	@Override
+	public void dispose() {
+		super.dispose();
+		if (canvas != null) {
+			canvas.dispose();
+		}
 	}
 
 	@Override
