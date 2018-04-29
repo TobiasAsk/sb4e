@@ -45,6 +45,7 @@ public class InspectorView implements IPartListener {
 	}
 	
 	public void dispose() {
+		inspectorViewController.getInspectorPanelController().setEditorController(dummyEditorController);
 		if (canvas != null) {
 			canvas.dispose();
 		}
