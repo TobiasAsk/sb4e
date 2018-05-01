@@ -468,7 +468,7 @@ public class InfoPanelController extends AbstractFxmlPanelController {
     
     private final ChangeListener<Boolean> checkBoxListener = (ov, t, t1) -> toggleFxRoot();
 
-    private void resetSuggestedControllerClasses(URL location) {
+    public void resetSuggestedControllerClasses(URL location) {
         if (controllerClassEditor != null) {
             // The listener on fxmlLocationProperty is called before the file
             // denoted by the location is created on disk, hence the runLater.
