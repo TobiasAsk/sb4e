@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scenebuilder
 Bundle-SymbolicName: com.oracle.javafx.scenebuilder;singleton:=true
-Bundle-Version: 8.3.0
+Bundle-Version: 9.0.1
 Bundle-ClassPath: lib/javax.json-api-1.0.jar,
  lib/plexus-utils-2.1.jar,
  .

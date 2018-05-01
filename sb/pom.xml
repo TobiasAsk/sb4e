@@ -12,7 +12,7 @@
 		<relativePath>../sb4e.parent</relativePath>
 	</parent>
 
-	<version>8.3.0</version>
+	<version>9.0.1</version>
 
 	<dependencies>
 		<dependency>
