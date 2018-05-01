@@ -8,8 +8,8 @@
 
 	<properties>
 		<tycho-version>1.0.0</tycho-version>
-		<maven.compile.source>1.8</maven.compile.source>
-		<maven.compile.target>1.8</maven.compile.target>
+		<maven.compile.source>1.9</maven.compile.source>
+		<maven.compile.target>1.9</maven.compile.target>
 		<xvfb-maven-plugin.version>1.4.0</xvfb-maven-plugin.version>
 	</properties>
 
@@ -57,7 +57,7 @@
 				<version>${tycho-version}</version>
 				<configuration>
 					<pomDependencies>consider</pomDependencies>
-					<executionEnvironment>JavaSE-1.8</executionEnvironment>
+					<executionEnvironment>JavaSE-9</executionEnvironment>
 					<target>
 						<artifact>
 							<groupId>no.tobask.sb4e</groupId>
