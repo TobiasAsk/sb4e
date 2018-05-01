@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2016, 2017, Gluon and/or its affiliates.
  * Copyright (c) 2012, 2014, Oracle and/or its affiliates.
  * All rights reserved. Use is subject to license terms.
  *
@@ -33,16 +34,24 @@ package com.oracle.javafx.scenebuilder.app;
 
 import com.oracle.javafx.scenebuilder.app.DocumentWindowController.ActionStatus;
 import com.oracle.javafx.scenebuilder.app.about.AboutWindowController;
+import com.oracle.javafx.scenebuilder.kit.preferences.MavenPreferences;
+import com.oracle.javafx.scenebuilder.kit.ResourceUtils;
+import com.oracle.javafx.scenebuilder.kit.ToolTheme;
+import com.oracle.javafx.scenebuilder.kit.alert.ImportingGluonControlsAlert;
+import com.oracle.javafx.scenebuilder.kit.alert.SBAlert;
 import com.oracle.javafx.scenebuilder.app.i18n.I18N;
 import com.oracle.javafx.scenebuilder.app.menubar.MenuBarController;
 import com.oracle.javafx.scenebuilder.app.preferences.PreferencesController;
 import com.oracle.javafx.scenebuilder.app.preferences.PreferencesRecordGlobal;
 import com.oracle.javafx.scenebuilder.app.preferences.PreferencesWindowController;
 import com.oracle.javafx.scenebuilder.app.registration.RegistrationWindowController;
-import com.oracle.javafx.scenebuilder.app.template.FxmlTemplates;
-import com.oracle.javafx.scenebuilder.app.template.TemplateDialogController;
+import com.oracle.javafx.scenebuilder.kit.library.util.JarReport;
+import com.oracle.javafx.scenebuilder.kit.template.Template;
+import com.oracle.javafx.scenebuilder.kit.template.TemplatesWindowController;
+import com.oracle.javafx.scenebuilder.kit.template.Type;
 import com.oracle.javafx.scenebuilder.app.tracking.Tracking;
-import com.oracle.javafx.scenebuilder.app.util.SBSettings;
+import com.oracle.javafx.scenebuilder.app.util.AppSettings;
+import com.oracle.javafx.scenebuilder.app.welcomedialog.WelcomeDialogWindowController;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorPlatform;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.util.dialog.AlertDialog;
@@ -50,7 +59,6 @@ import com.oracle.javafx.scenebuilder.kit.editor.panel.util.dialog.ErrorDialog;
 import com.oracle.javafx.scenebuilder.kit.library.BuiltinLibrary;
 import com.oracle.javafx.scenebuilder.kit.library.user.UserLibrary;
 import com.oracle.javafx.scenebuilder.kit.metadata.Metadata;
-import com.oracle.javafx.scenebuilder.kit.util.Deprecation;
 import com.oracle.javafx.scenebuilder.kit.util.control.effectpicker.EffectPicker;
 
 import java.io.File;
@@ -67,6 +75,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -75,6 +84,10 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -82,22 +95,14 @@ import javafx.stage.Stage;
  *
  */
 public class SceneBuilderApp extends Application implements AppPlatform.AppNotificationHandler {
-    public static final String VERSION = "8.3.0";
 
     public enum ApplicationControlAction {
 
         ABOUT,
+        CHECK_UPDATES,
         REGISTER,
         NEW_FILE,
-        NEW_ALERT_DIALOG,
-        NEW_ALERT_DIALOG_CSS,
-        NEW_ALERT_DIALOG_I18N,
-        NEW_BASIC_APPLICATION,
-        NEW_BASIC_APPLICATION_CSS,
-        NEW_BASIC_APPLICATION_I18N,
-        NEW_COMPLEX_APPLICATION,
-        NEW_COMPLEX_APPLICATION_CSS,
-        NEW_COMPLEX_APPLICATION_I18N,
+        NEW_TEMPLATE,
         OPEN_FILE,
         CLOSE_FRONT_WINDOW,
         USE_DEFAULT_THEME,
@@ -106,31 +111,11 @@ public class SceneBuilderApp extends Application implements AppPlatform.AppNotif
         EXIT
     }
 
-    public enum ToolTheme {
-
-        DEFAULT {
-            @Override
-            public String toString() {
-                return I18N.getString("prefs.tool.theme.default");
-            }
-        },
-        DARK {
-            @Override
-            public String toString() {
-                return I18N.getString("prefs.tool.theme.dark");
-            }
-        }
-    }
-
     private static SceneBuilderApp singleton;
     private static String darkToolStylesheet;
     private static final CountDownLatch launchLatch = new CountDownLatch(1);
 
-    private final List<DocumentWindowController> windowList = new ArrayList<>();
-    private final PreferencesWindowController preferencesWindowController
-            = new PreferencesWindowController();
-    private final AboutWindowController aboutWindowController
-            = new AboutWindowController();
+    private final ObservableList<DocumentWindowController> windowList = FXCollections.observableArrayList();
     private UserLibrary userLibrary;
     private ToolTheme toolTheme = ToolTheme.DEFAULT;
 
@@ -148,6 +133,18 @@ public class SceneBuilderApp extends Application implements AppPlatform.AppNotif
 
         // set design time flag
         java.beans.Beans.setDesignTime(true);
+        
+        // SB-270
+        windowList.addListener((ListChangeListener.Change<? extends DocumentWindowController> c) -> {
+            while (c.next()) {
+                if (c.wasAdded()) {
+                    final String toolStylesheet = getToolStylesheet();
+                    for (DocumentWindowController dwc : c.getAddedSubList()) {
+                        dwc.setToolStylesheet(toolStylesheet);
+                    }
+                }
+            }
+        });
         
         /*
          * We spawn our two threads for handling background startup.
@@ -175,34 +172,31 @@ public class SceneBuilderApp extends Application implements AppPlatform.AppNotif
     public void performControlAction(ApplicationControlAction a, DocumentWindowController source) {
         switch (a) {
             case ABOUT:
+                AboutWindowController aboutWindowController = new AboutWindowController();
+                aboutWindowController.setToolStylesheet(getToolStylesheet());
                 aboutWindowController.openWindow();
-                SBSettings.setWindowIcon(aboutWindowController.getStage());
+                AppSettings.setWindowIcon(aboutWindowController.getStage());
                 break;
 
             case REGISTER:
-                final RegistrationWindowController registrationWindowController = new RegistrationWindowController();
+                final RegistrationWindowController registrationWindowController = new RegistrationWindowController(source.getStage());
                 registrationWindowController.openWindow();
+                break;
+
+            case CHECK_UPDATES:
+                checkUpdates(source);
                 break;
 
             case NEW_FILE:
                 final DocumentWindowController newWindow = makeNewWindow();
-                newWindow.loadWithDefaultContent();
+                newWindow.updateWithDefaultContent();
                 newWindow.openWindow();
                 break;
 
-            case NEW_ALERT_DIALOG:
-            case NEW_BASIC_APPLICATION:
-            case NEW_COMPLEX_APPLICATION:
-                performNewTemplate(a);
-                break;
-
-            case NEW_ALERT_DIALOG_CSS:
-            case NEW_ALERT_DIALOG_I18N:
-            case NEW_BASIC_APPLICATION_CSS:
-            case NEW_BASIC_APPLICATION_I18N:
-            case NEW_COMPLEX_APPLICATION_CSS:
-            case NEW_COMPLEX_APPLICATION_I18N:
-                performNewTemplateWithResources(a);
+            case NEW_TEMPLATE:
+                final TemplatesWindowController templatesWindowController = new TemplatesWindowController(source.getStage());
+                templatesWindowController.setOnTemplateChosen(this::performNewTemplateInNewWindow);
+                templatesWindowController.openWindow();
                 break;
 
             case OPEN_FILE:
@@ -222,7 +216,8 @@ public class SceneBuilderApp extends Application implements AppPlatform.AppNotif
                 break;
 
             case SHOW_PREFERENCES:
-                SBSettings.setWindowIcon(preferencesWindowController.getStage());
+                PreferencesWindowController preferencesWindowController = new PreferencesWindowController(source.getStage());
+                preferencesWindowController.setToolStylesheet(getToolStylesheet());
                 preferencesWindowController.openWindow();
                 break;
 
@@ -238,16 +233,9 @@ public class SceneBuilderApp extends Application implements AppPlatform.AppNotif
         switch (a) {
             case ABOUT:
             case REGISTER:
+            case CHECK_UPDATES:
             case NEW_FILE:
-            case NEW_ALERT_DIALOG:
-            case NEW_BASIC_APPLICATION:
-            case NEW_COMPLEX_APPLICATION:
-            case NEW_ALERT_DIALOG_CSS:
-            case NEW_ALERT_DIALOG_I18N:
-            case NEW_BASIC_APPLICATION_CSS:
-            case NEW_BASIC_APPLICATION_I18N:
-            case NEW_COMPLEX_APPLICATION_CSS:
-            case NEW_COMPLEX_APPLICATION_I18N:
+            case NEW_TEMPLATE:
             case OPEN_FILE:
             case SHOW_PREFERENCES:
             case EXIT:
@@ -349,9 +337,7 @@ public class SceneBuilderApp extends Application implements AppPlatform.AppNotif
 
     public static synchronized String getDarkToolStylesheet() {
         if (darkToolStylesheet == null) {
-            final URL url = SceneBuilderApp.class.getResource("css/ThemeDark.css"); //NOI18N
-            assert url != null;
-            darkToolStylesheet = url.toExternalForm();
+            darkToolStylesheet = ResourceUtils.THEME_DARK_STYLESHEET;
         }
         return darkToolStylesheet;
     }
@@ -397,8 +383,36 @@ public class SceneBuilderApp extends Application implements AppPlatform.AppNotif
     public void handleLaunch(List<String> files) {
         setApplicationUncaughtExceptionHandler();
 
+        MavenPreferences mavenPreferences = PreferencesController.getSingleton().getMavenPreferences();
         // Creates the user library
-        userLibrary = new UserLibrary(AppPlatform.getUserLibraryFolder());
+        userLibrary = new UserLibrary(AppPlatform.getUserLibraryFolder(),
+                () -> mavenPreferences.getArtifactsPathsWithDependencies(),
+                () -> mavenPreferences.getArtifactsFilter());
+
+        userLibrary.setOnUpdatedJarReports(jarReports -> {
+            boolean shouldShowImportGluonJarAlert = false;
+            for (JarReport jarReport : jarReports) {
+                if (jarReport.hasGluonControls()) {
+                    // We check if the jar has already been imported to avoid showing the import gluon jar
+                    // alert every time Scene Builder starts for jars that have already been imported
+                    if (!hasGluonJarBeenImported(jarReport.getJar().getFileName().toString())) {
+                        shouldShowImportGluonJarAlert = true;
+                    }
+
+                }
+            }
+            if (shouldShowImportGluonJarAlert) {
+                SceneBuilderApp sceneBuilderApp = SceneBuilderApp.getSingleton();
+                DocumentWindowController dwc = sceneBuilderApp.getFrontDocumentWindow();
+                if (dwc == null) {
+                    dwc = sceneBuilderApp.getDocumentWindowControllers().get(0);
+                }
+                ImportingGluonControlsAlert alert = new ImportingGluonControlsAlert(dwc.getStage());
+                AppSettings.setWindowIcon(alert);
+                alert.showAndWait();
+            }
+            updateImportedGluonJars(jarReports);
+        });
 
         userLibrary.explorationCountProperty().addListener((ChangeListener<Number>) (ov, t, t1) -> userLibraryExplorationCountDidChange());
 
@@ -409,7 +423,7 @@ public class SceneBuilderApp extends Application implements AppPlatform.AppNotif
         if (files.isEmpty()) {
             // Creates an empty document
             final DocumentWindowController newWindow = makeNewWindow();
-            newWindow.loadWithDefaultContent();
+            newWindow.updateWithDefaultContent();
             newWindow.openWindow();
 
             // Show ScenicView Tool when the JVM is started with option -Dscenic.
@@ -418,24 +432,24 @@ public class SceneBuilderApp extends Application implements AppPlatform.AppNotif
                 Platform.runLater(new ScenicViewStarter(newWindow.getScene()));
             }
 
-            WelcomeDialog.getInstance().setOnHidden(event -> {
-                verifyLatestVersion();
-                verifyRegistration();
+            WelcomeDialogWindowController.getInstance().getStage().setOnHidden(event -> {
+                showUpdateDialogIfRequired(newWindow, () -> {
+                    if (!Platform.isFxApplicationThread()) {
+                        Platform.runLater(() -> showRegistrationDialogIfRequired(newWindow));
+                    } else {
+                        showRegistrationDialogIfRequired(newWindow);
+                    }
+
+                });
             });
 
             // Unless we're on a Mac we're starting SB directly (fresh start)
             // so we're not opening any file and as such we should show the Welcome Dialog
-            WelcomeDialog.getInstance().show();
+            WelcomeDialogWindowController.getInstance().getStage().show();
 
         } else {
             // Open files passed as arguments by the platform
             handleOpenFilesAction(files);
-        }
-
-        // On Mac, AppPlatform disables implicit exit.
-        // So we need to set a default system menu bar.
-        if (Platform.isImplicitExit() == false) {
-            Deprecation.setDefaultSystemMenuBar(MenuBarController.getSystemMenuBarController().getMenuBar());
         }
 
     }
@@ -548,7 +562,7 @@ public class SceneBuilderApp extends Application implements AppPlatform.AppNotif
     public DocumentWindowController makeNewWindow() {
         final DocumentWindowController result = new DocumentWindowController();
 
-        SBSettings.setWindowIcon(result.getStage());
+        AppSettings.setWindowIcon(result.getStage());
 
         windowList.add(result);
         return result;
@@ -581,31 +595,41 @@ public class SceneBuilderApp extends Application implements AppPlatform.AppNotif
         }
     }
 
-    private void performNewTemplate(ApplicationControlAction action) {
-        final DocumentWindowController newTemplateWindow = makeNewWindow();
-        final URL url = FxmlTemplates.getContentURL(action);
-        newTemplateWindow.loadFromURL(url);
-        newTemplateWindow.openWindow();
+    public void performNewTemplate(Template template) {
+        DocumentWindowController documentWC = getDocumentWindowControllers().get(0);
+        loadTemplateInWindow(template, documentWC);
     }
 
-    private void performNewTemplateWithResources(ApplicationControlAction action) {
-        final TemplateDialogController tdc = new TemplateDialogController(action);
-        tdc.setToolStylesheet(getToolStylesheet());
-        tdc.openWindow();
+    public void performNewTemplateInNewWindow(Template template) {
+        final DocumentWindowController newTemplateWindow = makeNewWindow();
+        loadTemplateInWindow(template, newTemplateWindow);
+    }
+
+    private void loadTemplateInWindow(Template template, DocumentWindowController documentWindowController) {
+        final URL url = template.getFXMLURL();
+        if (url != null) {
+            documentWindowController.loadFromURL(url, template.getType() != Type.PHONE);
+        }
+        Template.prepareDocument(documentWindowController.getEditorController(), template);
+        documentWindowController.openWindow();
     }
 
     private void performCloseFrontWindow() {
-        if (preferencesWindowController != null
-                && preferencesWindowController.getStage().isFocused()) {
-            preferencesWindowController.closeWindow();
-        } else {
-            for (DocumentWindowController dwc : windowList) {
-                if (dwc.isFrontDocumentWindow()) {
-                    dwc.performCloseFrontDocumentWindow();
-                    break;
-                }
+        for (DocumentWindowController dwc : windowList) {
+            if (dwc.isFrontDocumentWindow()) {
+                dwc.performCloseFrontDocumentWindow();
+                break;
             }
         }
+    }
+
+    public DocumentWindowController getFrontDocumentWindow() {
+        for (DocumentWindowController dwc : windowList) {
+            if (dwc.isFrontDocumentWindow()) {
+                return dwc;
+            }
+        }
+        return null;
     }
 
     private void performOpenFiles(List<File> fxmlFiles,
@@ -643,8 +667,7 @@ public class SceneBuilderApp extends Application implements AppPlatform.AppNotif
             case 0: { // Good
                 // Update recent items with opened files
                 final PreferencesController pc = PreferencesController.getSingleton();
-                final PreferencesRecordGlobal recordGlobal = pc.getRecordGlobal();
-                recordGlobal.addRecentItems(fxmlFiles);
+                pc.getRecordGlobal().addRecentItems(fxmlFiles);
                 break;
             }
             case 1: {
@@ -801,27 +824,11 @@ public class SceneBuilderApp extends Application implements AppPlatform.AppNotif
         for (DocumentWindowController dwc : windowList) {
             dwc.setToolStylesheet(toolStylesheet);
         }
-        preferencesWindowController.setToolStylesheet(toolStylesheet);
-        aboutWindowController.setToolStylesheet(toolStylesheet);
     }
 
 
     private String getToolStylesheet() {
-        final String result;
-
-        switch (this.toolTheme) {
-
-            default:
-            case DEFAULT:
-                result = EditorController.getBuiltinToolStylesheet();
-                break;
-
-            case DARK:
-                result = getDarkToolStylesheet();
-                break;
-        }
-
-        return result;
+        return ResourceUtils.getToolStylesheet(toolTheme);
     }
     
     
@@ -917,30 +924,88 @@ public class SceneBuilderApp extends Application implements AppPlatform.AppNotif
         }
     }
 
-    private void verifyLatestVersion() {
-        SBSettings.getLatestVersion(latestVersion -> {
+    private void showUpdateDialogIfRequired(DocumentWindowController dwc, Runnable runAfterUpdateDialog) {
+        AppSettings.getLatestVersion(latestVersion -> {
             if (latestVersion == null) {
-                // This can be because the url was not reachable so we don't show the update dialog
+                // This can be because the url was not reachable so we don't show the update dialog.
                 return;
             }
-            if (SBSettings.isCurrentVersionLowerThan(latestVersion)) {
-                PreferencesController pc = PreferencesController.getSingleton();
-                PreferencesRecordGlobal recordGlobal = pc.getRecordGlobal();
+            try {
+                boolean showUpdateDialog = true;
+                if (AppSettings.isCurrentVersionLowerThan(latestVersion)) {
+                    PreferencesController pc = PreferencesController.getSingleton();
+                    PreferencesRecordGlobal recordGlobal = pc.getRecordGlobal();
 
-                if (isVersionToBeIgnored(recordGlobal, latestVersion)) {
-                    return;
+                    if (isVersionToBeIgnored(recordGlobal, latestVersion)) {
+                        showUpdateDialog = false;
+                    }
+
+                    if (!isUpdateDialogDateReached(recordGlobal)) {
+                        showUpdateDialog = false;
+                    }
+                } else {
+                    showUpdateDialog = false;
                 }
 
-                if (!isUpdateDialogDateReached(recordGlobal)) {
-                    return;
+                if (showUpdateDialog) {
+                    String latestVersionText = AppSettings.getLatestVersionText();
+                    String latestVersionAnnouncementURL = AppSettings.getLatestVersionAnnouncementURL();
+                    Platform.runLater(() -> {
+                        UpdateSceneBuilderDialog dialog = new UpdateSceneBuilderDialog(latestVersion, latestVersionText,
+                                latestVersionAnnouncementURL, dwc.getStage());
+                        dialog.setOnHidden(event -> runAfterUpdateDialog.run());
+                        dialog.showAndWait();
+                    });
+                } else {
+                    runAfterUpdateDialog.run();
                 }
-                Platform.runLater(() -> {
-                    UpdateSceneBuilderDialog dialog = new UpdateSceneBuilderDialog(latestVersion);
-                    dialog.showAndWait();
-                });
+            } catch (NumberFormatException ex) {
+                Platform.runLater(() -> showVersionNumberFormatError(dwc));
             }
         });
+    }
 
+    private void checkUpdates(DocumentWindowController source) {
+        AppSettings.getLatestVersion(latestVersion -> {
+            if (latestVersion == null) {
+                Platform.runLater(() -> {
+                    SBAlert alert = new SBAlert(Alert.AlertType.ERROR, getFrontDocumentWindow().getStage());
+                    alert.setTitle(I18N.getString("check_for_updates.alert.error.title"));
+                    alert.setHeaderText(I18N.getString("check_for_updates.alert.headertext"));
+                    alert.setContentText(I18N.getString("check_for_updates.alert.error.message"));
+                    alert.showAndWait();
+                });
+            }
+            try {
+                if (AppSettings.isCurrentVersionLowerThan(latestVersion)) {
+                    String latestVersionText = AppSettings.getLatestVersionText();
+                    String latestVersionAnnouncementURL = AppSettings.getLatestVersionAnnouncementURL();
+                    Platform.runLater(() -> {
+                        UpdateSceneBuilderDialog dialog = new UpdateSceneBuilderDialog(latestVersion, latestVersionText,
+                                latestVersionAnnouncementURL, source.getStage());
+                        dialog.showAndWait();
+                    });
+                } else {
+                    SBAlert alert = new SBAlert(Alert.AlertType.INFORMATION, getFrontDocumentWindow().getStage());
+                    alert.setTitle(I18N.getString("check_for_updates.alert.up_to_date.title"));
+                    alert.setHeaderText(I18N.getString("check_for_updates.alert.headertext"));
+                    alert.setContentText(I18N.getString("check_for_updates.alert.up_to_date.message"));
+                    alert.showAndWait();
+                }
+            } catch (NumberFormatException ex) {
+                Platform.runLater(() -> showVersionNumberFormatError(source));
+            }
+        });
+    }
+
+    private void showVersionNumberFormatError(DocumentWindowController dwc) {
+        SBAlert alert = new SBAlert(Alert.AlertType.ERROR, dwc.getStage());
+        // The version number format is not supported and this is most probably only happening
+        // in development so we don't localize the strings
+        alert.setTitle("Error");
+        alert.setHeaderText(I18N.getString("check_for_updates.alert.headertext"));
+        alert.setContentText("Version number format not supported. Maybe using SNAPSHOT or RC versions.");
+        alert.showAndWait();
     }
 
     private boolean isVersionToBeIgnored(PreferencesRecordGlobal recordGlobal, String latestVersion) {
@@ -959,16 +1024,16 @@ public class SceneBuilderApp extends Application implements AppPlatform.AppNotif
         }
     }
 
-    private void verifyRegistration() {
+    private void showRegistrationDialogIfRequired(DocumentWindowController dwc) {
         PreferencesController pc = PreferencesController.getSingleton();
         PreferencesRecordGlobal recordGlobal = pc.getRecordGlobal();
         String registrationHash = recordGlobal.getRegistrationHash();
         if (registrationHash == null) {
-            performControlAction(ApplicationControlAction.REGISTER, null);
+            performControlAction(ApplicationControlAction.REGISTER, dwc);
         } else {
             String registrationEmail = recordGlobal.getRegistrationEmail();
             if (registrationEmail == null && Math.random() > 0.8) {
-                performControlAction(ApplicationControlAction.REGISTER, null);
+                performControlAction(ApplicationControlAction.REGISTER, dwc);
             }
         }
     }
@@ -984,4 +1049,42 @@ public class SceneBuilderApp extends Application implements AppPlatform.AppNotif
             dwc.getEditorController().getMessageLog().logInfoMessage(key, I18N.getBundle(), args);
         }
     }
+
+    private static void updateImportedGluonJars(List<JarReport> jars) {
+        PreferencesController pc = PreferencesController.getSingleton();
+        PreferencesRecordGlobal recordGlobal = pc.getRecordGlobal();
+        List<String> jarReportCollection = new ArrayList<>();
+        for (JarReport jarReport : jars) {
+            if (jarReport.hasGluonControls()) {
+                jarReportCollection.add(jarReport.getJar().getFileName().toString());
+            }
+        }
+        if (jarReportCollection.isEmpty()) {
+            recordGlobal.setImportedGluonJars(new String[0]);
+        } else {
+            recordGlobal.setImportedGluonJars(jarReportCollection.toArray(new String[0]));
+        }
+    }
+
+    private static boolean hasGluonJarBeenImported(String jar) {
+        PreferencesController pc = PreferencesController.getSingleton();
+        String[] importedJars = pc.getRecordGlobal().getImportedGluonJars();
+        if (importedJars == null) {
+            return false;
+        }
+
+        for (String importedJar : importedJars) {
+            if (jar.equals(importedJar)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void applyToAllDocumentWindows(Consumer<DocumentWindowController> consumer) {
+        for (DocumentWindowController dwc : getSingleton().getDocumentWindowControllers()) {
+            consumer.accept(dwc);
+        }
+    }
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Gluon and/or its affiliates.
+ * Copyright (c) 2017, Gluon and/or its affiliates.
  * All rights reserved. Use is subject to license terms.
  *
  * This file is available and licensed under the following license:
@@ -29,56 +29,51 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+@import "/com/oracle/javafx/scenebuilder/kit/template/TemplatesWindow.css";
 
-.welcome-dialog {
-    -fx-min-height: 300px;
-    -fx-background-color: white;
+.left-pane {
+    -fx-background-color: #f68a1f;
 }
 
-.welcome-dialog .header {
-    -fx-font-weight: bold;
-    -fx-font-size: 1.25em;
-}
-.welcome-dialog .actions-options {
-    -fx-padding: 5 0 0 0;
-}
-.welcome-dialog .actions-options .hyperlink, .welcome-dialog .recent-items-options .hyperlink {
-    -fx-padding: 0 0 0 0;
+.recent-documents-scrollpane{
+    -fx-background-color: transparent;
 }
 
-.welcome-dialog .actions-options > .action-option-container {
-    -fx-spacing: 3;
+.recent-documents-scrollpane > .viewport {
+    -fx-background-color: transparent;
 }
 
-.welcome-dialog .recent-items-options, .welcome-dialog .scroll-pane-container {
-    -fx-padding: 5 0 0 0;
+.recent-document, .action-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
 }
 
-.welcome-dialog .scroll-pane .recent-items-options {
-    -fx-padding: 0 0 0 0;
+.recent-document {
+    -fx-text-fill: white;
+    -fx-font-size: 1em;
+
+    -fx-padding: 0.1666665em 5px 0.1666665em 7px; /* 2 5 2 7 */
 }
 
-.welcome-dialog .scroll-pane {
-    -fx-max-height: 150px;
-    -fx-min-width: 250px;
-    -fx-pref-width: 250px;
-    -fx-max-width: 250px;
+.recent-document:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.3);
 }
 
-.welcome-dialog .scroll-pane > .viewport {
-    -fx-background-color: white;
+.action-button {
+    -fx-padding: 0.1666665em 0em 0.1666665em 7px; /* 2 0 2 7 */
 }
 
-.welcome-dialog .recent-items-container{
-    -fx-pref-width: 350px;
+.action-button:selected {
+    -fx-background-color: #f8a452;
 }
 
-.welcome-dialog .actions-container{
-    -fx-pref-width: 350px;
+.action-button:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.3);
 }
 
-.welcome-dialog .separator {
-    -fx-padding: 0 5 0 0;
+.no-recent-items-label {
+    -fx-text-fill: white;
+    -fx-font-size: 1em;
+    -fx-padding: 0.1666665em 5px 0.1666665em 7px; /* 2 5 2 7 */
 }
-
-
