@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.e4.tools.compat;bundle-version="4.7.0",
  org.eclipse.core.resources
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Import-Package: com.oracle.javafx.scenebuilder.app.selectionbar,
+Import-Package: com.oracle.javafx.scenebuilder.kit.selectionbar,
+ com.oracle.javafx.scenebuilder.kit.i18n,
  com.oracle.javafx.scenebuilder.kit.editor,
  com.oracle.javafx.scenebuilder.kit.editor.job,
  com.oracle.javafx.scenebuilder.kit.editor.panel.content,
