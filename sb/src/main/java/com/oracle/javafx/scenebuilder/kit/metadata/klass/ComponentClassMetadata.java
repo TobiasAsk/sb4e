@@ -155,11 +155,12 @@ public class ComponentClassMetadata extends ClassMetadata {
          * ------------ Gluon ------------------
          *
          * BottomNavigation             actionItems
-         * CardPane                     cards
+         * CardPane                     items
          * DropdownButton               items
          * ExpansionPanelContainer      items
          * ToggleButtonGroup            toggles
          * CollapsedPanel               titleNodes
+         * SettingsPane                 options
          *
          * ------------------------------------
          *
@@ -200,18 +201,20 @@ public class ComponentClassMetadata extends ClassMetadata {
             result = childrenName;
         } else if (componentClass == javafx.scene.layout.Pane.class) {
             result = childrenName;
-//        } else if (componentClass == com.gluonhq.charm.glisten.control.BottomNavigation.class) {
-//            result = actionItemsName;
-//        } else if (componentClass == com.gluonhq.charm.glisten.control.CardPane.class) {
-//            result = cardsName;
-//        } else if (componentClass == com.gluonhq.charm.glisten.control.DropdownButton.class) {
-//            result = itemsName;
-//        } else if (componentClass == com.gluonhq.charm.glisten.control.ExpansionPanelContainer.class) {
-//            result = itemsName;
-//        } else if (componentClass == com.gluonhq.charm.glisten.control.ToggleButtonGroup.class) {
-//            result = togglesName;
-//        } else if (componentClass == com.gluonhq.charm.glisten.control.ExpansionPanel.CollapsedPanel.class) {
-//            result = titleNodesName;
+        } else if (componentClass == com.gluonhq.charm.glisten.control.BottomNavigation.class) {
+            result = actionItemsName;
+        } else if (componentClass == com.gluonhq.charm.glisten.control.CardPane.class) {
+            result = itemsName;
+        } else if (componentClass == com.gluonhq.charm.glisten.control.DropdownButton.class) {
+            result = itemsName;
+        } else if (componentClass == com.gluonhq.charm.glisten.control.ExpansionPanelContainer.class) {
+            result = itemsName;
+        } else if (componentClass == com.gluonhq.charm.glisten.control.ToggleButtonGroup.class) {
+            result = togglesName;
+        } else if (componentClass == com.gluonhq.charm.glisten.control.ExpansionPanel.CollapsedPanel.class) {
+            result = titleNodesName;
+        } else if (componentClass == com.gluonhq.charm.glisten.control.SettingsPane.class) {
+            result = optionsName;
         } else {
             result = null;
         }
@@ -229,8 +232,8 @@ public class ComponentClassMetadata extends ClassMetadata {
     private static final PropertyName childrenName = new PropertyName("children");
     // Gluon
     private static final PropertyName actionItemsName = new PropertyName("actionItems");
-    private static final PropertyName cardsName = new PropertyName("cards");
     private static final PropertyName togglesName = new PropertyName("toggles");
     private static final PropertyName titleNodesName = new PropertyName("titleNodes");
+    private static final PropertyName optionsName = new PropertyName("options");
 
 }

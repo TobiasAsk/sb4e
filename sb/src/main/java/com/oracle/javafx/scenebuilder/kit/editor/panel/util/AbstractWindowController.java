@@ -41,7 +41,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Region;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 
 /**
@@ -50,7 +49,7 @@ import javafx.stage.WindowEvent;
  */
 public abstract class AbstractWindowController {
     
-    final private Window owner;
+    final private Stage owner;
     private Parent root;
     private Scene scene;
     private Stage stage;
@@ -67,11 +66,11 @@ public abstract class AbstractWindowController {
         this(null, true);
     }
     
-    public AbstractWindowController(Window owner) {
+    public AbstractWindowController(Stage owner) {
         this(owner, true);
     }
     
-    public AbstractWindowController(Window owner, boolean sizeToScene) {
+    public AbstractWindowController(Stage owner, boolean sizeToScene) {
         this.owner = owner;
         this.sizeToScene = sizeToScene;
     }
@@ -133,6 +132,11 @@ public abstract class AbstractWindowController {
             if (sizeToScene) {
                 stage.sizeToScene();
             }
+            // By default we set the same icons as the owner
+            if (owner != null) {
+                stage.getIcons().addAll(owner.getIcons());
+            }
+
             controllerDidCreateStage();
         }
         

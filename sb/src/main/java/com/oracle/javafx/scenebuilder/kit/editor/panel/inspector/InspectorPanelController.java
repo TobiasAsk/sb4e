@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Gluon and/or its affiliates.
+ * Copyright (c) 2016, 2017 Gluon and/or its affiliates.
  * Copyright (c) 2012, 2014, Oracle and/or its affiliates.
  * All rights reserved. Use is subject to license terms.
  *
@@ -34,7 +34,7 @@ package com.oracle.javafx.scenebuilder.kit.editor.panel.inspector;
 
 import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
 import com.oracle.javafx.scenebuilder.kit.editor.drag.source.AbstractDragSource;
-import com.oracle.javafx.scenebuilder.kit.editor.i18n.I18N;
+import com.oracle.javafx.scenebuilder.kit.i18n.I18N;
 import com.oracle.javafx.scenebuilder.kit.editor.job.Job;
 import com.oracle.javafx.scenebuilder.kit.editor.job.ModifyCacheHintJob;
 import com.oracle.javafx.scenebuilder.kit.editor.job.ModifySelectionJob;
@@ -218,6 +218,7 @@ public class InspectorPanelController extends AbstractFxmlPanelController {
 
     // Inspector state
     private SelectionState selectionState;
+    private final EditorController editorController;
 
     private double searchResultDividerPosition;
 
@@ -229,6 +230,7 @@ public class InspectorPanelController extends AbstractFxmlPanelController {
      */
     public InspectorPanelController(EditorController editorController) {
         super(InspectorPanelController.class.getResource(fxmlFile), I18N.getBundle(), editorController);
+        this.editorController = editorController;
         this.availableCharsets = CharsetEditor.getStandardCharsets();
         viewModeProperty.setValue(ViewMode.SECTION);
         viewModeProperty.addListener(new ChangeListener<ViewMode>() {
@@ -538,7 +540,7 @@ public class InspectorPanelController extends AbstractFxmlPanelController {
      * Private
      */
     private void updateInspector() {
-        if (isInspectorLoaded()) {
+        if (isInspectorLoaded() && hasFxomDocument()) {
             SelectionState newSelectionState = new SelectionState(editorController);
             if (isInspectorStateChanged(newSelectionState) || isEditedMode()) {
                 selectionState = newSelectionState;
@@ -1876,7 +1878,7 @@ public class InspectorPanelController extends AbstractFxmlPanelController {
             }
         } else if (editorClass == EffectPopupEditor.class) {
             if (createdPropertyEditor != null) {
-                ((EffectPopupEditor) createdPropertyEditor).reset(propMeta, selectedClasses, getEditorController());
+                ((EffectPopupEditor) createdPropertyEditor).reset(propMeta, selectedClasses);
             } else {
                 createdPropertyEditor = new EffectPopupEditor(propMeta, selectedClasses, getEditorController());
             }
@@ -1888,7 +1890,7 @@ public class InspectorPanelController extends AbstractFxmlPanelController {
             }
         } else if (editorClass == PaintPopupEditor.class) {
             if (createdPropertyEditor != null) {
-                ((PaintPopupEditor) createdPropertyEditor).reset(propMeta, selectedClasses, getEditorController());
+                ((PaintPopupEditor) createdPropertyEditor).reset(propMeta, selectedClasses);
             } else {
                 createdPropertyEditor = new PaintPopupEditor(propMeta, selectedClasses, getEditorController());
             }

@@ -126,12 +126,6 @@ public class FontPopupEditor extends PopupEditor {
     public void reset(ValuePropertyMetadata propMeta, Set<Class<?>> selectedClasses, EditorController editorController) {
         super.reset(propMeta, selectedClasses);
         this.editorController = editorController;
-        if (familyEditor != null) {
-        	familyEditor.setEditorController(editorController);
-        }
-        if (styleEditor != null) {
-            styleEditor.setEditorController(editorController);
-        }
     }
 
     //
@@ -215,7 +209,6 @@ public class FontPopupEditor extends PopupEditor {
 
         private List<String> families;
         private String family = null;
-        private EditorController editorController;
 
         public FamilyEditor(String name, String defaultValue, List<String> families, EditorController editorController) {
             super(name, defaultValue, families);
@@ -224,29 +217,24 @@ public class FontPopupEditor extends PopupEditor {
         
         private void initialize(List<String> families, EditorController editorController) {
             this.families = families;
-            this.editorController = editorController;
+            EventHandler<ActionEvent> onActionListener = event -> {
+                if (Objects.equals(family, getTextField().getText())) {
+                    // no change
+                    return;
+                }
+                family = getTextField().getText();
+                if (family.isEmpty() || !FamilyEditor.this.families.contains(family)) {
+                    editorController.getMessageLog().logWarningMessage(
+                            "inspector.font.invalidfamily", family); //NOI18N
+                    return;
+                }
+//                    System.out.println("Setting family from '" + valueProperty().get() + "' to '" + value + "'");
+                valueProperty().setValue(family);
+            };
+
             setTextEditorBehavior(this, getTextField(), onActionListener);
             commitOnFocusLost(this);
         }
-        
-        public void setEditorController(EditorController editorController) {
-        	this.editorController = editorController;
-        }
-        
-        private EventHandler<ActionEvent> onActionListener = event -> {
-            if (Objects.equals(family, getTextField().getText())) {
-                // no change
-                return;
-            }
-            family = getTextField().getText();
-            if (family.isEmpty() || !FamilyEditor.this.families.contains(family)) {
-                editorController.getMessageLog().logWarningMessage(
-                        "inspector.font.invalidfamily", family); //NOI18N
-                return;
-            }
-//                System.out.println("Setting family from '" + valueProperty().get() + "' to '" + value + "'");
-            valueProperty().setValue(family);
-        };
 
         @Override
         public Object getValue() {
@@ -262,7 +250,6 @@ public class FontPopupEditor extends PopupEditor {
     private static class StyleEditor extends AutoSuggestEditor {
         
         private String style = null;
-        private EditorController editorController;
 
         public StyleEditor(String name, String defaultValue, List<String> suggestedList, EditorController editorController) {
             super(name, defaultValue, suggestedList);
@@ -270,28 +257,23 @@ public class FontPopupEditor extends PopupEditor {
         }
         
         private void initialize(EditorController editorController) {
-        	this.editorController = editorController;
+            EventHandler<ActionEvent> onActionListener = event -> {
+                if (Objects.equals(style, getTextField().getText())) {
+                    // no change
+                    return;
+                }
+                style = getTextField().getText();
+                if (style.isEmpty() || !getSuggestedList().contains(style)) {
+                    editorController.getMessageLog().logWarningMessage(
+                            "inspector.font.invalidstyle", style); //NOI18N
+                    return;
+                }
+                valueProperty().setValue(style);
+            };
+
             setTextEditorBehavior(this, getTextField(), onActionListener);
             commitOnFocusLost(this);
         }
-        
-        public void setEditorController(EditorController editorController) {
-        	this.editorController = editorController;
-        }
-        
-        private EventHandler<ActionEvent> onActionListener = event -> {
-            if (Objects.equals(style, getTextField().getText())) {
-                // no change
-                return;
-            }
-            style = getTextField().getText();
-            if (style.isEmpty() || !getSuggestedList().contains(style)) {
-                editorController.getMessageLog().logWarningMessage(
-                        "inspector.font.invalidstyle", style); //NOI18N
-                return;
-            }
-            valueProperty().setValue(style);
-        };
 
         @Override
         public Object getValue() {

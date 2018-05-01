@@ -91,11 +91,6 @@ public class PaintPopupEditor extends PopupEditor {
         final PaintPicker.Delegate delegate = (warningKey, arguments) -> editorController.getMessageLog().logWarningMessage(warningKey, arguments);
         paintPicker = new PaintPicker(delegate);
     }
-    
-    public void reset(ValuePropertyMetadata propMeta, Set<Class<?>> selectedClasses, EditorController editorController) {
-    	super.reset(propMeta, selectedClasses);
-    	this.editorController = editorController;
-    }
 
     @Override
     public String getPreviewString(Object value) {

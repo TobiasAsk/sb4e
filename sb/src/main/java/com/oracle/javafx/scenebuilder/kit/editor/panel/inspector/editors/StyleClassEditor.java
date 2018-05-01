@@ -34,7 +34,7 @@ package com.oracle.javafx.scenebuilder.kit.editor.panel.inspector.editors;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorPlatform;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorPlatform.Theme;
-import com.oracle.javafx.scenebuilder.kit.editor.i18n.I18N;
+import com.oracle.javafx.scenebuilder.kit.i18n.I18N;
 import com.oracle.javafx.scenebuilder.kit.fxom.FXOMInstance;
 import com.oracle.javafx.scenebuilder.kit.metadata.property.ValuePropertyMetadata;
 import com.oracle.javafx.scenebuilder.kit.util.CssInternal;
@@ -92,12 +92,8 @@ public class StyleClassEditor extends InlineListEditor {
         addItem(getNewStyleClassItem());
 
         // On Theme change, update the themeClasses
-        editorController.themeProperty().addListener(themeListener);
+        editorController.themeProperty().addListener((ChangeListener<Theme>) (ov, t, t1) -> themeClasses = CssInternal.getThemeStyleClasses(StyleClassEditor.this.editorController.getTheme()));
     }
-    
-    private ChangeListener<Theme> themeListener = (ov, t, t1) -> {
-    	themeClasses = CssInternal.getThemeStyleClasses(editorController.getTheme());
-    };
 
     private StyleClassItem getNewStyleClassItem() {
         if (cssClassesMap == null) {
@@ -182,12 +178,7 @@ public class StyleClassEditor extends InlineListEditor {
             Set<FXOMInstance> selectedInstances, EditorController editorController) {
         super.reset(propMeta, selectedClasses);
         this.selectedInstances = selectedInstances;
-        EditorController oldEditorController = this.editorController;
-        if (oldEditorController != editorController) {
-        	oldEditorController.themeProperty().removeListener(themeListener);
-            this.editorController = editorController;
-            editorController.themeProperty().addListener(themeListener);
-        }
+        this.editorController = editorController;
         cssClassesMap = null;
         // add an empty item
         addItem(getNewStyleClassItem());
