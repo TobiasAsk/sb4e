@@ -218,7 +218,6 @@ public class InspectorPanelController extends AbstractFxmlPanelController {
 
     // Inspector state
     private SelectionState selectionState;
-    private final EditorController editorController;
 
     private double searchResultDividerPosition;
 
@@ -230,7 +229,6 @@ public class InspectorPanelController extends AbstractFxmlPanelController {
      */
     public InspectorPanelController(EditorController editorController) {
         super(InspectorPanelController.class.getResource(fxmlFile), I18N.getBundle(), editorController);
-        this.editorController = editorController;
         this.availableCharsets = CharsetEditor.getStandardCharsets();
         viewModeProperty.setValue(ViewMode.SECTION);
         viewModeProperty.addListener(new ChangeListener<ViewMode>() {
@@ -540,7 +538,7 @@ public class InspectorPanelController extends AbstractFxmlPanelController {
      * Private
      */
     private void updateInspector() {
-        if (isInspectorLoaded() && hasFxomDocument()) {
+        if (isInspectorLoaded()) {
             SelectionState newSelectionState = new SelectionState(editorController);
             if (isInspectorStateChanged(newSelectionState) || isEditedMode()) {
                 selectionState = newSelectionState;
