@@ -49,6 +49,34 @@ public class FxIdEditor extends AutoSuggestEditor {
     private static final String PROPERTY_NAME = "fx:id";
     private static final String DEFAULT_VALUE = null;
     private EditorController editorController;
+    
+    // text field events handling
+    EventHandler<ActionEvent> onActionListener = event -> {
+        if (isHandlingError()) {
+            // Event received because of focus lost due to error dialog
+            return;
+        }
+        String value = textField.getText();
+        if (value != null && !value.isEmpty()) {
+            if (!JavaLanguage.isIdentifier(value)) {
+//                    System.err.println(I18N.getString("log.warning.invalid.fxid", value));
+                handleInvalidValue(value);
+                return;
+            }
+            if (isValueChanged(value)) {
+                // Avoid multiple identical messages
+                if (getFxIdsInUse().contains(value)) {
+                    editorController.getMessageLog().logWarningMessage(
+                            "log.warning.duplicate.fxid", value); //NOI18N
+                } else if ((getControllerClass() != null) && !getSuggestedList().contains(value)) {
+                    editorController.getMessageLog().logWarningMessage(
+                            "log.warning.no.injectable.fxid", value); //NOI18N
+                }
+            }
+        }
+        userUpdateValueProperty((value == null || value.isEmpty()) ? null : value);
+        textField.selectAll();
+    };
 
     public FxIdEditor(List<String> suggestedFxIds, EditorController editorController) {
         super(PROPERTY_NAME, DEFAULT_VALUE, suggestedFxIds); //NOI18N
@@ -57,34 +85,6 @@ public class FxIdEditor extends AutoSuggestEditor {
     
     private void initialize(EditorController editorController) {
         this.editorController = editorController;
-
-        // text field events handling
-        EventHandler<ActionEvent> onActionListener = event -> {
-            if (isHandlingError()) {
-                // Event received because of focus lost due to error dialog
-                return;
-            }
-            String value = textField.getText();
-            if (value != null && !value.isEmpty()) {
-                if (!JavaLanguage.isIdentifier(value)) {
-//                        System.err.println(I18N.getString("log.warning.invalid.fxid", value));
-                    handleInvalidValue(value);
-                    return;
-                }
-                if (isValueChanged(value)) {
-                    // Avoid multiple identical messages
-                    if (getFxIdsInUse().contains(value)) {
-                        editorController.getMessageLog().logWarningMessage(
-                                "log.warning.duplicate.fxid", value); //NOI18N
-                    } else if ((getControllerClass() != null) && !getSuggestedList().contains(value)) {
-                        editorController.getMessageLog().logWarningMessage(
-                                "log.warning.no.injectable.fxid", value); //NOI18N
-                    }
-                }
-            }
-            userUpdateValueProperty((value == null || value.isEmpty()) ? null : value);
-            textField.selectAll();
-        };
         setTextEditorBehavior(this, textField, onActionListener);
     }
 
