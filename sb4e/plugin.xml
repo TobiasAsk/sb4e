@@ -80,5 +80,44 @@
             class="no.tobask.sb4e.handlers.IncludeFxmlHandler">
       </handler>
    </extension>
+   <extension
+         point="org.eclipse.jdt.core.compilationParticipant">
+      <compilationParticipant
+            class="no.tobask.sb4e.FxControllerValidator"
+            id="FxControllerValidator"
+            createsProblems="true">
+            <managedMarker
+                  markerType="no.tobask.sb4e.fxcontrollerproblemmarker">
+            </managedMarker>
+      </compilationParticipant>
+   </extension>
+   <extension
+         id="no.tobask.sb4e.fxcontrollerproblemmarker"
+         name="Fx controller problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.jdt.core.problem">
+      </super>
+   </extension>
+   <extension
+         point="org.eclipse.jdt.ui.quickFixProcessors">
+      <quickFixProcessor
+            class="no.tobask.sb4e.MissingFxIdsFixer"
+            id="no.tobask.sb4e.missingfxidsfixer"
+            name="Missing fxids fixer">
+         <handledMarkerTypes>
+            <markerType
+                  id="no.tobask.sb4e.fxcontrollerproblemmarker">
+            </markerType>
+         </handledMarkerTypes>
+         <enablement>
+            <with variable="projectNatures">
+                  <iterate operator="or">
+                  		<equals value="org.eclipse.jdt.core.javanature"/>
+                  </iterate>
+            </with>
+         </enablement>
+      </quickFixProcessor>
+   </extension>
 
 </plugin>
