@@ -12,6 +12,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -33,11 +34,11 @@ public class JavaModelUtils {
 		return null;
 	}
 
-	public static IPackageFragment getPackageContainingFile(URL fileLocation) {
+	public static IJavaElement getPackageContainingFile(URL fileLocation) {
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IPath path = new Path(fileLocation.getPath()).removeLastSegments(1);
 		IFolder folder = (IFolder) workspaceRoot.getContainerForLocation(path);
-		return (IPackageFragment) JavaCore.create(folder);
+		return JavaCore.create(folder);
 	}
 
 	public static IJavaProject getJavaProjectFromUrl(URL fileLocation) {

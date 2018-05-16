@@ -55,7 +55,9 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 	public List<String> queryControllerClasses(URL fxmlLocation) {
 		if (candidateControllers == null) {
 			IJavaProject project = JavaModelUtils.getJavaProjectFromUrl(fxmlLocation);
-			String packageName = JavaModelUtils.getPackageContainingFile(fxmlLocation).getElementName();
+			IJavaElement pkgWithFile = JavaModelUtils.getPackageContainingFile(fxmlLocation);
+			String packageName = (pkgWithFile.getElementType() == IJavaElement.PACKAGE_FRAGMENT) ? 
+					pkgWithFile.getElementName() : "";
 			candidateControllers = new ArrayList<>();
 			for (IPackageFragment pkg : JavaModelUtils.getAllMatchingPackages(packageName, project)) {
 				candidateControllers.addAll(getCandidateControllers(pkg));
