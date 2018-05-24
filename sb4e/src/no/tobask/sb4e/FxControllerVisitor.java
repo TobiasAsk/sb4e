@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
@@ -17,7 +18,7 @@ import javafx.fxml.FXML;
 
 public class FxControllerVisitor extends ASTVisitor {
 	
-	private Map<String, ITypeBinding> fxIds = new HashMap<>();
+	private Map<String, String> fxIds = new HashMap<>(); // var name -> type
 	private static final String FXML_ANNOTATION = FXML.class.getSimpleName();
 	
 	@Override
@@ -25,15 +26,25 @@ public class FxControllerVisitor extends ASTVisitor {
 		if (isFxIdCandidate(node)) {
 			Type type = node.getType();
 			ITypeBinding typeBinding = type.resolveBinding();
+			String typeName;
+			if (typeBinding != null) {
+				typeName = typeBinding.getQualifiedName();
+			} else {
+				if (type.isSimpleType()) {
+					typeName = ((SimpleType) type).getName().getFullyQualifiedName();
+				} else {
+					typeName = "UNKNOWN";
+				}
+			}
 			List<VariableDeclarationFragment> fragments = node.fragments();
 			String variableName = fragments.get(0).getName().toString();
-			fxIds.put(variableName, typeBinding);
+			fxIds.put(variableName, typeName);
 		}
 		return super.visit(node);
 	}
 	
 	
-	public Map<String, ITypeBinding> getFxIds() {
+	public Map<String, String> getFxIds() {
 		return fxIds;
 	}
 

@@ -51,6 +51,7 @@ public class FxControllerValidator extends CompilationParticipant {
 	private CompilationUnit getAst(ICompilationUnit source) {
 		ASTParser parser = ASTParser.newParser(AST.JLS10);
 		parser.setSource(source);
+		parser.setResolveBindings(true);
 		return (CompilationUnit) parser.createAST(null);
 	}
 
@@ -62,7 +63,7 @@ public class FxControllerValidator extends CompilationParticipant {
 	private CategorizedProblem[] getProblems(CompilationUnit ast, FXOMDocument document) {
 		FxControllerVisitor visitor = new FxControllerVisitor();
 		ast.accept(visitor);
-		Map<String, ITypeBinding> controllerIds = visitor.getFxIds();
+		Map<String, String> controllerIds = visitor.getFxIds();
 		Map<String, FXOMObject> documentIds = document.collectFxIds();
 		List<String> missingIds = new ArrayList<>();
 		for (Entry<String, FXOMObject> id : documentIds.entrySet()) {
