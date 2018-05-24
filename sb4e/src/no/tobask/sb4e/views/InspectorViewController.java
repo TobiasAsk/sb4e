@@ -34,8 +34,12 @@ public class InspectorViewController extends AbstractFxmlWindowController {
 		inspectorSearchController = new SearchController(dummyEdtCtrl);
 	}
 	
-	public InspectorPanelController getInspectorPanelController() {
-		return inspectorPanelController;
+	public EditorController getEditorController() {
+		return inspectorPanelController.getEditorController();
+	}
+	
+	public void setEditorController(EditorController editorController) {
+		inspectorPanelController.setEditorController(editorController);
 	}
 
 	@Override
