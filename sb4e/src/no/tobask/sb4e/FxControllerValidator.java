@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -19,6 +20,7 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.ui.PlatformUI;
 
 import com.oracle.javafx.scenebuilder.kit.editor.i18n.I18N;
 import com.oracle.javafx.scenebuilder.kit.fxom.FXOMDocument;
@@ -26,13 +28,22 @@ import com.oracle.javafx.scenebuilder.kit.fxom.FXOMInstance;
 import com.oracle.javafx.scenebuilder.kit.fxom.FXOMObject;
 
 public class FxControllerValidator extends CompilationParticipant {
-				
+					
+	FxmlDocumentListener documentListener;
+	
+	public FxControllerValidator() {
+		IEclipseContext context = PlatformUI.getWorkbench().getService(IEclipseContext.class);
+		documentListener = context.get(FxmlDocumentListener.class);
+		if (documentListener == null) {
+			documentListener = Activator.getFxmlDocumentListener();
+		}
+	}
+	
 	@Override
 	public void buildStarting(BuildContext[] files, boolean isBatch) {
 		for (BuildContext file : files) {
 			ICompilationUnit clazz = (ICompilationUnit) JavaCore.create(file.getFile());
 			String className = clazz.findPrimaryType().getFullyQualifiedName();
-			FxmlDocumentListener documentListener = Activator.getFxmlDocumentListener();
 			if (documentListener.isAssignedController(className)) {
 				URL documentLocation = documentListener.getDocument(className);
 				try {
