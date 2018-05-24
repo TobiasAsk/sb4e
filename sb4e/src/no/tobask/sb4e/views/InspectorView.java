@@ -36,6 +36,11 @@ public class InspectorView implements IPartListener {
 		canvas = new FXCanvas(parent, SWT.NONE);
 		canvas.setScene(inspectorViewController.getScene());
 		partService.addPartListener(this);
+		
+		if (workbenchAccessor.hasActiveFxmlEditor()) {
+			FXMLEditor editor = workbenchAccessor.getActiveFxmlEditor();
+			inspectorViewController.setEditorController(editor.getEditorController());
+		}
 	}
 	
 	@Focus
