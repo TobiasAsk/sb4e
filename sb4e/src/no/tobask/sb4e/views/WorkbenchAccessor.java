@@ -38,4 +38,10 @@ public class WorkbenchAccessor implements IWorkbenchAccessor {
 		return activeEditor instanceof FXMLEditor;
 	}
 
+	@Override
+	public FXMLEditor getActiveFxmlEditor() {
+		IWorkbenchPage activePage = context.get(IWorkbenchPage.class);
+		return (FXMLEditor) activePage.getActiveEditor();
+	}
+
 }
