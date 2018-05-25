@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2017, Gluon and/or its affiliates.
  * Copyright (c) 2012, 2014, Oracle and/or its affiliates.
  * All rights reserved. Use is subject to license terms.
  *
@@ -31,8 +32,8 @@
  */
 package com.oracle.javafx.scenebuilder.kit.editor.panel.library;
 
-import com.oracle.javafx.scenebuilder.app.preferences.PreferencesController;
-import com.oracle.javafx.scenebuilder.kit.editor.i18n.I18N;
+import com.oracle.javafx.scenebuilder.kit.alert.ImportingGluonControlsAlert;
+import com.oracle.javafx.scenebuilder.kit.i18n.I18N;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.util.dialog.AbstractModalDialog;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.util.dialog.ErrorDialog;
 import com.oracle.javafx.scenebuilder.kit.fxom.FXOMDocument;
@@ -56,6 +57,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import com.oracle.javafx.scenebuilder.kit.preferences.MavenPreferences;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -75,9 +77,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 
@@ -85,6 +85,11 @@ import javafx.util.Callback;
  *
  */
 public class ImportWindowController extends AbstractModalDialog {
+
+    public enum PrefSize {
+
+        DEFAULT, TWO_HUNDRED_BY_ONE_HUNDRED, TWO_HUNDRED_BY_TWO_HUNDRED
+    };
 
     final List<File> importFiles;
     private final LibraryPanelController libPanelController;
@@ -95,6 +100,7 @@ public class ImportWindowController extends AbstractModalDialog {
     double builtinPrefHeight;
     private int numOfImportedJar;
     private boolean copyFilesToUserLibraryDir;
+    private Stage owner;
     
     // At first we put in this collection the items which are already excluded,
     // basically all which are listed in the filter file.
@@ -105,10 +111,7 @@ public class ImportWindowController extends AbstractModalDialog {
     private List<String> alreadyExcludedItems = new ArrayList<>();
     private final List<String> artifactsFilter;
 
-    public enum PrefSize {
-
-        DEFAULT, TWO_HUNDRED_BY_ONE_HUNDRED, TWO_HUNDRED_BY_TWO_HUNDRED
-    };
+    private final MavenPreferences mavenPreferences;
     
     @FXML
     private VBox leftHandSidePart;
@@ -145,18 +148,21 @@ public class ImportWindowController extends AbstractModalDialog {
     
     @FXML
     ToggleButton checkAllUncheckAllToggle;
+
     
-    public ImportWindowController(LibraryPanelController lpc, List<File> files, Window owner) {
-        this(lpc, files, owner, true, new ArrayList<>());
+    public ImportWindowController(LibraryPanelController lpc, List<File> files, MavenPreferences mavenPreferences, Stage owner) {
+        this(lpc, files, mavenPreferences, owner, true, new ArrayList<>());
     }
     
-    public ImportWindowController(LibraryPanelController lpc, List<File> files, Window owner, 
+    public ImportWindowController(LibraryPanelController lpc, List<File> files, MavenPreferences mavenPreferences, Stage owner,
             boolean copyFilesToUserLibraryDir, List<String> artifactsFilter) {
         super(ImportWindowController.class.getResource("ImportDialog.fxml"), I18N.getBundle(), owner); //NOI18N
         libPanelController = lpc;
         importFiles = new ArrayList<>(files);
         this.copyFilesToUserLibraryDir = copyFilesToUserLibraryDir;
         this.artifactsFilter = artifactsFilter;
+        this.owner = owner;
+        this.mavenPreferences = mavenPreferences;
     }
 
     /*
@@ -312,8 +318,8 @@ public class ImportWindowController extends AbstractModalDialog {
      */
     @Override
     protected void controllerDidCreateStage() {
+        super.controllerDidCreateStage();
         getStage().setTitle(I18N.getString("import.window.title"));
-        getStage().initModality(Modality.APPLICATION_MODAL);
     }
 
     /*
@@ -343,7 +349,7 @@ public class ImportWindowController extends AbstractModalDialog {
             }
         }
         // add artifacts jars (main and dependencies)
-        res.addAll(PreferencesController.getSingleton().getMavenPreferences().getArtifactsFilesWithDependencies());
+        res.addAll(mavenPreferences.getArtifactsFilesWithDependencies());
         
         return res;
     }
@@ -418,6 +424,7 @@ public class ImportWindowController extends AbstractModalDialog {
                         = row -> row.importRequired();
                 importList.setCellFactory(CheckBoxListCell.forListView(importRequired));
 
+                boolean importingGluonControls = false;
                 for (JarReport jarReport : jarReportList) {
                     for (JarReportEntry e : jarReport.getEntries()) {
                         if ((e.getStatus() == JarReportEntry.Status.OK) && e.isNode()) {
@@ -442,13 +449,22 @@ public class ImportWindowController extends AbstractModalDialog {
                                     });
                         }
                     }
+                    if (jarReport.hasGluonControls()) {
+                        importingGluonControls = true;
+                    }
                 }
-                
+
+                if (importingGluonControls) {
+                    ImportingGluonControlsAlert alert = new ImportingGluonControlsAlert(owner);
+                    alert.showAndWait();
+                }
+
                 // Sort based on the simple class name.
                 Collections.sort(importList.getItems(), new ImportRowComparator());
 
                 final int numOfComponentToImport = getNumOfComponentToImport(importList);
                 updateOKButtonTitle(numOfComponentToImport);
+                updateOKCancelDefaultState(numOfComponentToImport);
                 updateSelectionToggleText(numOfComponentToImport);
                 updateNumOfItemsLabelAndSelectionToggleState();
             } catch (InterruptedException | ExecutionException | IOException ex) {
@@ -583,7 +599,7 @@ public class ImportWindowController extends AbstractModalDialog {
                 .stream()
                 .filter(r -> !r.isImportRequired())
                 .map(ImportRow::getCanonicalClassName)
-                .collect(Collectors.joining(":"));
+                .collect(Collectors.joining(File.pathSeparator));
     }
     
     // The title of the button is important in the sense it says to the user
@@ -604,6 +620,16 @@ public class ImportWindowController extends AbstractModalDialog {
             setOKButtonTitle(I18N.getString("import.button.import.component"));
         } else {
             setOKButtonTitle(I18N.getString("import.button.import.components"));
+        }
+    }
+
+    private void updateOKCancelDefaultState(int numOfComponentsToImport) {
+        if (numOfComponentsToImport == 0) {
+            cancelButton.setDefaultButton(true);
+            cancelButton.requestFocus();
+        } else {
+            okButton.setDefaultButton(true);
+            okButton.requestFocus();
         }
     }
     

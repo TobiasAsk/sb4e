@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2016, 2017 Gluon and/or its affiliates.
  * Copyright (c) 2012, 2014, Oracle and/or its affiliates.
  * All rights reserved. Use is subject to license terms.
  *
@@ -34,7 +35,7 @@ package com.oracle.javafx.scenebuilder.kit.editor.panel.library;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
 import com.oracle.javafx.scenebuilder.kit.editor.drag.source.AbstractDragSource;
 import com.oracle.javafx.scenebuilder.kit.editor.drag.source.DocumentDragSource;
-import com.oracle.javafx.scenebuilder.kit.editor.i18n.I18N;
+import com.oracle.javafx.scenebuilder.kit.i18n.I18N;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.util.AbstractFxmlPanelController;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.util.dialog.AbstractModalDialog.ButtonID;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.util.dialog.AlertDialog;
@@ -74,6 +75,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
 
+import com.oracle.javafx.scenebuilder.kit.preferences.MavenPreferences;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
@@ -113,6 +115,7 @@ public class LibraryPanelController extends AbstractFxmlPanelController {
     boolean initiateImportDialog = false;
     final List<File> jarAndFxmlFiles = new ArrayList<>();
     private String userLibraryPathString = null;
+    private final MavenPreferences mavenPreferences;
 
     @FXML
     private Accordion libAccordion;
@@ -133,9 +136,10 @@ public class LibraryPanelController extends AbstractFxmlPanelController {
      *
      * @param c the editor controller (never null).
      */
-    public LibraryPanelController(EditorController c) {
+    public LibraryPanelController(EditorController c, MavenPreferences mavenPreferences) {
         super(LibraryPanelController.class.getResource("LibraryPanel.fxml"), I18N.getBundle(), c); //NOI18N
         startListeningToLibrary();
+        this.mavenPreferences = mavenPreferences;
     }
 
     /**
@@ -752,7 +756,7 @@ public class LibraryPanelController extends AbstractFxmlPanelController {
                     }
 
                     final ImportWindowController iwc
-                            = new ImportWindowController(this, jarFiles, window);
+                            = new ImportWindowController(this, jarFiles, mavenPreferences, (Stage) window);
                     iwc.setToolStylesheet(getEditorController().getToolStylesheet());
                     // See comment in OnDragDropped handle set in method startListeningToDrop.
                     ButtonID userChoice = iwc.showAndWait();

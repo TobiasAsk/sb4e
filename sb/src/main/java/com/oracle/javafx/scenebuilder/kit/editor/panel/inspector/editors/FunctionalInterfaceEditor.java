@@ -32,7 +32,7 @@
 
 package com.oracle.javafx.scenebuilder.kit.editor.panel.inspector.editors;
 
-import com.oracle.javafx.scenebuilder.kit.editor.i18n.I18N;
+import com.oracle.javafx.scenebuilder.kit.i18n.I18N;
 import com.oracle.javafx.scenebuilder.kit.metadata.property.ValuePropertyMetadata;
 import com.oracle.javafx.scenebuilder.kit.util.JavaLanguage;
 import javafx.event.ActionEvent;
@@ -49,7 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class FunctionalInterfaceEditor extends  AutoSuggestEditor {
+public class FunctionalInterfaceEditor extends AutoSuggestEditor {
     private static final String HASH_STR = "#"; //NOI18N
     private final MenuItem controllerMethodMenuItem = new MenuItem(I18N.getString("inspector.event.menu.methodmode"));
     private final MenuItem scriptMenuItem = new MenuItem(I18N.getString("inspector.event.menu.scriptmode"));

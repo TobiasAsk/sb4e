@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2017, Gluon and/or its affiliates.
  * Copyright (c) 2012, 2014, Oracle and/or its affiliates.
  * All rights reserved. Use is subject to license terms.
  *
@@ -31,9 +32,11 @@
  */
 package com.oracle.javafx.scenebuilder.kit.editor;
 
+import com.oracle.javafx.scenebuilder.kit.ResourceUtils;
+import com.oracle.javafx.scenebuilder.kit.alert.WarnThemeAlert;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorPlatform.Theme;
 import com.oracle.javafx.scenebuilder.kit.editor.drag.DragController;
-import com.oracle.javafx.scenebuilder.kit.editor.i18n.I18N;
+import com.oracle.javafx.scenebuilder.kit.i18n.I18N;
 import com.oracle.javafx.scenebuilder.kit.editor.job.AddContextMenuToSelectionJob;
 import com.oracle.javafx.scenebuilder.kit.editor.job.AddTooltipToSelectionJob;
 import com.oracle.javafx.scenebuilder.kit.editor.job.ModifySelectionJob;
@@ -122,6 +125,7 @@ import javafx.scene.control.Control;
 import javafx.scene.effect.Effect;
 import javafx.scene.input.Clipboard;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
 /**
@@ -157,6 +161,8 @@ public class EditorController {
         USE_COMPUTED_SIZES,
         ADD_CONTEXT_MENU,
         ADD_TOOLTIP,
+        SET_SIZE_335x600,
+        SET_SIZE_900x600,
         SET_SIZE_320x240,
         SET_SIZE_640x480,
         SET_SIZE_1280x800,
@@ -226,6 +232,8 @@ public class EditorController {
      * under user control.
      */
     public enum Size {
+        SIZE_335x600,
+        SIZE_900x600,
         SIZE_320x240,
         SIZE_640x480,
         SIZE_1280x800,
@@ -258,8 +266,10 @@ public class EditorController {
             = new SimpleObjectProperty<>(new BuiltinGlossary());
     private final ObjectProperty<ResourceBundle> resourcesProperty
             = new SimpleObjectProperty<>(null);
-    private final ObjectProperty<Theme> themeProperty
-            = new SimpleObjectProperty<>(Theme.MODENA);
+    private final ObjectProperty<EditorPlatform.GluonTheme> gluonThemeProperty
+            = new SimpleObjectProperty<>(EditorPlatform.DEFAULT_GLUON_THEME);
+    private final ObjectProperty<EditorPlatform.GluonSwatch> gluonSwatchProperty
+            = new SimpleObjectProperty<>(EditorPlatform.DEFAULT_SWATCH);
     private final ListProperty<File> sceneStyleSheetProperty
             = new SimpleListProperty<>();
     private final BooleanProperty pickModeEnabledProperty
@@ -270,6 +280,8 @@ public class EditorController {
             = new SimpleStringProperty(getBuiltinToolStylesheet());
     
     private Callback<Void, Boolean> requestTextEditingSessionEnd;
+
+    private Stage ownerWindow;
     
     private static String builtinToolStylesheet;
     private static File nextInitialDirectory = new File(System.getProperty("user.home")); //NOI18N
@@ -325,8 +337,8 @@ public class EditorController {
      * @param fxmlText null or the fxml text to be edited
      * @throws IOException if fxml text cannot be parsed and loaded correctly.
      */
-    public void setFxmlText(String fxmlText) throws IOException {
-        setFxmlTextAndLocation(fxmlText, getFxmlLocation());
+    public void setFxmlText(String fxmlText, boolean checkGluonControls) throws IOException {
+        setFxmlTextAndLocation(fxmlText, getFxmlLocation(), checkGluonControls);
     }
     
     /**
@@ -526,7 +538,19 @@ public class EditorController {
     public ObservableValue<ResourceBundle> resourcesProperty() {
         return resourcesProperty;
     }
-    
+
+    // -- Theme property
+    private final ObjectProperty<Theme> themeProperty
+            = new SimpleObjectProperty<Theme>(EditorPlatform.DEFAULT_THEME) {
+        @Override
+        protected void invalidated() {
+            FXOMDocument fxomDocument = getFxomDocument();
+            if (fxomDocument != null) {
+                fxomDocument.refreshSceneGraph();
+            }
+        }
+    };
+
     /**
      * Returns the theme used by this editor.
      * 
@@ -555,7 +579,65 @@ public class EditorController {
     public ObservableValue<Theme> themeProperty() {
         return themeProperty;
     }
-    
+
+    /**
+     * Returns the gluon theme used by this editor
+     *
+     * @return the gluon theme used by this editor
+     */
+    public EditorPlatform.GluonTheme getGluonTheme() {
+        return gluonThemeProperty.get();
+    }
+
+    /**
+     * Sets the gluon theme used by this editor.
+     * Content and Preview panels sharing this editor will update
+     * their content to use this new theme.
+     *
+     * @param theme the theme to be used in this editor
+     */
+    public void setGluonTheme(EditorPlatform.GluonTheme theme) {
+        gluonThemeProperty.set(theme);
+    }
+
+    /**
+     * The property holding the gluon theme used by this editor
+     *
+     * @return the property holding the gluon theme used by this editor.
+     */
+    public ObjectProperty<EditorPlatform.GluonTheme> gluonThemeProperty() {
+        return gluonThemeProperty;
+    }
+
+    /**
+     * Sets the gluon swatch used by this editor.
+     * Content and Preview panels sharing this editor will update
+     * their content to use this new swatch.
+     *
+     * @param swatch the swatch to be used in this editor
+     */
+    public void setGluonSwatch(EditorPlatform.GluonSwatch swatch) {
+        gluonSwatchProperty.set(swatch);
+    }
+
+    /**
+     * Returns the gluon swatch used by this editor
+     *
+     * @return the gluon swatch used by this editor
+     */
+    public EditorPlatform.GluonSwatch getGluonSwatch() {
+        return gluonSwatchProperty.get();
+    }
+
+    /**
+     * The property holding the gluon swatch used by this editor
+     *
+     * @return the property holding the gluon swatch used by this editor.
+     */
+    public ObjectProperty<EditorPlatform.GluonSwatch> gluonSwatchProperty() {
+        return gluonSwatchProperty;
+    }
+
     /**
      * 
      * @return the list of scene style sheet used by this editor
@@ -650,7 +732,20 @@ public class EditorController {
     public URL getFxmlLocation() {
         return fxmlLocationProperty.getValue();
     }
-    
+
+    /**
+     * Sets both fxml text and location to be edited by this editor.
+     * Performs setFxmlText() and setFxmlLocation() but in a optimized manner
+     * (it avoids an extra scene graph refresh).
+     *
+     * @param fxmlText null or the fxml text to be edited
+     * @param fxmlLocation null or the location of the fxml text being edited
+     * @throws IOException if fxml text cannot be parsed and loaded correctly.
+     */
+    public void setFxmlTextAndLocation(String fxmlText, URL fxmlLocation) throws IOException {
+        setFxmlTextAndLocation(fxmlText, fxmlLocation, false);
+    }
+
     /**
      * Sets both fxml text and location to be edited by this editor.
      * Performs setFxmlText() and setFxmlLocation() but in a optimized manner
@@ -658,13 +753,31 @@ public class EditorController {
      * 
      * @param fxmlText null or the fxml text to be edited
      * @param fxmlLocation null or the location of the fxml text being edited
+     * @param checkTheme if set to true a check will be made if the fxml contains
+     *                           Gluon controls and if so, the correct theme is set
      * @throws IOException if fxml text cannot be parsed and loaded correctly.
      */
-    public void setFxmlTextAndLocation(String fxmlText, URL fxmlLocation) throws IOException {
-        updateFxomDocument(fxmlText, fxmlLocation, getResources());
+    public void setFxmlTextAndLocation(String fxmlText, URL fxmlLocation, boolean checkTheme) throws IOException {
+        updateFxomDocument(fxmlText, fxmlLocation, getResources(), checkTheme);
         this.fxmlLocationProperty.setValue(fxmlLocation);
     }
-    
+
+    /**
+     * Sets fxml text, location and resources to be edited by this editor.
+     * Performs setFxmlText(), setFxmlLocation() and setResources() but in an
+     * optimized manner (it avoids extra scene graph refresh).
+     *
+     * @param fxmlText null or the fxml text to be edited
+     * @param fxmlLocation null or the location of the fxml text being edited
+     * @param resources null or the resource bundle used to load the fxml text
+     *
+     * @throws IOException if fxml text cannot be parsed and loaded correctly.
+     */
+    public void setFxmlTextLocationAndResources(String fxmlText, URL fxmlLocation,
+                                                ResourceBundle resources) throws IOException {
+        setFxmlTextLocationAndResources(fxmlText, fxmlLocation, resources, false);
+    }
+
     /**
      * Sets fxml text, location and resources to be edited by this editor.
      * Performs setFxmlText(), setFxmlLocation() and setResources() but in an
@@ -673,11 +786,13 @@ public class EditorController {
      * @param fxmlText null or the fxml text to be edited
      * @param fxmlLocation null or the location of the fxml text being edited
      * @param resources null or the resource bundle used to load the fxml text
+     * @param checkTheme if set to true a check will be made if the fxml contains G
+     *                           Gluon controls and if so, the correct theme is set
      * @throws IOException if fxml text cannot be parsed and loaded correctly.
      */
     public void setFxmlTextLocationAndResources(String fxmlText, URL fxmlLocation,
-            ResourceBundle resources) throws IOException {
-        updateFxomDocument(fxmlText, fxmlLocation, resources);
+            ResourceBundle resources, boolean checkTheme) throws IOException {
+        updateFxomDocument(fxmlText, fxmlLocation, resources, checkTheme);
         this.fxmlLocationProperty.setValue(fxmlLocation);
     }
     
@@ -736,9 +851,7 @@ public class EditorController {
      */
     public static synchronized String getBuiltinToolStylesheet() {
         if (builtinToolStylesheet == null) {
-            final URL url = EditorController.class.getResource("css/Theme.css"); //NOI18N
-            assert url != null;
-            builtinToolStylesheet = url.toExternalForm();
+            builtinToolStylesheet = ResourceUtils.THEME_DEFAULT_STYLESHEET;
         }
         return builtinToolStylesheet;
     }
@@ -776,6 +889,27 @@ public class EditorController {
      */
     public Selection getSelection() {
         return selection;
+    }
+
+    /**
+     * Returns the list of selected objects
+     *
+     * @return the selected objects
+     */
+    public List<FXOMObject> getSelectedObjects() {
+        // Collects all the selected objects
+        final List<FXOMObject> selectedObjects = new ArrayList<>();
+        final Selection selection = getSelection();
+        if (selection.getGroup() instanceof ObjectSelectionGroup) {
+            final ObjectSelectionGroup osg = (ObjectSelectionGroup) selection.getGroup();
+            selectedObjects.addAll(osg.getItems());
+        } else if (selection.getGroup() instanceof GridSelectionGroup) {
+            final GridSelectionGroup gsg = (GridSelectionGroup) selection.getGroup();
+            selectedObjects.addAll(gsg.collectSelectedObjects());
+        } else {
+            assert false;
+        }
+        return selectedObjects;
     }
     
     
@@ -1020,6 +1154,16 @@ public class EditorController {
                 jobManager.push(job);
                 break;
             }
+            case SET_SIZE_335x600: {
+                final UsePredefinedSizeJob job = new UsePredefinedSizeJob(this, Size.SIZE_335x600);
+                jobManager.push(job);
+                break;
+            }
+            case SET_SIZE_900x600: {
+                final UsePredefinedSizeJob job = new UsePredefinedSizeJob(this, Size.SIZE_900x600);
+                jobManager.push(job);
+                break;
+            }
             case SET_SIZE_320x240: {
                 final UsePredefinedSizeJob job = new UsePredefinedSizeJob(this, Size.SIZE_320x240);
                 jobManager.push(job);
@@ -1259,6 +1403,16 @@ public class EditorController {
             }
             case SEND_TO_BACK: {
                 final SendToBackJob job = new SendToBackJob(this);
+                result = job.isExecutable();
+                break;
+            }
+            case SET_SIZE_335x600: {
+                final UsePredefinedSizeJob job = new UsePredefinedSizeJob(this, Size.SIZE_335x600);
+                result = job.isExecutable();
+                break;
+            }
+            case SET_SIZE_900x600: {
+                final UsePredefinedSizeJob job = new UsePredefinedSizeJob(this, Size.SIZE_900x600);
                 result = job.isExecutable();
                 break;
             }
@@ -1608,6 +1762,8 @@ public class EditorController {
         }
 
         jobManager.push(job);
+
+        WarnThemeAlert.showAlertIfRequired(this, newObject, ownerWindow);
     }
 
     /**
@@ -2377,7 +2533,7 @@ public class EditorController {
         return true;
     }
 
-    private void updateFxomDocument(String fxmlText, URL fxmlLocation, ResourceBundle resources) throws IOException {
+    private void updateFxomDocument(String fxmlText, URL fxmlLocation, ResourceBundle resources, boolean checkTheme) throws IOException {
         final FXOMDocument newFxomDocument;
         
         if (fxmlText != null) {
@@ -2392,7 +2548,10 @@ public class EditorController {
         fxomDocumentProperty.setValue(newFxomDocument);
         
         watchingController.fxomDocumentDidChange();
-        
+
+        if (checkTheme) {
+            WarnThemeAlert.showAlertIfRequired(this, newFxomDocument, ownerWindow);
+        }
     }
     
     private final ChangeListener<ClassLoader> libraryClassLoaderListener
@@ -2416,5 +2575,13 @@ public class EditorController {
         errorReport.forget();
         watchingController.jobManagerRevisionDidChange();
 //        setPickModeEnabled(false);
+    }
+
+    public void setOwnerWindow(Stage ownerWindow) {
+        this.ownerWindow = ownerWindow;
+    }
+
+    public Stage getOwnerWindow() {
+        return ownerWindow;
     }
 }

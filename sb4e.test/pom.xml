@@ -26,21 +26,20 @@
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<version>${tycho-version}</version>
-				<configuration>
-					<argLine>-Dorg.osgi.framework.bundle.parent=ext
-						-Dosgi.framework.extensions=org.eclipse.fx.osgi</argLine>
+<!-- 				<configuration> -->
+<!-- 					<argLine>-Dosgi.framework.extensions=org.eclipse.fx.osgi</argLine> -->
 <!-- 					<useUIHarness>true</useUIHarness> -->
 <!-- 					<environmentVariables> -->
 <!-- 						<DISPLAY>${xvfb.display}</DISPLAY> -->
 <!-- 					</environmentVariables> -->
-					<frameworkExtensions>
-						<frameworkExtension>
-							<groupId>at.bestsolution.efxclipse.rt</groupId>
-							<artifactId>org.eclipse.fx.osgi</artifactId>
-							<version>3.1.0</version>
-						</frameworkExtension>
-					</frameworkExtensions>
-				</configuration>
+<!-- 					<frameworkExtensions> -->
+<!-- 						<frameworkExtension> -->
+<!-- 							<groupId>at.bestsolution.efxclipse.rt</groupId> -->
+<!-- 							<artifactId>org.eclipse.fx.osgi</artifactId> -->
+<!-- 							<version>3.1.0</version> -->
+<!-- 						</frameworkExtension> -->
+<!-- 					</frameworkExtensions> -->
+<!-- 				</configuration> -->
 			</plugin>
 <!-- 			<plugin> -->
 <!-- 				<groupId>com.github.zetten</groupId> -->

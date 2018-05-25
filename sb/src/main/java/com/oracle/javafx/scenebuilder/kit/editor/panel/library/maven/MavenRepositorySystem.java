@@ -1,9 +1,37 @@
+/*
+ * Copyright (c) 2016, Gluon and/or its affiliates.
+ * All rights reserved. Use is subject to license terms.
+ *
+ * This file is available and licensed under the following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *  - Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *  - Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the distribution.
+ *  - Neither the name of Oracle Corporation and Gluon nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package com.oracle.javafx.scenebuilder.kit.editor.panel.library.maven;
 
 import com.oracle.javafx.scenebuilder.kit.editor.panel.library.maven.repository.Repository;
-import com.oracle.javafx.scenebuilder.app.AppPlatform;
-import com.oracle.javafx.scenebuilder.app.i18n.I18N;
-import com.oracle.javafx.scenebuilder.app.preferences.PreferencesController;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.library.maven.preset.MavenPresets;
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +44,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.oracle.javafx.scenebuilder.kit.preferences.RepositoryPreferences;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.util.FileUtils;
@@ -73,9 +103,17 @@ public class MavenRepositorySystem {
     private final boolean onlyReleases;
     
     private BasicRepositoryConnectorFactory basicRepositoryConnectorFactory;
+
+    private final String userM2Repository;
+    private final String tempM2Repository;
+    private final RepositoryPreferences repositoryPreferences;
     
-    public MavenRepositorySystem(boolean onlyReleases) {
+    public MavenRepositorySystem(boolean onlyReleases, String userM2Repository, String tempM2Repository,
+                                 RepositoryPreferences repositoryPreferences) {
         this.onlyReleases = onlyReleases;
+        this.userM2Repository = userM2Repository;
+        this.tempM2Repository = tempM2Repository;
+        this.repositoryPreferences = repositoryPreferences;
         initRepositorySystem();
     }
     
@@ -87,7 +125,7 @@ public class MavenRepositorySystem {
         locator.setErrorHandler(new DefaultServiceLocator.ErrorHandler() {
             @Override
             public void serviceCreationFailed(Class<?> type, Class<?> impl, Throwable exception) {
-                throw new RuntimeException(I18N.getString("maven.dialog.creation.failed"), exception);
+                throw new RuntimeException(exception);
             }
         });
         
@@ -98,7 +136,7 @@ public class MavenRepositorySystem {
 
         session = MavenRepositorySystemUtils.newSession();
 
-        localRepo = new LocalRepository(new File(AppPlatform.getUserM2Repository()));
+        localRepo = new LocalRepository(new File(userM2Repository));
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
 
         // TODO: log file transfers
@@ -132,7 +170,7 @@ public class MavenRepositorySystem {
                         (onlyReleases && !r.getId().toUpperCase(Locale.ROOT).contains("SNAPSHOT")))
                 .map(this::createRepository)
                 .collect(Collectors.toList());
-        list.addAll(PreferencesController.getSingleton().getRepositoryPreferences().getRepositories().stream()
+        list.addAll(repositoryPreferences.getRepositories().stream()
                 .filter(r -> !onlyReleases ||
                         (onlyReleases && !r.getId().toUpperCase(Locale.ROOT).contains("SNAPSHOT")))
                 .map(this::createRepository)
@@ -214,7 +252,7 @@ public class MavenRepositorySystem {
         
     public String resolveArtifacts(RemoteRepository remoteRepository, Artifact... artifact) {
         
-        LocalRepository localTmpRepo = new LocalRepository(AppPlatform.getTempM2Repository());
+        LocalRepository localTmpRepo = new LocalRepository(tempM2Repository);
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localTmpRepo));
         
         List<Artifact> artifacts = Stream.of(artifact)
@@ -269,7 +307,7 @@ public class MavenRepositorySystem {
         } catch (ArtifactResolutionException ex) { }
         
         try {
-            FileUtils.deleteDirectory(AppPlatform.getTempM2Repository());
+            FileUtils.deleteDirectory(tempM2Repository);
         } catch (IOException ex) { }
         
         return absolutePath;
@@ -290,7 +328,7 @@ public class MavenRepositorySystem {
             return artifactResults.stream()
                     .skip(1) // exclude jar itself
                     .map(a -> a.getArtifact().getFile().getAbsolutePath())
-                    .collect(Collectors.joining(":"));
+                    .collect(Collectors.joining(File.pathSeparator));
         } catch (DependencyResolutionException ex) { }
         return "";
     }
@@ -330,5 +368,4 @@ public class MavenRepositorySystem {
         
         return "";
     }
-    
 }

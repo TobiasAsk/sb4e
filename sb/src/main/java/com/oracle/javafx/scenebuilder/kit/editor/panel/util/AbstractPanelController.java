@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2017, Gluon and/or its affiliates.
  * Copyright (c) 2012, 2014, Oracle and/or its affiliates.
  * All rights reserved. Use is subject to license terms.
  *
@@ -34,7 +35,6 @@ package com.oracle.javafx.scenebuilder.kit.editor.panel.util;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
 import com.oracle.javafx.scenebuilder.kit.fxom.FXOMDocument;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -87,39 +87,40 @@ public abstract class AbstractPanelController {
     public EditorController getEditorController() {
         return editorController;
     }
-        
+    
     public void setEditorController(EditorController editorController) {
-        assert editorController != null;
-        EditorController oldEditorController = this.editorController;
-        if (oldEditorController == editorController) {
-        	return;
-        }
-        if (oldEditorController != null) {
-        	stopListeningToEditorSelection();
-        	stopListeningToJobManagerRevision();
-        	stopListeningToFxomDocumentChange();
-        	stopListeningToToolStylesheet();
-        	
-        	if (oldEditorController.getFxomDocument() != null) {
-        		stopListeningToFxomDocumentSceneGraphRevision();
-        		stopListeningToFxomDocumentCssRevision();
-        	}
-        }
-        
-        this.editorController = editorController;
-        startListeningToEditorSelection();
-        startListeningToJobManagerRevision();
-        startListeningToFxomDocumentChange();
-        startListeningToToolStylesheet();
-        
-        if (editorController.getFxomDocument() != null) {
-            startListeningToFxomDocumentSceneGraphRevision();
-            startListeningToFxomDocumentCssRevision();
-        }
-        
-        if (oldEditorController != null) {
-            editorSelectionDidChange();
-        }
+    	assert editorController != null;
+    	EditorController old = this.editorController;
+    	if (old == editorController) {
+    		return;
+    	}
+    	
+    	if (old != null) {
+    		stopListeningToEditorSelection();
+    		stopListeningToJobManagerRevision();
+    		stopListeningToFxomDocumentChange();
+    		stopListeningToToolStylesheet();
+    		
+    		if (old.getFxomDocument() != null) {
+    			stopListeningToFxomDocumentSceneGraphRevision();
+    			stopListeningToFxomDocumentCssRevision();
+    		}
+    	}
+    	
+    	this.editorController = editorController;
+    	startListeningToEditorSelection();
+    	startListeningToJobManagerRevision();
+    	startListeningToFxomDocumentChange();
+    	startListeningToToolStylesheet();
+    	
+    	if (editorController.getFxomDocument() != null) {
+    		startListeningToFxomDocumentSceneGraphRevision();
+    		startListeningToFxomDocumentCssRevision();
+    	}
+    	
+    	if (old != null) {
+    		editorSelectionDidChange();
+    	}
     }
     
     /**
@@ -246,7 +247,7 @@ public abstract class AbstractPanelController {
     };
     
     private final ChangeListener<FXOMDocument> fxomDocumentChangeListener
-    		= (ov, od, nd) -> {
+    		= (observable, od, nd) -> {
     	assert editorController.getFxomDocument() == nd;
     	if (od != null) {
     		od.sceneGraphRevisionProperty().removeListener(fxomDocumentRevisionListener);
@@ -264,7 +265,13 @@ public abstract class AbstractPanelController {
     };
     
     private final ChangeListener<String> toolStylesheetListener
-    		= (ov, od, nd) -> toolStylesheetDidChange(od);
+    		= (observable, oldValue, newValue) -> {
+    	try {
+    		toolStylesheetDidChange(newValue);
+    	} catch(RuntimeException x) {
+    		LOG.log(Level.SEVERE, "Bug", x); //NOI18N
+    	}
+    };
     
     /**
      * Setup a listener which invokes {@link #editorSelectionDidChange} each
@@ -314,45 +321,38 @@ public abstract class AbstractPanelController {
         editorController.getJobManager().revisionProperty().removeListener(jobManagerRevisionListener);
     }
     
-    
     protected final void startListeningToFxomDocumentChange() {
     	editorController.fxomDocumentProperty().addListener(fxomDocumentChangeListener);
     }
-    
     
     protected final void stopListeningToFxomDocumentChange() {
     	editorController.fxomDocumentProperty().removeListener(fxomDocumentChangeListener);
     }
     
-    
-    protected final void startListeningToFxomDocumentSceneGraphRevision() {
-        editorController.getFxomDocument().sceneGraphRevisionProperty().addListener(fxomDocumentRevisionListener);
-    }
-    
-    
-    protected final void stopListeningToFxomDocumentSceneGraphRevision() {
-    	editorController.getFxomDocument().sceneGraphRevisionProperty().removeListener(fxomDocumentRevisionListener);
-    }
-    
-    
-    protected final void startListeningToFxomDocumentCssRevision() {
-        editorController.getFxomDocument().cssRevisionProperty().addListener(cssRevisionListener);
-    }
-    
-    
-    protected final void stopListeningToFxomDocumentCssRevision() {
-    	editorController.getFxomDocument().cssRevisionProperty().removeListener(cssRevisionListener);
-    }
-    
-    
     protected final void startListeningToToolStylesheet() {
-        editorController.toolStylesheetProperty().addListener(toolStylesheetListener);
+    	editorController.toolStylesheetProperty().addListener(toolStylesheetListener);
     }
     
     protected final void stopListeningToToolStylesheet() {
     	editorController.toolStylesheetProperty().removeListener(toolStylesheetListener);
     }
     
+    protected final void startListeningToFxomDocumentSceneGraphRevision() {
+    	editorController.getFxomDocument().sceneGraphRevisionProperty().addListener(fxomDocumentRevisionListener);
+    }
+    
+    protected final void stopListeningToFxomDocumentSceneGraphRevision() {
+    	editorController.getFxomDocument().sceneGraphRevisionProperty().removeListener(fxomDocumentRevisionListener);
+    }
+    
+    protected final void startListeningToFxomDocumentCssRevision() {
+    	editorController.getFxomDocument().cssRevisionProperty().addListener(cssRevisionListener);
+    }
+    
+    protected final void stopListeningToFxomDocumentCssRevision() {
+    	editorController.getFxomDocument().cssRevisionProperty().removeListener(cssRevisionListener);
+    }
+        
     /**
      * Replaces oldStylesheet by the tool style sheet assigned to the editor
      * controller. This methods {@link EditorController#getToolStylesheet}.

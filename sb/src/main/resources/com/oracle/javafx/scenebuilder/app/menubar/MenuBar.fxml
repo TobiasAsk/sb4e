@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
+  Copyright (c) 2016, 2017, Gluon and/or its affiliates.
   Copyright (c) 2012, 2014, Oracle and/or its affiliates.
   All rights reserved. Use is subject to license terms.
 
@@ -35,7 +36,6 @@
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?scenebuilder-preview-i18n-resource ../i18n/SceneBuilderApp.properties?>
 
 <StackPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
   <children>
@@ -44,20 +44,7 @@
         <Menu fx:id="fileMenu" mnemonicParsing="true" text="%menu.title.file">
           <items>
             <MenuItem fx:id="newMenuItem" mnemonicParsing="true" text="%menu.title.new" />
-            <Menu fx:id="newTemplateMenuItem" mnemonicParsing="true" text="%menu.title.new.template">
-              <items>
-                <MenuItem fx:id="newAlertDialogMenuItem" mnemonicParsing="false" text="%menu.title.new.alert.dialog" />
-                <MenuItem fx:id="newBasicAppMenuItem" mnemonicParsing="false" text="%menu.title.new.basic.app" />
-                <MenuItem fx:id="newComplexAppMenuItem" mnemonicParsing="false" text="%menu.title.new.complex.app" />
-                <SeparatorMenuItem mnemonicParsing="false" />
-                <MenuItem fx:id="newAlertDialogCssMenuItem" mnemonicParsing="false" text="%menu.title.new.alert.dialog.css" />
-                <MenuItem fx:id="newAlertDialogI18nMenuItem" mnemonicParsing="false" text="%menu.title.new.alert.dialog.i18n" />
-                <MenuItem fx:id="newBasicAppCssMenuItem" mnemonicParsing="false" text="%menu.title.new.basic.app.css" />
-                <MenuItem fx:id="newBasicAppI18nMenuItem" mnemonicParsing="false" text="%menu.title.new.basic.app.i18n" />
-                <MenuItem fx:id="newComplexAppCssMenuItem" mnemonicParsing="false" text="%menu.title.new.complex.app.css" />
-                <MenuItem fx:id="newComplexAppI18nMenuItem" mnemonicParsing="false" text="%menu.title.new.complex.app.i18n" />
-              </items>
-            </Menu>
+            <MenuItem fx:id="newTemplateMenuItem" mnemonicParsing="true" text="%menu.title.new.template" />
             <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem fx:id="openMenuItem" mnemonicParsing="true" text="%menu.title.open" />
             <Menu fx:id="openRecentMenu" mnemonicParsing="true" text="%menu.title.open.recent">
@@ -175,6 +162,8 @@
             <SeparatorMenuItem mnemonicParsing="false" />
             <Menu fx:id="sizeMenu" mnemonicParsing="true" text="%menu.title.size">
               <items>
+                  <RadioMenuItem fx:id="phoneSetSizeMenuItem" mnemonicParsing="false" text="%menu.title.size.phone" />
+                  <RadioMenuItem fx:id="tabletSetSizeMenuItem" mnemonicParsing="false" text="%menu.title.size.tablet" />
                   <RadioMenuItem fx:id="qvgaSetSizeMenuItem" mnemonicParsing="false" text="%menu.title.size.qvga" />
                   <RadioMenuItem fx:id="vgaSetSizeMenuItem" mnemonicParsing="false" text="%menu.title.size.vga" />
                   <RadioMenuItem fx:id="touchSetSizeMenuItem" mnemonicParsing="false" text="%menu.title.size.touch" />
@@ -221,19 +210,43 @@
             <SeparatorMenuItem mnemonicParsing="false" />
             <Menu fx:id="themeMenu" mnemonicParsing="true" text="%menu.title.theme">
               <items>
-                <RadioMenuItem fx:id="gluonMobileThemeMenuItem" mnemonicParsing="false" text="%menu.title.theme.gluon_mobile" />
-                <RadioMenuItem fx:id="modenaThemeMenuItem" mnemonicParsing="false" text="%menu.title.theme.modena" />
-                <RadioMenuItem fx:id="modenaTouchThemeMenuItem" mnemonicParsing="false" text="%menu.title.theme.modena.touch" />
+                <RadioMenuItem fx:id="gluonMobileLightThemeMenuItem" mnemonicParsing="false" text="%title.theme.gluon_mobile_light" />
+                <RadioMenuItem fx:id="gluonMobileDarkThemeMenuItem" mnemonicParsing="false" text="%title.theme.gluon_mobile_dark" />
+                <RadioMenuItem fx:id="modenaThemeMenuItem" mnemonicParsing="false" text="%title.theme.modena" />
+                <RadioMenuItem fx:id="modenaTouchThemeMenuItem" mnemonicParsing="false" text="%title.theme.modena_touch" />
                 <SeparatorMenuItem mnemonicParsing="false" />
-                <RadioMenuItem fx:id="modenaHighContrastBlackonwhiteThemeMenuItem" mnemonicParsing="false" text="%menu.title.theme.modena.high.contrast.blackonwhite" />
-                <RadioMenuItem fx:id="modenaHighContrastWhiteonblackThemeMenuItem" mnemonicParsing="false" text="%menu.title.theme.modena.high.contrast.whiteonblack" />
-                <RadioMenuItem fx:id="modenaHighContrastYellowonblackThemeMenuItem" mnemonicParsing="false" text="%menu.title.theme.modena.high.contrast.yellowonblack" />
+                <RadioMenuItem fx:id="modenaHighContrastBlackonwhiteThemeMenuItem" mnemonicParsing="false" text="%title.theme.modena_high_contrast_black_on_white" />
+                <RadioMenuItem fx:id="modenaHighContrastWhiteonblackThemeMenuItem" mnemonicParsing="false" text="%title.theme.modena_high_contrast_white_on_black" />
+                <RadioMenuItem fx:id="modenaHighContrastYellowonblackThemeMenuItem" mnemonicParsing="false" text="%title.theme.modena_high_contrast_yellow_on_black" />
                 <SeparatorMenuItem mnemonicParsing="false" />
-                <RadioMenuItem fx:id="caspianThemeMenuItem" mnemonicParsing="false" text="%menu.title.theme.caspian" />
-                <RadioMenuItem fx:id="caspianEmbeddedThemeMenuItem" mnemonicParsing="false" text="%menu.title.theme.caspian.embedded" />
-                <RadioMenuItem fx:id="caspianEmbeddedQVGAThemeMenuItem" mnemonicParsing="false" text="%menu.title.theme.caspian.embedded.qvga" />
+                <RadioMenuItem fx:id="caspianThemeMenuItem" mnemonicParsing="false" text="%title.theme.caspian" />
+                <RadioMenuItem fx:id="caspianEmbeddedThemeMenuItem" mnemonicParsing="false" text="%title.theme.caspian_embedded" />
+                <RadioMenuItem fx:id="caspianEmbeddedQVGAThemeMenuItem" mnemonicParsing="false" text="%title.theme.caspian_embedded_qvga" />
                 <SeparatorMenuItem mnemonicParsing="false" />
-                <CheckMenuItem fx:id="caspianHighContrastThemeMenuItem" mnemonicParsing="false" text="%menu.title.theme.caspian.high.contrast" />
+                <CheckMenuItem fx:id="caspianHighContrastThemeMenuItem" mnemonicParsing="false" text="%title.theme.caspian_high_contrast" />
+              </items>
+            </Menu>
+            <Menu fx:id="gluonThemeMenu" mnemonicParsing="true" text="%menu.title.gluon.swatch" >
+              <items>
+                <RadioMenuItem fx:id="amberSwatch" mnemonicParsing="false" text="%title.gluon.swatch.amber" />
+                <RadioMenuItem fx:id="blueGreySwatch" mnemonicParsing="false" text="%title.gluon.swatch.blue_grey" />
+                <RadioMenuItem fx:id="blueSwatch" mnemonicParsing="false" text="%title.gluon.swatch.blue" />
+                <RadioMenuItem fx:id="brownSwatch" mnemonicParsing="false" text="%title.gluon.swatch.brown" />
+                <RadioMenuItem fx:id="cyanSwatch" mnemonicParsing="false" text="%title.gluon.swatch.cyan" />
+                <RadioMenuItem fx:id="deepOrangeSwatch" mnemonicParsing="false" text="%title.gluon.swatch.deep_orange" />
+                <RadioMenuItem fx:id="deepPurpleSwatch" mnemonicParsing="false" text="%title.gluon.swatch.deep_purple" />
+                <RadioMenuItem fx:id="greenSwatch" mnemonicParsing="false" text="%title.gluon.swatch.green" />
+                <RadioMenuItem fx:id="greySwatch" mnemonicParsing="false" text="%title.gluon.swatch.grey" />
+                <RadioMenuItem fx:id="indigoSwatch" mnemonicParsing="false" text="%title.gluon.swatch.indigo" />
+                <RadioMenuItem fx:id="lightBlueSwatch" mnemonicParsing="false" text="%title.gluon.swatch.light_blue" />
+                <RadioMenuItem fx:id="lightGreenSwatch" mnemonicParsing="false" text="%title.gluon.swatch.light_green" />
+                <RadioMenuItem fx:id="limeSwatch" mnemonicParsing="false" text="%title.gluon.swatch.lime" />
+                <RadioMenuItem fx:id="orangeSwatch" mnemonicParsing="false" text="%title.gluon.swatch.orange" />
+                <RadioMenuItem fx:id="pinkSwatch" mnemonicParsing="false" text="%title.gluon.swatch.pink" />
+                <RadioMenuItem fx:id="purpleSwatch" mnemonicParsing="false" text="%title.gluon.swatch.purple" />
+                <RadioMenuItem fx:id="redSwatch" mnemonicParsing="false" text="%title.gluon.swatch.red" />
+                <RadioMenuItem fx:id="tealSwatch" mnemonicParsing="false" text="%title.gluon.swatch.teal" />
+                <RadioMenuItem fx:id="yellowSwatch" mnemonicParsing="false" text="%title.gluon.swatch.yellow" />
               </items>
             </Menu>
             <Menu fx:id="styleSheetMenu" mnemonicParsing="true" text="%menu.title.scene.stylesheets">
@@ -262,6 +275,8 @@
               <items>
                   <RadioMenuItem fx:id="preferredPreviewSizeMenuItem" mnemonicParsing="false" text="%menu.title.size.preferred" />
                   <SeparatorMenuItem mnemonicParsing="false" />
+                  <RadioMenuItem fx:id="phonePreviewSizeMenuItem" mnemonicParsing="false" text="%menu.title.size.phone" />
+                  <RadioMenuItem fx:id="tabletPreviewSizeMenuItem" mnemonicParsing="false" text="%menu.title.size.tablet" />
                   <RadioMenuItem fx:id="qvgaPreviewSizeMenuItem" mnemonicParsing="false" text="%menu.title.size.qvga" />
                   <RadioMenuItem fx:id="vgaPreviewSizeMenuItem" mnemonicParsing="false" text="%menu.title.size.vga" />
                   <RadioMenuItem fx:id="touchPreviewSizeMenuItem" mnemonicParsing="false" text="%menu.title.size.touch" />
@@ -278,6 +293,7 @@
         <Menu fx:id="helpMenu" mnemonicParsing="false" text="%menu.title.help">
           <items>
             <MenuItem fx:id="helpMenuItem" mnemonicParsing="true" text="%menu.title.scene.builder.help" />
+            <MenuItem fx:id="checkUpdatesMenuItem" mnemonicParsing="true" text="%menu.title.check.updates" />
             <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="%menu.title.about" />
           </items>
         </Menu>
