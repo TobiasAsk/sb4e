@@ -35,10 +35,9 @@ public class FxControllerValidatorTest {
 	
 	@Test
 	public void buildStarting_discoversAndReportsProblems_whenThereAreProblems() throws MalformedURLException {
-		IEclipseContext context = PlatformUI.getWorkbench().getService(IEclipseContext.class);
-		FxmlDocumentListener documentListener = mock(FxmlDocumentListener.class);
-		context.set(FxmlDocumentListener.class, documentListener);
 		FxControllerValidator validator = new FxControllerValidator();
+		FxmlDocumentListener documentListener = mock(FxmlDocumentListener.class);
+		validator.setDocumentListener(documentListener);
 		
 		BuildContext buildContext = mock(BuildContext.class);
 		IFile controller = project.getFolder("src").getFile("TestController.java");

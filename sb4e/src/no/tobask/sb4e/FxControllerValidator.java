@@ -32,11 +32,11 @@ public class FxControllerValidator extends CompilationParticipant {
 	FxmlDocumentListener documentListener;
 	
 	public FxControllerValidator() {
-		IEclipseContext context = PlatformUI.getWorkbench().getService(IEclipseContext.class);
-		documentListener = context.get(FxmlDocumentListener.class);
-		if (documentListener == null) {
-			documentListener = Activator.getFxmlDocumentListener();
-		}
+		documentListener = Activator.getFxmlDocumentListener();
+	}
+	
+	public void setDocumentListener(FxmlDocumentListener documentListener) {
+		this.documentListener = documentListener;
 	}
 	
 	@Override
