@@ -10,8 +10,6 @@ import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPart;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
-import com.oracle.javafx.scenebuilder.kit.editor.panel.inspector.InspectorPanelController;
-
 import javafx.embed.swt.FXCanvas;
 import no.tobask.sb4e.editors.FXMLEditor;
 
@@ -38,6 +36,11 @@ public class InspectorView implements IPartListener {
 		canvas = new FXCanvas(parent, SWT.NONE);
 		canvas.setScene(inspectorViewController.getScene());
 		partService.addPartListener(this);
+		
+		if (workbenchAccessor.hasActiveFxmlEditor()) {
+			FXMLEditor editor = workbenchAccessor.getActiveFxmlEditor();
+			inspectorViewController.setEditorController(editor.getEditorController());
+		}
 	}
 	
 	@Focus
@@ -45,7 +48,7 @@ public class InspectorView implements IPartListener {
 	}
 	
 	public void dispose() {
-		inspectorViewController.getInspectorPanelController().setEditorController(dummyEditorController);
+		inspectorViewController.setEditorController(dummyEditorController);
 		if (canvas != null) {
 			canvas.dispose();
 		}
@@ -54,18 +57,16 @@ public class InspectorView implements IPartListener {
 	
 	@Override
 	public void partActivated(IWorkbenchPart part) {
-		InspectorPanelController inspectorPanelController = inspectorViewController
-				.getInspectorPanelController();
-		EditorController currentController = inspectorPanelController.getEditorController();
+		EditorController currentController = inspectorViewController.getEditorController();
 		if (part instanceof FXMLEditor) {
 			EditorController partController = ((FXMLEditor) part).getEditorController();
 			if (currentController != partController) {
-				inspectorPanelController.setEditorController(partController);
+				inspectorViewController.setEditorController(partController);
 			}
 		} else {
 			if (!workbenchAccessor.anyFxmlEditorsVisible() &&
 					currentController != dummyEditorController) {
-				inspectorPanelController.setEditorController(dummyEditorController);
+				inspectorViewController.setEditorController(dummyEditorController);
 			}
 		}
 	}
@@ -78,9 +79,7 @@ public class InspectorView implements IPartListener {
 	@Override
 	public void partClosed(IWorkbenchPart part) {
 		if (!workbenchAccessor.hasActiveFxmlEditor()) {
-			InspectorPanelController inspectorPanelController = inspectorViewController
-					.getInspectorPanelController();
-			inspectorPanelController.setEditorController(dummyEditorController);
+			inspectorViewController.setEditorController(dummyEditorController);
 		}
 	}
 

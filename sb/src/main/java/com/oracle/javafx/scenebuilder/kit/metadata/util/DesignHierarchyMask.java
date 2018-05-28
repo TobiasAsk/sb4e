@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Gluon and/or its affiliates.
+ * Copyright (c) 2016, 2017, Gluon and/or its affiliates.
  * Copyright (c) 2012, 2014, Oracle and/or its affiliates.
  * All rights reserved. Use is subject to license terms.
  *
@@ -32,6 +32,12 @@
  */
 package com.oracle.javafx.scenebuilder.kit.metadata.util;
 
+//import com.gluonhq.charm.glisten.control.BottomNavigation;
+import com.oracle.javafx.scenebuilder.kit.editor.EditorPlatform;
+//import com.gluonhq.charm.glisten.control.DropdownButton;
+//import com.gluonhq.charm.glisten.control.ExpansionPanel;
+//import com.gluonhq.charm.glisten.control.ToggleButtonGroup;
+import com.oracle.javafx.scenebuilder.kit.editor.EditorPlatform;
 import com.oracle.javafx.scenebuilder.kit.editor.images.ImageUtils;
 import com.oracle.javafx.scenebuilder.kit.fxom.FXOMCollection;
 import com.oracle.javafx.scenebuilder.kit.fxom.FXOMInstance;
@@ -119,7 +125,12 @@ public class DesignHierarchyMask {
                 },
         // ExpansionPanel
         EXPANDED_CONTENT,
-        COLLAPSED_CONTENT
+        COLLAPSED_CONTENT,
+        // ExpandedPanel
+        EX_CONTENT {
+            @Override
+            public String toString() { return "CONTENT"; }
+        }
     }
     private static final PropertyName graphicName = new PropertyName("graphic");
     private static final PropertyName contentName = new PropertyName("content");
@@ -130,8 +141,8 @@ public class DesignHierarchyMask {
     private static final PropertyName leftName = new PropertyName("left");
     private static final PropertyName rightName = new PropertyName("right");
     private static final PropertyName centerName = new PropertyName("center");
-    private static final PropertyName xAxisName = new PropertyName("XAxis");
-    private static final PropertyName yAxisName = new PropertyName("YAxis");
+    private static final PropertyName xAxisName = new PropertyName("xAxis");
+    private static final PropertyName yAxisName = new PropertyName("yAxis");
     private static final PropertyName placeholderName = new PropertyName("placeholder");
     private static final PropertyName tooltipName = new PropertyName("tooltip");
     private static final PropertyName contextMenuName = new PropertyName("contextMenu");
@@ -224,7 +235,7 @@ public class DesignHierarchyMask {
             // Default
             Class componentClass = sceneGraphObject.getClass();
             String fileName = componentClass.getSimpleName();
-            if (componentClass.getName().startsWith(BuiltinLibrary.GLUON_PACKAGE)) {
+            if (componentClass.getName().startsWith(EditorPlatform.GLUON_PACKAGE)) {
                 fileName = BuiltinLibrary.GLUON_FILE_PREFIX + fileName;
             }
             url = ImageUtils.getNodeIconURL(fileName + ".png"); //NOI18N
@@ -414,15 +425,26 @@ public class DesignHierarchyMask {
         switch (accessory) {
             case CONTENT:
             case GRAPHIC:
-                if (sceneGraphObject instanceof DialogPane == true) {
+                if (sceneGraphObject instanceof DialogPane == true /*|| sceneGraphObject  instanceof ExpansionPanel.ExpandedPanel == true*/) {
                     return false;
                 }
                 break;
             case DP_CONTENT:
             case DP_GRAPHIC:
-                if (sceneGraphObject instanceof DialogPane == false) {
+                if (sceneGraphObject instanceof DialogPane == false /*|| sceneGraphObject instanceof ExpansionPanel.ExpandedPanel == true*/) {
                     return false;
                 }
+                break;
+            case EXPANDABLE_CONTENT:
+            case COLLAPSED_CONTENT:
+//                if (sceneGraphObject instanceof ExpansionPanel == false) {
+//                    return false;
+//                }
+                break;
+            case EX_CONTENT:
+//                if (sceneGraphObject instanceof ExpansionPanel.ExpandedPanel == false) {
+//                    return false;
+//                }
                 break;
             default:
                 break;
@@ -478,6 +500,7 @@ public class DesignHierarchyMask {
                 result = javafx.scene.control.TreeTableColumn.class;
                 break;
             case DP_CONTENT:
+            case EX_CONTENT:
             case EXPANDABLE_CONTENT:
             case DP_GRAPHIC:
             case HEADER:
@@ -670,6 +693,7 @@ public class DesignHierarchyMask {
                 break;
             case CONTENT:
             case DP_CONTENT:
+            case EX_CONTENT:
                 result = contentName;
                 break;
             case EXPANDABLE_CONTENT:
@@ -1038,6 +1062,11 @@ public class DesignHierarchyMask {
                 || this.isAcceptingAccessory(Accessory.LEFT))
                 && ! (fxomObject.getSceneGraphObject() instanceof MenuButton
                         || fxomObject.getSceneGraphObject() instanceof MenuBar
-                        || fxomObject.getSceneGraphObject() instanceof ToolBar); // Jerome
+                        || fxomObject.getSceneGraphObject() instanceof ToolBar
+                        /*|| fxomObject.getSceneGraphObject() instanceof ExpansionPanel.ExpandedPanel
+                        || fxomObject.getSceneGraphObject() instanceof DropdownButton
+                        || fxomObject.getSceneGraphObject() instanceof BottomNavigation
+                        || fxomObject.getSceneGraphObject() instanceof ExpansionPanel.CollapsedPanel
+                        || fxomObject.getSceneGraphObject() instanceof ToggleButtonGroup*/); // Jerome
     }
 }

@@ -1,10 +1,38 @@
+/*
+ * Copyright (c) 2016, 2017 Gluon and/or its affiliates.
+ * All rights reserved. Use is subject to license terms.
+ *
+ * This file is available and licensed under the following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *  - Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *  - Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the distribution.
+ *  - Neither the name of Oracle Corporation and Gluon nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package com.oracle.javafx.scenebuilder.kit.editor.panel.library.maven;
 
-import com.oracle.javafx.scenebuilder.app.DocumentWindowController;
-import com.oracle.javafx.scenebuilder.app.preferences.PreferencesController;
-import com.oracle.javafx.scenebuilder.app.preferences.PreferencesRecordArtifact;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
-import com.oracle.javafx.scenebuilder.kit.editor.i18n.I18N;
+import com.oracle.javafx.scenebuilder.kit.i18n.I18N;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.library.ImportWindowController;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.library.LibraryPanelController;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.util.AbstractFxmlWindowController;
@@ -15,6 +43,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.oracle.javafx.scenebuilder.kit.preferences.PreferencesControllerBase;
+import com.oracle.javafx.scenebuilder.kit.preferences.PreferencesRecordArtifact;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,6 +60,7 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import org.eclipse.aether.artifact.Artifact;
@@ -57,8 +89,6 @@ public class MavenDialogController extends AbstractFxmlWindowController {
     @FXML
     private Button installButton;
 
-    private final DocumentWindowController documentWindowController;
-
     private final UserLibrary userLibrary;
     
     private MavenRepositorySystem maven;
@@ -66,6 +96,7 @@ public class MavenDialogController extends AbstractFxmlWindowController {
     private Service<ObservableList<Version>> versionsService;
     private final Service<MavenArtifact> installService;
     private final Window owner;
+    private final EditorController editorController;
     
     private final ChangeListener<Version> comboBoxListener = (obs, ov, nv) -> {
         remoteRepository = maven.getRemoteRepository(nv);
@@ -76,16 +107,19 @@ public class MavenDialogController extends AbstractFxmlWindowController {
             callVersionsService();
         }
     };
+
+    private final PreferencesControllerBase preferencesControllerBase;
     
-    
-    public MavenDialogController(EditorController editorController, DocumentWindowController documentWindowController, 
-            Window owner) {
+    public MavenDialogController(EditorController editorController, String userM2Repository,
+            String tempM2Repository, PreferencesControllerBase preferencesControllerBase, Stage owner) {
         super(LibraryPanelController.class.getResource("MavenDialog.fxml"), I18N.getBundle(), owner); //NOI18N
-        this.documentWindowController = documentWindowController;
         this.userLibrary = (UserLibrary) editorController.getLibrary();
         this.owner = owner;
+        this.editorController = editorController;
+        this.preferencesControllerBase = preferencesControllerBase;
         
-        maven = new MavenRepositorySystem(false);
+        maven = new MavenRepositorySystem(false, userM2Repository, tempM2Repository,
+                preferencesControllerBase.getRepositoryPreferences());
         
         versionsService = new Service<ObservableList<Version>>() {
             @Override
@@ -138,8 +172,6 @@ public class MavenDialogController extends AbstractFxmlWindowController {
         installService.stateProperty().addListener((obs, ov, nv) -> {
             if (nv.equals(Worker.State.SUCCEEDED)) {
                 final MavenArtifact mavenArtifact = installService.getValue();
-                final PreferencesController pc = PreferencesController.getSingleton();
-    
                 if (mavenArtifact == null || mavenArtifact.getPath().isEmpty() || 
                         !new File(mavenArtifact.getPath()).exists()) {
                     logInfoMessage("log.user.maven.failed", getArtifactCoordinates());
@@ -148,16 +180,17 @@ public class MavenDialogController extends AbstractFxmlWindowController {
                     files.add(new File(mavenArtifact.getPath()));
                     if (!mavenArtifact.getDependencies().isEmpty()) {
                         files.addAll(Stream
-                                .of(mavenArtifact.getDependencies().split(":"))
+                                .of(mavenArtifact.getDependencies().split(File.pathSeparator))
                                 .map(File::new)
                                 .collect(Collectors.toList()));
                     }
 
                     final ImportWindowController iwc
                             = new ImportWindowController(
-                                new LibraryPanelController(editorController), 
-                                files, installButton.getScene().getWindow(), false,
-                                pc.getMavenPreferences().getArtifactsFilter());
+                            new LibraryPanelController(editorController, preferencesControllerBase.getMavenPreferences()),
+                            files, preferencesControllerBase.getMavenPreferences(),
+                            (Stage)installButton.getScene().getWindow(), false,
+                                preferencesControllerBase.getMavenPreferences().getArtifactsFilter());
                     iwc.setToolStylesheet(editorController.getToolStylesheet());
                     ButtonID userChoice = iwc.showAndWait();
                     if (userChoice == ButtonID.OK) {
@@ -272,7 +305,7 @@ public class MavenDialogController extends AbstractFxmlWindowController {
     }
 
     private void logInfoMessage(String key, Object... args) {
-        documentWindowController.getEditorController().getMessageLog().logInfoMessage(key, I18N.getBundle(), args);
+        editorController.getMessageLog().logInfoMessage(key, I18N.getBundle(), args);
     }
     
     private String getArtifactCoordinates() {
@@ -288,7 +321,7 @@ public class MavenDialogController extends AbstractFxmlWindowController {
         userLibrary.stopWatching();
         
         // Update record artifact
-        final PreferencesRecordArtifact recordArtifact = PreferencesController.getSingleton().
+        final PreferencesRecordArtifact recordArtifact = preferencesControllerBase.
                 getRecordArtifact(mavenArtifact);
         recordArtifact.writeToJavaPreferences();
 

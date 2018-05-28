@@ -36,7 +36,7 @@ import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
 import com.oracle.javafx.scenebuilder.kit.editor.drag.DragController;
 import com.oracle.javafx.scenebuilder.kit.editor.drag.source.DocumentDragSource;
 import com.oracle.javafx.scenebuilder.kit.editor.drag.source.ExternalDragSource;
-import com.oracle.javafx.scenebuilder.kit.editor.i18n.I18N;
+import com.oracle.javafx.scenebuilder.kit.i18n.I18N;
 import static com.oracle.javafx.scenebuilder.kit.editor.panel.hierarchy.treeview.HierarchyTreeCell.HIERARCHY_FIRST_CELL;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.util.AbstractFxmlPanelController;
 import com.oracle.javafx.scenebuilder.kit.editor.selection.GridSelectionGroup;
@@ -667,6 +667,21 @@ public abstract class AbstractHierarchyPanelController extends AbstractFxmlPanel
         return treeItem;
     }
 
+    private TreeItem<HierarchyItem> makeTreeItemExpandedPanel(final DesignHierarchyMask owner, final FXOMObject fxomObject) {
+        final HierarchyItemExpandedPanel item = new HierarchyItemExpandedPanel(owner, fxomObject);
+        final TreeItem<HierarchyItem> treeItem = new TreeItem<>(item);
+        // Set back the TreeItem expanded property if any
+        Boolean expanded = treeItemsExpandedMapProperty.get(fxomObject);
+        if (expanded != null) {
+            treeItem.setExpanded(expanded);
+        }
+        // Mask may be null for empty place holder
+        if (item.getMask() != null) {
+            updateTreeItem(treeItem);
+        }
+        return treeItem;
+    }
+
     private TreeItem<HierarchyItem> makeTreeItemBorderPane(
             final DesignHierarchyMask owner,
             final FXOMObject fxomObject,
@@ -865,7 +880,13 @@ public abstract class AbstractHierarchyPanelController extends AbstractFxmlPanel
                 treeItem.getChildren().add(makeTreeItemExpansionPanel(mask, value, accessory));
             }
         }
-        
+
+        // Gluon ExpandedPanel
+        if (mask.isAcceptingAccessory(Accessory.EX_CONTENT)) {
+            final FXOMObject value = mask.getAccessory(Accessory.EX_CONTENT);
+            treeItem.getChildren().add(makeTreeItemExpandedPanel(mask, value));
+        }
+
         // Content (ScrollPane, Tab...)
         //---------------------------------
         if (mask.isAcceptingAccessory(Accessory.CONTENT)) {

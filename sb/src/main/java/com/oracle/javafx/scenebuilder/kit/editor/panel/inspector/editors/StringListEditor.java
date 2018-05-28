@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, Gluon and/or its affiliates.
+ * Copyright (c) 2016, Gluon and/or its affiliates.
  * All rights reserved. Use is subject to license terms.
  *
  * This file is available and licensed under the following license:
@@ -32,7 +33,7 @@
 
 package com.oracle.javafx.scenebuilder.kit.editor.panel.inspector.editors;
 
-import com.oracle.javafx.scenebuilder.kit.editor.i18n.I18N;
+import com.oracle.javafx.scenebuilder.kit.i18n.I18N;
 import com.oracle.javafx.scenebuilder.kit.fxom.FXOMInstance;
 import com.oracle.javafx.scenebuilder.kit.metadata.property.ValuePropertyMetadata;
 import com.oracle.javafx.scenebuilder.kit.metadata.util.PrefixedValue;
@@ -206,6 +207,14 @@ public class StringListEditor extends InlineListEditor {
             removeMi.setText(I18N.getString("inspector.list.remove"));
             moveUpMi.setText(I18N.getString("inspector.list.moveup"));
             moveDownMi.setText(I18N.getString("inspector.list.movedown"));
+
+            // Select all text when this editor is selected
+            textTextfield.setOnMousePressed(event -> textTextfield.selectAll());
+            textTextfield.focusedProperty().addListener(((observable, oldValue, newValue) -> {
+                if (newValue) {
+                    textTextfield.selectAll();
+                }
+            }));
         }
 
         @Override

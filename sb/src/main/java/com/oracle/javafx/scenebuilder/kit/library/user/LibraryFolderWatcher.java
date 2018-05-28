@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2017, Gluon and/or its affiliates.
  * Copyright (c) 2012, 2014, Oracle and/or its affiliates.
  * All rights reserved. Use is subject to license terms.
  *
@@ -31,15 +32,14 @@
  */
 package com.oracle.javafx.scenebuilder.kit.library.user;
 
-import com.oracle.javafx.scenebuilder.app.preferences.MavenPreferences;
-import com.oracle.javafx.scenebuilder.app.preferences.PreferencesController;
-import com.oracle.javafx.scenebuilder.kit.editor.i18n.I18N;
+import com.oracle.javafx.scenebuilder.kit.i18n.I18N;
 import com.oracle.javafx.scenebuilder.kit.editor.images.ImageUtils;
 import com.oracle.javafx.scenebuilder.kit.library.BuiltinLibrary;
 import com.oracle.javafx.scenebuilder.kit.library.LibraryItem;
 import com.oracle.javafx.scenebuilder.kit.library.util.JarExplorer;
 import com.oracle.javafx.scenebuilder.kit.library.util.JarReport;
 import com.oracle.javafx.scenebuilder.kit.library.util.JarReportEntry;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -72,13 +72,11 @@ import java.util.stream.Collectors;
 class LibraryFolderWatcher implements Runnable {
     
     private final UserLibrary library;
-    private final MavenPreferences mavenPreferences;
-    
+
     private enum FILE_TYPE {FXML, JAR};
     
     public LibraryFolderWatcher(UserLibrary library) {
         this.library = library;
-        mavenPreferences = PreferencesController.getSingleton().getMavenPreferences();
     }
 
     /*
@@ -102,16 +100,14 @@ class LibraryFolderWatcher implements Runnable {
     /*
      * Private
      */
-    
-    
     private void runDiscovery() throws InterruptedException {
         // First put the builtin items in the library
         library.setItems(BuiltinLibrary.getLibrary().getItems());
 
         // Attempts to add the maven jars, including dependencies
-        List<Path> currentMavenJars = mavenPreferences.getArtifactsPathsWithDependencies();
+        List<Path> additionalJars = library.getAdditionalJarPaths().get();
         
-        final Set<Path> currentJars = new HashSet<>(currentMavenJars);
+        final Set<Path> currentJars = new HashSet<>(additionalJars);
         final Set<Path> currentFxmls = new HashSet<>();
                 
         // Now attempts to discover the user library folder
@@ -180,7 +176,11 @@ class LibraryFolderWatcher implements Runnable {
                                     || kind == StandardWatchEventKinds.ENTRY_DELETE
                                     || kind == StandardWatchEventKinds.ENTRY_MODIFY) {
                                 assert context instanceof Path;
-                                if (isJarPath((Path)context) || isFxmlPath((Path)context)) {
+                                if (isJarPath((Path) context)) {
+                                    if (!hasJarBeenAdded((Path) context)) {
+                                        isDirty = true;
+                                    }
+                                } else if (isFxmlPath((Path)context)){
                                     isDirty = true;
                                 }
                             } else {
@@ -195,7 +195,7 @@ class LibraryFolderWatcher implements Runnable {
                             library.setItems(BuiltinLibrary.getLibrary().getItems());
                             
                             // Now attempts to add the maven jars
-                            List<Path> currentMavenJars = mavenPreferences.getArtifactsPaths();
+                            List<Path> currentMavenJars = library.getAdditionalJarPaths().get();
                             
                             final Set<Path> fxmls = new HashSet<>();
                             fxmls.addAll(getAllFiles(FILE_TYPE.FXML));
@@ -215,8 +215,7 @@ class LibraryFolderWatcher implements Runnable {
 
         }
     }
-    
-    
+
     private Set<Path> getAllFiles(FILE_TYPE fileType) throws IOException {
         Set<Path> res = new HashSet<>();
         final Path folder = Paths.get(library.getPath());
@@ -254,8 +253,19 @@ class LibraryFolderWatcher implements Runnable {
         final String pathString = path.toString().toLowerCase(Locale.ROOT);
         return pathString.endsWith(".fxml"); //NOI18N
     }
-    
-    
+
+    private boolean hasJarBeenAdded(Path context) {
+        boolean hasJarBeenAdded = false;
+        for (JarReport report : library.getJarReports()) {
+            if (report.getJar().getFileName().equals(context)) {
+                hasJarBeenAdded = true;
+                break;
+            }
+        }
+        return hasJarBeenAdded;
+    }
+
+
     private void updateLibrary(Collection<Path> paths) throws IOException {
         final List<LibraryItem> newItems = new ArrayList<>();
         
@@ -308,11 +318,26 @@ class LibraryFolderWatcher implements Runnable {
 
         // 2)
         final List<JarReport> jarReports = new ArrayList<>();
+//        boolean shouldShowImportGluonJarAlert = false;
         for (Path currentJar : jars) {
             Logger.getLogger(this.getClass().getSimpleName()).info(I18N.getString("log.info.explore.jar", currentJar));
             final JarExplorer explorer = new JarExplorer(currentJar);
-            jarReports.add(explorer.explore(classLoader));
+            JarReport jarReport = explorer.explore(classLoader);
+            jarReports.add(jarReport);
+
+            //            if (jarReport.hasGluonControls()) {
+//                // We check if the jar has already been imported to avoid showing the import gluon jar
+//                // alert every time Scene Builder starts for jars that have already been imported
+//                if (!hasGluonJarBeenImported(jarReport.getJar().getFileName().toString())) {
+//                    shouldShowImportGluonJarAlert = true;
+//                }
+//
+//            }
         }
+
+//        if (shouldShowImportGluonJarAlert && onImportingGluonControls != null) {
+//            onImportingGluonControls.run();
+//        }
 
         // 3)
         final List<LibraryItem> newItems = new ArrayList<>();
@@ -328,12 +353,12 @@ class LibraryFolderWatcher implements Runnable {
                 .distinct()
                 .collect(Collectors.toList()));
         library.updateJarReports(new ArrayList<>(jarReports));
+        library.getOnFinishedUpdatingJarReports().accept(jarReports);
         library.updateExplorationDate(new Date());
         
         // 5
         // Fix for #45: mark end of first exploration
         library.updateFirstExplorationCompleted();
-                
     }
     
     
@@ -341,7 +366,7 @@ class LibraryFolderWatcher implements Runnable {
         final List<LibraryItem> result = new ArrayList<>();
         final URL iconURL = ImageUtils.getNodeIconURL(null);
         final List<String> excludedItems = library.getFilter();
-        final List<String> artifactsFilter = mavenPreferences.getArtifactsFilter();
+        final List<String> artifactsFilter = library.getAdditionalFilter().get();
                 
         for (JarReportEntry e : jarReport.getEntries()) {
             if ((e.getStatus() == JarReportEntry.Status.OK) && e.isNode()) {
@@ -373,5 +398,4 @@ class LibraryFolderWatcher implements Runnable {
         
         return result;
     }
-    
 }

@@ -34,7 +34,7 @@ package com.oracle.javafx.scenebuilder.kit.editor.panel.inspector.editors;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorPlatform;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorPlatform.Theme;
-import com.oracle.javafx.scenebuilder.kit.editor.i18n.I18N;
+import com.oracle.javafx.scenebuilder.kit.i18n.I18N;
 import com.oracle.javafx.scenebuilder.kit.fxom.FXOMInstance;
 import com.oracle.javafx.scenebuilder.kit.metadata.property.ValuePropertyMetadata;
 import com.oracle.javafx.scenebuilder.kit.util.CssInternal;
@@ -77,6 +77,10 @@ public class StyleClassEditor extends InlineListEditor {
     private Map<String, String> cssClassesMap;
     private List<String> themeClasses;
     private EditorController editorController;
+    
+    private ChangeListener<Theme> themeListener = (ov, t, t1) -> {
+    	themeClasses = CssInternal.getThemeStyleClasses(editorController.getTheme());
+    };
 
     public StyleClassEditor(ValuePropertyMetadata propMeta, Set<Class<?>> selectedClasses,
             Set<FXOMInstance> selectedInstances, EditorController editorController) {
@@ -94,10 +98,6 @@ public class StyleClassEditor extends InlineListEditor {
         // On Theme change, update the themeClasses
         editorController.themeProperty().addListener(themeListener);
     }
-    
-    private ChangeListener<Theme> themeListener = (ov, t, t1) -> {
-    	themeClasses = CssInternal.getThemeStyleClasses(editorController.getTheme());
-    };
 
     private StyleClassItem getNewStyleClassItem() {
         if (cssClassesMap == null) {
@@ -185,8 +185,8 @@ public class StyleClassEditor extends InlineListEditor {
         EditorController oldEditorController = this.editorController;
         if (oldEditorController != editorController) {
         	oldEditorController.themeProperty().removeListener(themeListener);
-            this.editorController = editorController;
-            editorController.themeProperty().addListener(themeListener);
+        	this.editorController = editorController;
+        	editorController.themeProperty().addListener(themeListener);
         }
         cssClassesMap = null;
         // add an empty item

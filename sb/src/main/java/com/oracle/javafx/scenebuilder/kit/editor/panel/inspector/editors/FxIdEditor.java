@@ -49,19 +49,9 @@ public class FxIdEditor extends AutoSuggestEditor {
     private static final String PROPERTY_NAME = "fx:id";
     private static final String DEFAULT_VALUE = null;
     private EditorController editorController;
-
-    public FxIdEditor(List<String> suggestedFxIds, EditorController editorController) {
-        super(PROPERTY_NAME, DEFAULT_VALUE, suggestedFxIds); //NOI18N
-        initialize(editorController);
-    }
-    
-    private void initialize(EditorController editorController) {
-        this.editorController = editorController;
-        setTextEditorBehavior(this, textField, onActionListener);
-    }
     
     // text field events handling
-    private EventHandler<ActionEvent> onActionListener = event -> {
+    EventHandler<ActionEvent> onActionListener = event -> {
         if (isHandlingError()) {
             // Event received because of focus lost due to error dialog
             return;
@@ -87,6 +77,16 @@ public class FxIdEditor extends AutoSuggestEditor {
         userUpdateValueProperty((value == null || value.isEmpty()) ? null : value);
         textField.selectAll();
     };
+
+    public FxIdEditor(List<String> suggestedFxIds, EditorController editorController) {
+        super(PROPERTY_NAME, DEFAULT_VALUE, suggestedFxIds); //NOI18N
+        initialize(editorController);
+    }
+    
+    private void initialize(EditorController editorController) {
+        this.editorController = editorController;
+        setTextEditorBehavior(this, textField, onActionListener);
+    }
 
     public void reset(List<String> suggestedFxIds, EditorController editorController) {
         reset(PROPERTY_NAME, DEFAULT_VALUE, suggestedFxIds);

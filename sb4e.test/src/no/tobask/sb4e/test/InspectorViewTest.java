@@ -10,8 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
-import com.oracle.javafx.scenebuilder.kit.editor.panel.inspector.InspectorPanelController;
-
 import no.tobask.sb4e.editors.FXMLEditor;
 import no.tobask.sb4e.views.IWorkbenchAccessor;
 import no.tobask.sb4e.views.InspectorView;
@@ -37,32 +35,28 @@ public class InspectorViewTest {
 	@Test
 	public void setsEditorCtrler_WhenEditorIsActivated_AndEditorHasNewEditorCtrler() {
 		FXMLEditor editor = mock(FXMLEditor.class);
-		InspectorPanelController inspectorPanelController = mock(InspectorPanelController.class);
 		EditorController editorController = mock(EditorController.class);
 		EditorController editorEditorController = mock(EditorController.class);
 
-		when(inspectorViewController.getInspectorPanelController()).thenReturn(inspectorPanelController);
-		when(inspectorPanelController.getEditorController()).thenReturn(editorController);
+		when(inspectorViewController.getEditorController()).thenReturn(editorController);
 		when(editor.getEditorController()).thenReturn(editorEditorController);
 		
 		inspectorView.partActivated(editor);
-		verify(inspectorPanelController).setEditorController(editorEditorController);
+		verify(inspectorViewController).setEditorController(editorEditorController);
 	}
 
 	@Test
 	public void resetsEditorCtrler_WhenOtherPartIsActivated_AndNoFxmlEditorsAreVisible() {
 		IWorkbenchPart part = mock(IWorkbenchPart.class);
-		InspectorPanelController inspectorPanelController = mock(InspectorPanelController.class);
 		EditorController editorController = mock(EditorController.class);
 
-		when(inspectorViewController.getInspectorPanelController()).thenReturn(inspectorPanelController);
-		when(inspectorPanelController.getEditorController()).thenReturn(editorController);
+		when(inspectorViewController.getEditorController()).thenReturn(editorController);
 		when(workbenchAccessor.anyFxmlEditorsVisible()).thenReturn(false);
 		
 		inspectorView.partActivated(part);
 		ArgumentCaptor<EditorController> editorCtrlerArgument = ArgumentCaptor.
 				forClass(EditorController.class);
-		verify(inspectorPanelController).setEditorController(editorCtrlerArgument.capture());
+		verify(inspectorViewController).setEditorController(editorCtrlerArgument.capture());
 		assertEquals(null, editorCtrlerArgument.getValue().getFxmlLocation());
 	}
 	
