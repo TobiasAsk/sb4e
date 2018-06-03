@@ -27,8 +27,13 @@ Import-Package: com.oracle.javafx.scenebuilder.kit.editor,
  org.eclipse.e4.core.di.annotations;version="1.6.0",
  org.eclipse.e4.ui.di,
  org.eclipse.jdt.core,
+ org.eclipse.jdt.core.compiler,
  org.eclipse.jdt.core.dom,
- org.eclipse.jdt.launching
+ org.eclipse.jdt.core.dom.rewrite,
+ org.eclipse.jdt.launching,
+ org.eclipse.jdt.ui.text.java,
+ org.eclipse.jdt.ui.text.java.correction,
+ org.eclipse.text.edits
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Export-Package: no.tobask.sb4e,

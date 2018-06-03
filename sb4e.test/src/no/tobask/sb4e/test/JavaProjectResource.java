@@ -48,11 +48,12 @@ public class JavaProjectResource extends ExternalResource {
 	
 	private String getContents(String fileName) throws IOException {
 		StringBuilder builder = new StringBuilder();
-		InputStream stream = getClass().getResourceAsStream(fileName);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-		String line;
-		while ((line = reader.readLine()) != null) {
-			builder.append(line);
+		try (InputStream stream = getClass().getResourceAsStream(fileName)) {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				builder.append(line);
+			}
 		}
 		return builder.toString();
 	}
