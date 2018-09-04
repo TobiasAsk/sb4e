@@ -48,7 +48,7 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 		this.qualifiedControllerName = controllerClassName;
 		this.fxmlLocation = fxmlLocation;
 		this.infoPanelController = infoPanelController;
-		JavaCore.addElementChangedListener(this);
+		JavaCore.addElementChangedListener(this, ElementChangedEvent.POST_CHANGE);
 	}
 
 	@Override
