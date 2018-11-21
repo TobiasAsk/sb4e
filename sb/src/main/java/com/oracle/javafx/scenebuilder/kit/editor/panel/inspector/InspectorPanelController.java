@@ -223,6 +223,10 @@ public class InspectorPanelController extends AbstractFxmlPanelController {
 
     // Charsets for the properties of included elements
     private Map<String, Charset> availableCharsets;
+    
+    private ChangeListener<Number> glossaryRevisionListener = (ov, t, t1) -> {
+    	updateInspector();
+    };
 
     /*
      * Public
@@ -519,6 +523,8 @@ public class InspectorPanelController extends AbstractFxmlPanelController {
         // Listen the Scene stylesheets changes
         getEditorController().sceneStyleSheetProperty().addListener((ChangeListener<ObservableList<File>>) (ov, t, t1) -> updateInspector());
         
+        getEditorController().getGlossary().revisionProperty().addListener(glossaryRevisionListener);
+        
         selectionState = new SelectionState(editorController);
         viewModeChanged(null, getViewMode());
         expandedSectionChanged();
@@ -532,6 +538,12 @@ public class InspectorPanelController extends AbstractFxmlPanelController {
         updateClassNameInSectionTitles();
         searchResultDividerPosition = inspectorRoot.getDividerPositions()[0];
         searchPatternDidChange();
+    }
+    
+    @Override
+    protected void editorControllerChanged(EditorController oldController, EditorController newController) {
+		oldController.getGlossary().revisionProperty().removeListener(glossaryRevisionListener);
+    	newController.getGlossary().revisionProperty().addListener(glossaryRevisionListener);
     }
 
     /*

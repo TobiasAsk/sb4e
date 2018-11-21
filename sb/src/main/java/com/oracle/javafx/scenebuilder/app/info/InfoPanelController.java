@@ -215,6 +215,10 @@ public class InfoPanelController extends AbstractFxmlPanelController {
                 updateControllerAndControllerClassEditor(controllerClassEditor.getTextField().getText());
             }
         });
+        
+        getEditorController().getGlossary().revisionProperty().addListener((ov, t, t1) -> {
+        	resetSuggestedControllerClasses(getEditorController().getFxmlLocation());
+        });
 
         leftTableColumn.setCellValueFactory(new PropertyValueFactory<>("key")); //NOI18N
         rightTableColumn.setCellValueFactory(new PropertyValueFactory<>("fxomObject")); //NOI18N
@@ -468,7 +472,7 @@ public class InfoPanelController extends AbstractFxmlPanelController {
     
     private final ChangeListener<Boolean> checkBoxListener = (ov, t, t1) -> toggleFxRoot();
 
-    public void resetSuggestedControllerClasses(URL location) {
+    private void resetSuggestedControllerClasses(URL location) {
         if (controllerClassEditor != null) {
             // The listener on fxmlLocationProperty is called before the file
             // denoted by the location is created on disk, hence the runLater.

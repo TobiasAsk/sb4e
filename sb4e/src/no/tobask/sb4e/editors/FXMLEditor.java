@@ -15,6 +15,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.ElementChangedEvent;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.ISourceRange;
@@ -147,9 +148,9 @@ public class FXMLEditor extends EditorPart {
 			if (root != null) {
 				controllerName = root.getFxController();
 			}
-			glossary = new JavaProjectGlossary(controllerName, fxmlUrl,
-					editorWindowController.infoPanelController);
+			glossary = new JavaProjectGlossary(controllerName, fxmlUrl);
 			editorController.setGlossary(glossary);
+			JavaCore.addElementChangedListener(glossary, ElementChangedEvent.POST_CHANGE);
 			
 			copyHandler = new SceneBuilderControlActionHandler(editorController, ControlAction.COPY);
 			cutHandler = new SceneBuilderEditActionHandler(editorController, EditAction.CUT);

@@ -10,12 +10,17 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 public class Requestor extends ASTRequestor {
 	
 	private List<ICompilationUnit> candidates = new ArrayList<>();
+	private String documentName;
+	
+	public Requestor(String documentName) {
+		this.documentName = documentName;
+	}
 	
 	@Override
 	public void acceptAST(ICompilationUnit source, CompilationUnit ast) {
-		ControllerCandidateChecker checker = new ControllerCandidateChecker();
-		ast.accept(checker);
-		if (checker.visitedCandidate()) {
+		FxControllerVisitor visitor = new FxControllerVisitor(documentName, source.getElementName());
+		ast.accept(visitor);
+		if (visitor.isCandidate()) {
 			candidates.add(source);
 		}
 	}

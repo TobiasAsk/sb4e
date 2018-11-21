@@ -50,8 +50,7 @@ public class FxControllerValidator extends CompilationParticipant {
 					String fxmlContent = FXOMDocument.readContentFromURL(documentLocation);
 					FXOMDocument document = new FXOMDocument(fxmlContent, documentLocation,
 							Activator.getClassLoader(), I18N.getBundle());
-					CompilationUnit ast = getAst(clazz);
-					file.recordNewProblems(getProblems(ast, document));
+					file.recordNewProblems(getProblems(clazz, document));
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -71,19 +70,28 @@ public class FxControllerValidator extends CompilationParticipant {
 		return true;
 	}
 	
-	private CategorizedProblem[] getProblems(CompilationUnit ast, FXOMDocument document) {
-		FxControllerVisitor visitor = new FxControllerVisitor();
+	private String getDocumentName(URL url) {
+		String path = url.getFile();
+		int start = path.lastIndexOf("/") + 1;
+		int end = path.lastIndexOf(".");
+		return path.substring(start, end);
+	}
+	
+	private CategorizedProblem[] getProblems(ICompilationUnit clazz, FXOMDocument document) {
+		CompilationUnit ast = getAst(clazz);
+		String documentName = getDocumentName(document.getLocation());
+		FxControllerVisitor visitor = new FxControllerVisitor(documentName, clazz.getElementName());
 		ast.accept(visitor);
-		Map<String, String> controllerIds = visitor.getFxIds();
+		Map<String, List<String>> controllerIds = visitor.getFxIds();
 		Map<String, FXOMObject> documentIds = document.collectFxIds();
 		List<String> missingIds = new ArrayList<>();
-		for (Entry<String, FXOMObject> id : documentIds.entrySet()) {
-			if (!controllerIds.containsKey(id.getKey())) {
-				FXOMObject fxomObject = id.getValue();
-				if (fxomObject instanceof FXOMInstance) {
-					FXOMInstance instance = (FXOMInstance) fxomObject;
-					missingIds.add(id.getKey() + ";" + instance.getDeclaredClass().getName());
-				}
+		for (Entry<String, FXOMObject> docId : documentIds.entrySet()) {
+			FXOMInstance instance = (FXOMInstance) docId.getValue();
+			String componentType = instance.getDeclaredClass().getSimpleName();
+			String id = docId.getKey();
+			List<String> idsForInstanceType = controllerIds.get(componentType);
+			if (idsForInstanceType == null || !idsForInstanceType.contains(id)) {
+				missingIds.add(id + ";" + instance.getDeclaredClass().getName());
 			}
 		}
 

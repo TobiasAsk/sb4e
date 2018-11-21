@@ -120,7 +120,12 @@ public abstract class AbstractPanelController {
     	
     	if (old != null) {
     		editorSelectionDidChange();
+        	editorControllerChanged(old, editorController);
     	}
+    }
+    
+    protected void editorControllerChanged(EditorController oldController, EditorController newController) {
+    	
     }
     
     /**
