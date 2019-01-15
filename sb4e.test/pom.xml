@@ -26,35 +26,32 @@
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<version>${tycho-version}</version>
-<!-- 				<configuration> -->
-<!-- 					<argLine>-Dosgi.framework.extensions=org.eclipse.fx.osgi</argLine> -->
-<!-- 					<useUIHarness>true</useUIHarness> -->
-<!-- 					<environmentVariables> -->
-<!-- 						<DISPLAY>${xvfb.display}</DISPLAY> -->
-<!-- 					</environmentVariables> -->
-<!-- 					<frameworkExtensions> -->
-<!-- 						<frameworkExtension> -->
-<!-- 							<groupId>at.bestsolution.efxclipse.rt</groupId> -->
-<!-- 							<artifactId>org.eclipse.fx.osgi</artifactId> -->
-<!-- 							<version>3.1.0</version> -->
-<!-- 						</frameworkExtension> -->
-<!-- 					</frameworkExtensions> -->
-<!-- 				</configuration> -->
+				<configuration>
+					<argLine>-Dosgi.framework.extensions=org.eclipse.fx.osgi --module-path="C:\Users\arneb\Downloads\Installasjoner\javafx-sdk-11.0.1\lib" --add-modules=javafx.base,javafx.controls,javafx.fxml,javafx.graphics,javafx.media,javafx.swing,javafx.web,javafx.swt</argLine>
+					<useUIHarness>false</useUIHarness>
+					<frameworkExtensions>
+						<frameworkExtension>
+							<groupId>at.bestsolution.efxclipse.rt</groupId>
+							<artifactId>org.eclipse.fx.osgi</artifactId>
+							<version>3.4.1.201809241043</version>
+						</frameworkExtension>
+					</frameworkExtensions>
+				</configuration>
 			</plugin>
-<!-- 			<plugin> -->
-<!-- 				<groupId>com.github.zetten</groupId> -->
-<!-- 				<artifactId>xvfb-maven-plugin</artifactId> -->
-<!-- 				<version>${xvfb-maven-plugin.version}</version> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<id>wrap-tests</id> -->
-<!-- 						<goals> -->
-<!-- 							<goal>run</goal> -->
-<!-- 							<goal>stop</goal> -->
-<!-- 						</goals> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 			</plugin> -->
+			<!-- <plugin> -->
+			<!-- <groupId>com.github.zetten</groupId> -->
+			<!-- <artifactId>xvfb-maven-plugin</artifactId> -->
+			<!-- <version>${xvfb-maven-plugin.version}</version> -->
+			<!-- <executions> -->
+			<!-- <execution> -->
+			<!-- <id>wrap-tests</id> -->
+			<!-- <goals> -->
+			<!-- <goal>run</goal> -->
+			<!-- <goal>stop</goal> -->
+			<!-- </goals> -->
+			<!-- </execution> -->
+			<!-- </executions> -->
+			<!-- </plugin> -->
 		</plugins>
 	</build>
 </project>

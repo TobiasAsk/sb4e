@@ -7,15 +7,11 @@ import org.eclipse.jdt.core.ElementChangedEvent;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.JavaCore;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
 
-import com.oracle.javafx.scenebuilder.app.info.InfoPanelController;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
 import java.net.URL;
 import java.util.List;
 

@@ -3,25 +3,18 @@ package no.tobask.sb4e.test;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jdt.core.compiler.BuildContext;
 import org.eclipse.jdt.core.compiler.CategorizedProblem;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
 import org.mockito.ArgumentCaptor;
 
-import javafx.embed.swt.FXCanvas;
 import no.tobask.sb4e.FxControllerProblem;
 import no.tobask.sb4e.FxControllerValidator;
 import no.tobask.sb4e.FxmlDocumentListener;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 import java.net.MalformedURLException;
