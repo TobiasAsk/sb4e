@@ -1,0 +1,25 @@
+diff -u -b -r ./kit/editor/EditorController.java ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/editor/EditorController.java
+--- ./kit/editor/EditorController.java	2019-03-06 15:54:03.448064900 +0100
++++ ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/editor/EditorController.java	2019-01-15 12:56:12.573904900 +0100
+@@ -495,7 +495,7 @@
+      * 
+      * @param glossary the glossary to be used by this editor (never null).
+      */
+-    public void setLibrary(Glossary glossary) {
++    public void setGlossary(Glossary glossary) {
+         assert glossary != null;
+         glossaryProperty.setValue(glossary);
+     }
+
+diff -u -b -r ./kit/fxom/FXOMLoader.java ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/fxom/FXOMLoader.java
+--- ./kit/fxom/FXOMLoader.java	2019-03-06 15:54:03.500085500 +0100
++++ ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/fxom/FXOMLoader.java	2019-01-31 12:52:30.971558300 +0100
+@@ -81,7 +81,7 @@
+         fxmlLoader.setResources(new ResourceKeyCollector(document.getResources()));
+         fxmlLoader.setClassLoader(new TransientClassLoader(classLoader));
+         fxmlLoader.setLoadListener(this);
+-        Deprecation.setStaticLoad(fxmlLoader, true);
++//        Deprecation.setStaticLoad(fxmlLoader, true);
+ 
+         final Charset utf8 = Charset.forName("UTF-8");
+         try (final InputStream is = new ByteArrayInputStream(fxmlText.getBytes(utf8))) {

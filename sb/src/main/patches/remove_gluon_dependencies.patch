@@ -1,0 +1,518 @@
+diff -u -b -r ./kit/editor/EditorPlatform.java ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/editor/EditorPlatform.java
+--- ./kit/editor/EditorPlatform.java	2019-03-06 15:54:03.449059300 +0100
++++ ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/editor/EditorPlatform.java	2019-03-08 17:47:08.296825500 +0100
+@@ -32,7 +32,7 @@
+  */
+ package com.oracle.javafx.scenebuilder.kit.editor;
+ 
+-import com.gluonhq.charm.glisten.visual.GlistenStyleClasses;
++//import com.gluonhq.charm.glisten.visual.GlistenStyleClasses;
+ 
+ import java.io.BufferedReader;
+ import java.io.File;
+@@ -122,8 +122,8 @@
+      * Themes supported by Scene Builder Kit.
+      */
+     public enum Theme implements StylesheetProvider {
+-        GLUON_MOBILE_LIGHT(GlistenStyleClasses.impl_loadResource("glisten.gls")),
+-        GLUON_MOBILE_DARK(GlistenStyleClasses.impl_loadResource("glisten.gls")),
++        GLUON_MOBILE_LIGHT(null),
++        GLUON_MOBILE_DARK(null),
+         MODENA("com/sun/javafx/scene/control/skin/modena/modena.bss"),
+         MODENA_TOUCH("com/oracle/javafx/scenebuilder/kit/util/css/modena/modena-touch.css"),
+         MODENA_HIGH_CONTRAST_BLACK_ON_WHITE("com/oracle/javafx/scenebuilder/kit/util/css/modena/modena-highContrast-blackOnWhite.css"),
+@@ -193,7 +193,8 @@
+ 
+         @Override
+         public String getStylesheetURL() {
+-            return GlistenStyleClasses.impl_loadResource("swatch_" + name().toLowerCase(Locale.ROOT) + ".gls");
++        	return null;
++//            return GlistenStyleClasses.impl_loadResource("swatch_" + name().toLowerCase(Locale.ROOT) + ".gls");
+         }
+ 
+         public Color getColor() {
+@@ -245,7 +246,8 @@
+ 
+         @Override
+         public String getStylesheetURL() {
+-            return GlistenStyleClasses.impl_loadResource("theme_" + name().toLowerCase(Locale.ROOT) + ".gls");
++        	return null;
++//            return GlistenStyleClasses.impl_loadResource("theme_" + name().toLowerCase(Locale.ROOT) + ".gls");
+         }
+     }
+
+diff -u -b -r ./kit/library/BuiltinLibrary.java ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/library/BuiltinLibrary.java
+--- ./kit/library/BuiltinLibrary.java	2019-03-06 15:54:03.511094900 +0100
++++ ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/library/BuiltinLibrary.java	2019-03-06 14:30:38.780383700 +0100
+@@ -119,42 +119,42 @@
+      * Private
+      */
+     
+-    private BuiltinLibrary() {
++    protected BuiltinLibrary() {
+         // Gluon
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.AppBar.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.AutoCompleteTextField.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.Avatar.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.BottomNavigation.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.BottomNavigationButton.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.CardPane.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.CharmListView.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.Chip.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.ExpansionPanel.CollapsedPanel.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.AppBar.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.AutoCompleteTextField.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.Avatar.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.BottomNavigation.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.BottomNavigationButton.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.CardPane.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.CharmListView.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.Chip.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.ExpansionPanel.CollapsedPanel.class, TAG_GLUON);
+ //        addCustomizedItem(com.gluonhq.charm.glisten.control.Dialog.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.DropdownButton.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.ExpansionPanel.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.ExpansionPanel.ExpandedPanel.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.ExpansionPanelContainer.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.DropdownButton.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.ExpansionPanel.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.ExpansionPanel.ExpandedPanel.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.ExpansionPanelContainer.class, TAG_GLUON);
+ //        addCustomizedItem(com.gluonhq.charm.glisten.layout.layer.FloatingActionButton.class, TAG_GLUON);
+ //        addCustomizedItem(com.gluonhq.charm.glisten.layout.responsive.grid.GridLayout.class, TAG_GLUON);
+ //        addCustomizedItem(com.gluonhq.charm.glisten.layout.responsive.grid.GridRow.class, TAG_GLUON);
+ //        addCustomizedItem(com.gluonhq.charm.glisten.layout.responsive.grid.GridSpan.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.Icon.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.layout.Layer.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.Icon.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.layout.Layer.class, TAG_GLUON);
+ //        addCustomizedItem(com.gluonhq.charm.glisten.control.ListTile.class, TAG_GLUON);
+ //        addCustomizedItem(com.gluonhq.charm.glisten.layout.layer.MenuPopupView.class, TAG_GLUON);
+ //        addCustomizedItem(com.gluonhq.charm.glisten.layout.layer.MenuSidePopupView.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.layout.MobileLayoutPane.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.NavigationDrawer.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.layout.MobileLayoutPane.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.NavigationDrawer.class, TAG_GLUON);
+ //        addCustomizedItem(com.gluonhq.charm.glisten.layout.layer.PopupView.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.ProgressBar.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.ProgressIndicator.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.SettingsPane.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.ProgressBar.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.ProgressIndicator.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.SettingsPane.class, TAG_GLUON);
+ //        addCustomizedItem(com.gluonhq.charm.glisten.layout.layer.SidePopupView.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.mvc.SplashView.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.TextField.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.control.ToggleButtonGroup.class, TAG_GLUON);
+-        addCustomizedItem(com.gluonhq.charm.glisten.mvc.View.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.mvc.SplashView.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.TextField.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.control.ToggleButtonGroup.class, TAG_GLUON);
++//        addCustomizedItem(com.gluonhq.charm.glisten.mvc.View.class, TAG_GLUON);
+ 
+         // Containers
+         addCustomizedItem(javafx.scene.control.Accordion.class, TAG_CONTAINERS);
+		 
+diff -u -b -r ./kit/metadata/klass/ComponentClassMetadata.java ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/metadata/klass/ComponentClassMetadata.java
+--- ./kit/metadata/klass/ComponentClassMetadata.java	2019-02-19 15:47:33.952538900 +0100
++++ ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/metadata/klass/ComponentClassMetadata.java	2019-01-15 12:56:12.954671600 +0100
+@@ -201,20 +201,20 @@
+             result = childrenName;
+         } else if (componentClass == javafx.scene.layout.Pane.class) {
+             result = childrenName;
+-        } else if (componentClass == com.gluonhq.charm.glisten.control.BottomNavigation.class) {
+-            result = actionItemsName;
+-        } else if (componentClass == com.gluonhq.charm.glisten.control.CardPane.class) {
+-            result = itemsName;
+-        } else if (componentClass == com.gluonhq.charm.glisten.control.DropdownButton.class) {
+-            result = itemsName;
+-        } else if (componentClass == com.gluonhq.charm.glisten.control.ExpansionPanelContainer.class) {
+-            result = itemsName;
+-        } else if (componentClass == com.gluonhq.charm.glisten.control.ToggleButtonGroup.class) {
+-            result = togglesName;
+-        } else if (componentClass == com.gluonhq.charm.glisten.control.ExpansionPanel.CollapsedPanel.class) {
+-            result = titleNodesName;
+-        } else if (componentClass == com.gluonhq.charm.glisten.control.SettingsPane.class) {
+-            result = optionsName;
++//        } else if (componentClass == com.gluonhq.charm.glisten.control.BottomNavigation.class) {
++//            result = actionItemsName;
++//        } else if (componentClass == com.gluonhq.charm.glisten.control.CardPane.class) {
++//            result = itemsName;
++//        } else if (componentClass == com.gluonhq.charm.glisten.control.DropdownButton.class) {
++//            result = itemsName;
++//        } else if (componentClass == com.gluonhq.charm.glisten.control.ExpansionPanelContainer.class) {
++//            result = itemsName;
++//        } else if (componentClass == com.gluonhq.charm.glisten.control.ToggleButtonGroup.class) {
++//            result = togglesName;
++//        } else if (componentClass == com.gluonhq.charm.glisten.control.ExpansionPanel.CollapsedPanel.class) {
++//            result = titleNodesName;
++//        } else if (componentClass == com.gluonhq.charm.glisten.control.SettingsPane.class) {
++//            result = optionsName;
+         } else {
+             result = null;
+         }
+
+diff -u -b -r ./kit/metadata/Metadata.java ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/metadata/Metadata.java
+--- ./kit/metadata/Metadata.java	2019-03-06 15:54:03.518099200 +0100
++++ ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/metadata/Metadata.java	2019-03-05 16:38:22.200458800 +0100
+@@ -36,7 +36,7 @@
+  * THIS CODE IS AUTOMATICALLY GENERATED !
+  */
+ 
+-import com.gluonhq.charm.glisten.control.BottomNavigation;
++//import com.gluonhq.charm.glisten.control.BottomNavigation;
+ import com.oracle.javafx.scenebuilder.kit.fxom.FXOMInstance;
+ import com.oracle.javafx.scenebuilder.kit.fxom.FXOMIntrinsic;
+ import com.oracle.javafx.scenebuilder.kit.metadata.klass.ComponentClassMetadata;
+@@ -310,8 +310,8 @@
+             new ComponentClassMetadata(javafx.embed.swing.SwingNode.class, NodeMetadata);
+     private final ComponentClassMetadata AmbientLightMetadata = 
+             new ComponentClassMetadata(javafx.scene.AmbientLight.class, LightBaseMetadata);
+-    private final ComponentClassMetadata CardPaneMetadata =
+-            new ComponentClassMetadata(com.gluonhq.charm.glisten.control.CardPane.class, ControlMetadata);
++//    private final ComponentClassMetadata CardPaneMetadata =
++//            new ComponentClassMetadata(com.gluonhq.charm.glisten.control.CardPane.class, ControlMetadata);
+     private final ComponentClassMetadata GroupMetadata =
+             new ComponentClassMetadata(javafx.scene.Group.class, ParentMetadata);
+     private final ComponentClassMetadata ParallelCameraMetadata = 
+@@ -328,14 +328,14 @@
+             new ComponentClassMetadata(javafx.scene.chart.AreaChart.class, XYChartMetadata);
+     private final ComponentClassMetadata BarChartMetadata = 
+             new ComponentClassMetadata(javafx.scene.chart.BarChart.class, XYChartMetadata);
+-    private final ComponentClassMetadata BottomNavigationMetadata =
+-            new ComponentClassMetadata(com.gluonhq.charm.glisten.control.BottomNavigation.class, ControlMetadata);
++//    private final ComponentClassMetadata BottomNavigationMetadata =
++//            new ComponentClassMetadata(com.gluonhq.charm.glisten.control.BottomNavigation.class, ControlMetadata);
+     private final ComponentClassMetadata BubbleChartMetadata =
+             new ComponentClassMetadata(javafx.scene.chart.BubbleChart.class, XYChartMetadata);
+     private final ComponentClassMetadata CategoryAxisMetadata = 
+             new ComponentClassMetadata(javafx.scene.chart.CategoryAxis.class, AxisMetadata);
+-    private final ComponentClassMetadata DropdownButtonMetadata =
+-            new ComponentClassMetadata(com.gluonhq.charm.glisten.control.DropdownButton.class, ControlMetadata);
++//    private final ComponentClassMetadata DropdownButtonMetadata =
++//            new ComponentClassMetadata(com.gluonhq.charm.glisten.control.DropdownButton.class, ControlMetadata);
+     private final ComponentClassMetadata LineChartMetadata =
+             new ComponentClassMetadata(javafx.scene.chart.LineChart.class, XYChartMetadata);
+     private final ComponentClassMetadata NumberAxisMetadata = 
+@@ -344,14 +344,14 @@
+             new ComponentClassMetadata(javafx.scene.chart.PieChart.class, ChartMetadata);
+     private final ComponentClassMetadata ScatterChartMetadata = 
+             new ComponentClassMetadata(javafx.scene.chart.ScatterChart.class, XYChartMetadata);
+-    private final ComponentClassMetadata SettingsPaneMetadata =
+-            new ComponentClassMetadata(com.gluonhq.charm.glisten.control.SettingsPane.class, ControlMetadata);
++//    private final ComponentClassMetadata SettingsPaneMetadata =
++//            new ComponentClassMetadata(com.gluonhq.charm.glisten.control.SettingsPane.class, ControlMetadata);
+     private final ComponentClassMetadata StackedAreaChartMetadata = 
+             new ComponentClassMetadata(javafx.scene.chart.StackedAreaChart.class, XYChartMetadata);
+     private final ComponentClassMetadata StackedBarChartMetadata = 
+             new ComponentClassMetadata(javafx.scene.chart.StackedBarChart.class, XYChartMetadata);
+-    private final ComponentClassMetadata ToggleButtonGroupMetadata =
+-            new ComponentClassMetadata(com.gluonhq.charm.glisten.control.ToggleButtonGroup.class, ControlMetadata);
++//    private final ComponentClassMetadata ToggleButtonGroupMetadata =
++//            new ComponentClassMetadata(com.gluonhq.charm.glisten.control.ToggleButtonGroup.class, ControlMetadata);
+     private final ComponentClassMetadata AccordionMetadata =
+             new ComponentClassMetadata(javafx.scene.control.Accordion.class, ControlMetadata);
+     private final ComponentClassMetadata ButtonMetadata = 
+@@ -364,8 +364,8 @@
+             new ComponentClassMetadata(javafx.scene.control.CheckMenuItem.class, MenuItemMetadata);
+     private final ComponentClassMetadata ChoiceBoxMetadata = 
+             new ComponentClassMetadata(javafx.scene.control.ChoiceBox.class, ControlMetadata);
+-    private final ComponentClassMetadata CollapsedPanelMetadata =
+-            new ComponentClassMetadata(com.gluonhq.charm.glisten.control.ExpansionPanel.CollapsedPanel.class, RegionMetadata);
++//    private final ComponentClassMetadata CollapsedPanelMetadata =
++//            new ComponentClassMetadata(com.gluonhq.charm.glisten.control.ExpansionPanel.CollapsedPanel.class, RegionMetadata);
+     private final ComponentClassMetadata ColorPickerMetadata =
+             new ComponentClassMetadata(javafx.scene.control.ColorPicker.class, ComboBoxBaseMetadata);
+     private final ComponentClassMetadata ComboBoxMetadata = 
+@@ -482,12 +482,12 @@
+             new ComponentClassMetadata(javafx.scene.shape.Cylinder.class, Shape3DMetadata);
+     private final ComponentClassMetadata EllipseMetadata = 
+             new ComponentClassMetadata(javafx.scene.shape.Ellipse.class, ShapeMetadata);
+-    private final ComponentClassMetadata ExpandedPanelMetadata =
+-            new ComponentClassMetadata( com.gluonhq.charm.glisten.control.ExpansionPanel.ExpandedPanel.class, RegionMetadata);
+-    private final ComponentClassMetadata ExpansionPanelMetadata =
+-            new ComponentClassMetadata( com.gluonhq.charm.glisten.control.ExpansionPanel.class, ControlMetadata);
+-    private final ComponentClassMetadata ExpansionPanelContainerMetadata =
+-            new ComponentClassMetadata(com.gluonhq.charm.glisten.control.ExpansionPanelContainer.class, ControlMetadata);
++//    private final ComponentClassMetadata ExpandedPanelMetadata =
++//            new ComponentClassMetadata( com.gluonhq.charm.glisten.control.ExpansionPanel.ExpandedPanel.class, RegionMetadata);
++//    private final ComponentClassMetadata ExpansionPanelMetadata =
++//            new ComponentClassMetadata( com.gluonhq.charm.glisten.control.ExpansionPanel.class, ControlMetadata);
++//    private final ComponentClassMetadata ExpansionPanelContainerMetadata =
++//            new ComponentClassMetadata(com.gluonhq.charm.glisten.control.ExpansionPanelContainer.class, ControlMetadata);
+     private final ComponentClassMetadata HLineToMetadata =
+             new ComponentClassMetadata(javafx.scene.shape.HLineTo.class, PathElementMetadata);
+     private final ComponentClassMetadata LineMetadata = 
+@@ -498,8 +498,8 @@
+             new ComponentClassMetadata(javafx.scene.shape.MeshView.class, Shape3DMetadata);
+     private final ComponentClassMetadata MoveToMetadata = 
+             new ComponentClassMetadata(javafx.scene.shape.MoveTo.class, PathElementMetadata);
+-    private final ComponentClassMetadata OptionMetadata =
+-            new ComponentClassMetadata(com.gluonhq.charm.glisten.control.settings.Option.class, null);
++//    private final ComponentClassMetadata OptionMetadata =
++//            new ComponentClassMetadata(com.gluonhq.charm.glisten.control.settings.Option.class, null);
+     private final ComponentClassMetadata PathMetadata = 
+             new ComponentClassMetadata(javafx.scene.shape.Path.class, ShapeMetadata);
+     private final ComponentClassMetadata PolygonMetadata = 
+@@ -1738,13 +1738,13 @@
+                 true, /* readWrite */
+                 10.0, /* defaultValue */
+                 new InspectorPath("Properties", "Specific", 73));
+-    private final EnumerationPropertyMetadata bottomNavigationTypePropertyMetadata =
+-            new EnumerationPropertyMetadata(
+-                bottomNavigationTypeName,
+-                BottomNavigation.Type.class,
+-                true, /* readWrite */
+-                BottomNavigation.Type.FIXED, /* defaultValue */
+-                new InspectorPath("Properties", "Specific", 0));
++//    private final EnumerationPropertyMetadata bottomNavigationTypePropertyMetadata =
++//            new EnumerationPropertyMetadata(
++//                bottomNavigationTypeName,
++//                BottomNavigation.Type.class,
++//                true, /* readWrite */
++//                BottomNavigation.Type.FIXED, /* defaultValue */
++//                new InspectorPath("Properties", "Specific", 0));
+     private final ComponentPropertyMetadata bottomPropertyMetadata =
+             new ComponentPropertyMetadata(
+                 bottomName,
+@@ -2529,11 +2529,11 @@
+                 false, /* readWrite */
+                 null, /* No defaultValue for R/O property */
+                 new InspectorPath("Properties", "Extras", 5));
+-    private final ComponentPropertyMetadata items_ExpansionPanel_PropertyMetadata =
+-            new ComponentPropertyMetadata(
+-                itemsName,
+-                ExpansionPanelMetadata,
+-                true); /* collection */
++//    private final ComponentPropertyMetadata items_ExpansionPanel_PropertyMetadata =
++//            new ComponentPropertyMetadata(
++//                itemsName,
++//                ExpansionPanelMetadata,
++//                true); /* collection */
+     private final ComponentPropertyMetadata items_MenuItem_PropertyMetadata =
+             new ComponentPropertyMetadata(
+                 itemsName,
+@@ -3205,11 +3205,11 @@
+                 true, /* readWrite */
+                 null, /* defaultValue */
+                 new InspectorPath("Properties", "Node", 12));
+-    private final ComponentPropertyMetadata options_Option_PropertyMetadata =
+-            new ComponentPropertyMetadata(
+-                optionsName,
+-                OptionMetadata,
+-                true); /* collection */
++//    private final ComponentPropertyMetadata options_Option_PropertyMetadata =
++//            new ComponentPropertyMetadata(
++//                optionsName,
++//                OptionMetadata,
++//                true); /* collection */
+     private final ValuePropertyMetadata orientation_HORIZONTAL_PropertyMetadata =
+             new EnumerationPropertyMetadata(
+                 orientationName,
+@@ -4786,7 +4786,7 @@
+         componentClassMap.put(AxisMetadata.getKlass(), AxisMetadata);
+         componentClassMap.put(BarChartMetadata.getKlass(), BarChartMetadata);
+         componentClassMap.put(BorderPaneMetadata.getKlass(), BorderPaneMetadata);
+-        componentClassMap.put(BottomNavigationMetadata.getKlass(), BottomNavigationMetadata);
++//        componentClassMap.put(BottomNavigationMetadata.getKlass(), BottomNavigationMetadata);
+         componentClassMap.put(BoxMetadata.getKlass(), BoxMetadata);
+         componentClassMap.put(BubbleChartMetadata.getKlass(), BubbleChartMetadata);
+         componentClassMap.put(ButtonMetadata.getKlass(), ButtonMetadata);
+@@ -4794,7 +4794,7 @@
+         componentClassMap.put(ButtonBaseMetadata.getKlass(), ButtonBaseMetadata);
+         componentClassMap.put(CameraMetadata.getKlass(), CameraMetadata);
+         componentClassMap.put(CanvasMetadata.getKlass(), CanvasMetadata);
+-        componentClassMap.put(CardPaneMetadata.getKlass(), CardPaneMetadata);
++//        componentClassMap.put(CardPaneMetadata.getKlass(), CardPaneMetadata);
+         componentClassMap.put(CategoryAxisMetadata.getKlass(), CategoryAxisMetadata);
+         componentClassMap.put(ChartMetadata.getKlass(), ChartMetadata);
+         componentClassMap.put(CheckBoxMetadata.getKlass(), CheckBoxMetadata);
+@@ -4802,7 +4802,7 @@
+         componentClassMap.put(ChoiceBoxMetadata.getKlass(), ChoiceBoxMetadata);
+         componentClassMap.put(CircleMetadata.getKlass(), CircleMetadata);
+         componentClassMap.put(ClosePathMetadata.getKlass(), ClosePathMetadata);
+-        componentClassMap.put(CollapsedPanelMetadata.getKlass(), CollapsedPanelMetadata);
++//        componentClassMap.put(CollapsedPanelMetadata.getKlass(), CollapsedPanelMetadata);
+         componentClassMap.put(ColorPickerMetadata.getKlass(), ColorPickerMetadata);
+         componentClassMap.put(ColumnConstraintsMetadata.getKlass(), ColumnConstraintsMetadata);
+         componentClassMap.put(ComboBoxMetadata.getKlass(), ComboBoxMetadata);
+@@ -4815,11 +4815,11 @@
+         componentClassMap.put(CylinderMetadata.getKlass(), CylinderMetadata);
+         componentClassMap.put(DatePickerMetadata.getKlass(), DatePickerMetadata);
+         componentClassMap.put(DialogPaneMetadata.getKlass(), DialogPaneMetadata);
+-        componentClassMap.put(DropdownButtonMetadata.getKlass(), DropdownButtonMetadata);
++//        componentClassMap.put(DropdownButtonMetadata.getKlass(), DropdownButtonMetadata);
+         componentClassMap.put(EllipseMetadata.getKlass(), EllipseMetadata);
+-        componentClassMap.put(ExpandedPanelMetadata.getKlass(), ExpandedPanelMetadata);
+-        componentClassMap.put(ExpansionPanelMetadata.getKlass(), ExpansionPanelMetadata);
+-        componentClassMap.put(ExpansionPanelContainerMetadata.getKlass(), ExpansionPanelContainerMetadata);
++//        componentClassMap.put(ExpandedPanelMetadata.getKlass(), ExpandedPanelMetadata);
++//        componentClassMap.put(ExpansionPanelMetadata.getKlass(), ExpansionPanelMetadata);
++//        componentClassMap.put(ExpansionPanelContainerMetadata.getKlass(), ExpansionPanelContainerMetadata);
+         componentClassMap.put(FlowPaneMetadata.getKlass(), FlowPaneMetadata);
+         componentClassMap.put(GridPaneMetadata.getKlass(), GridPaneMetadata);
+         componentClassMap.put(GroupMetadata.getKlass(), GroupMetadata);
+@@ -4898,7 +4898,7 @@
+         componentClassMap.put(TextInputControlMetadata.getKlass(), TextInputControlMetadata);
+         componentClassMap.put(TilePaneMetadata.getKlass(), TilePaneMetadata);
+         componentClassMap.put(TitledPaneMetadata.getKlass(), TitledPaneMetadata);
+-        componentClassMap.put(ToggleButtonGroupMetadata.getKlass(), ToggleButtonGroupMetadata);
++//        componentClassMap.put(ToggleButtonGroupMetadata.getKlass(), ToggleButtonGroupMetadata);
+         componentClassMap.put(ToggleButtonMetadata.getKlass(), ToggleButtonMetadata);
+         componentClassMap.put(ToolBarMetadata.getKlass(), ToolBarMetadata);
+         componentClassMap.put(TooltipMetadata.getKlass(), TooltipMetadata);
+@@ -4966,8 +4966,8 @@
+         BorderPaneMetadata.getProperties().add(rightPropertyMetadata);
+         BorderPaneMetadata.getProperties().add(topPropertyMetadata);
+ 
+-        BottomNavigationMetadata.getProperties().add(bottomNavigationTypePropertyMetadata);
+-        BottomNavigationMetadata.getProperties().add(actionItems_Node_PropertyMetadata);
++//        BottomNavigationMetadata.getProperties().add(bottomNavigationTypePropertyMetadata);
++//        BottomNavigationMetadata.getProperties().add(actionItems_Node_PropertyMetadata);
+ 
+         BoxMetadata.getProperties().add(accessibleRole_NODE_PropertyMetadata);
+         BoxMetadata.getProperties().add(depthPropertyMetadata);
+@@ -5005,8 +5005,8 @@
+         CanvasMetadata.getProperties().add(pickOnBounds_false_PropertyMetadata);
+         CanvasMetadata.getProperties().add(width_Double_0_PropertyMetadata);
+ 
+-        CardPaneMetadata.getProperties().add(items_Node_PropertyMetadata);
+-        CardPaneMetadata.getProperties().add(onPullToRefreshPropertyMetadata);
++//        CardPaneMetadata.getProperties().add(items_Node_PropertyMetadata);
++//        CardPaneMetadata.getProperties().add(onPullToRefreshPropertyMetadata);
+ 
+         CategoryAxisMetadata.getProperties().add(categoriesPropertyMetadata);
+         CategoryAxisMetadata.getProperties().add(categorySpacingPropertyMetadata);
+@@ -5044,7 +5044,7 @@
+         CircleMetadata.getProperties().add(pickOnBounds_false_PropertyMetadata);
+         CircleMetadata.getProperties().add(radius_0_PropertyMetadata);
+ 
+-        CollapsedPanelMetadata.getProperties().add(titleNodes_Node_PropertyMetadata);
++//        CollapsedPanelMetadata.getProperties().add(titleNodes_Node_PropertyMetadata);
+ 
+         ColorPickerMetadata.getProperties().add(focusTraversable_true_PropertyMetadata);
+         ColorPickerMetadata.getProperties().add(styleClass_c5_PropertyMetadata);
+@@ -5144,7 +5144,7 @@
+         DialogPaneMetadata.getProperties().add(headerTextPropertyMetadata);
+         DialogPaneMetadata.getProperties().add(styleClass_c30_PropertyMetadata);
+ 
+-        DropdownButtonMetadata.getProperties().add(items_MenuItem_PropertyMetadata);
++//        DropdownButtonMetadata.getProperties().add(items_MenuItem_PropertyMetadata);
+ 
+         EllipseMetadata.getProperties().add(accessibleRole_NODE_PropertyMetadata);
+         EllipseMetadata.getProperties().add(centerXPropertyMetadata);
+@@ -5153,14 +5153,14 @@
+         EllipseMetadata.getProperties().add(radiusXPropertyMetadata);
+         EllipseMetadata.getProperties().add(radiusYPropertyMetadata);
+ 
+-        ExpandedPanelMetadata.getProperties().add(content_EXPANDEDPANEL_PropertyMetadata);
+-        ExpandedPanelMetadata.getProperties().add(buttons_EXPANDEDPANEL_PropertyMetadata);
+-
+-        ExpansionPanelMetadata.getProperties().add(expandedContentPropertyMetadata);
+-        ExpansionPanelMetadata.getProperties().add(collapsedContentPropertyMetadata);
+-        ExpansionPanelMetadata.getProperties().add(expandedPropertyMetadata);
+-
+-        ExpansionPanelContainerMetadata.getProperties().add(items_ExpansionPanel_PropertyMetadata);
++//        ExpandedPanelMetadata.getProperties().add(content_EXPANDEDPANEL_PropertyMetadata);
++//        ExpandedPanelMetadata.getProperties().add(buttons_EXPANDEDPANEL_PropertyMetadata);
++//
++//        ExpansionPanelMetadata.getProperties().add(expandedContentPropertyMetadata);
++//        ExpansionPanelMetadata.getProperties().add(collapsedContentPropertyMetadata);
++//        ExpansionPanelMetadata.getProperties().add(expandedPropertyMetadata);
++//
++//        ExpansionPanelContainerMetadata.getProperties().add(items_ExpansionPanel_PropertyMetadata);
+ 
+         FlowPaneMetadata.getProperties().add(alignment_TOP_LEFT_PropertyMetadata);
+         FlowPaneMetadata.getProperties().add(columnHalignmentPropertyMetadata);
+@@ -5633,9 +5633,9 @@
+         SeparatorMenuItemMetadata.getProperties().add(hideOnClick_false_PropertyMetadata);
+         SeparatorMenuItemMetadata.getProperties().add(styleClass_c23_PropertyMetadata);
+ 
+-        SettingsPaneMetadata.getProperties().add(searchBoxVisiblePropertyMetadata);
+-        SettingsPaneMetadata.getProperties().add(titleFilterPropertyMetadata);
+-        SettingsPaneMetadata.getProperties().add(options_Option_PropertyMetadata);
++//        SettingsPaneMetadata.getProperties().add(searchBoxVisiblePropertyMetadata);
++//        SettingsPaneMetadata.getProperties().add(titleFilterPropertyMetadata);
++//        SettingsPaneMetadata.getProperties().add(options_Option_PropertyMetadata);
+ 
+         ShapeMetadata.getProperties().add(accessibleRole_NODE_PropertyMetadata);
+         ShapeMetadata.getProperties().add(fill_BLACK_PropertyMetadata);
+@@ -5845,8 +5845,8 @@
+         TitledPaneMetadata.getProperties().add(mnemonicParsing_false_PropertyMetadata);
+         TitledPaneMetadata.getProperties().add(styleClass_c26_PropertyMetadata);
+ 
+-        ToggleButtonGroupMetadata.getProperties().add(toggles_ToggleButton_PropertyMetadata);
+-        ToggleButtonGroupMetadata.getProperties().add(selectionTypePropertyMetadata);
++//        ToggleButtonGroupMetadata.getProperties().add(toggles_ToggleButton_PropertyMetadata);
++//        ToggleButtonGroupMetadata.getProperties().add(selectionTypePropertyMetadata);
+ 
+         ToggleButtonMetadata.getProperties().add(accessibleRole_TOGGLE_BUTTON_PropertyMetadata);
+         ToggleButtonMetadata.getProperties().add(alignment_CENTER_PropertyMetadata);
+
+diff -u -b -r ./kit/metadata/util/DesignHierarchyMask.java ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/metadata/util/DesignHierarchyMask.java
+--- ./kit/metadata/util/DesignHierarchyMask.java	2019-03-06 15:54:03.524104600 +0100
++++ ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/metadata/util/DesignHierarchyMask.java	2019-01-15 12:56:13.019121200 +0100
+@@ -32,11 +32,11 @@
+  */
+ package com.oracle.javafx.scenebuilder.kit.metadata.util;
+ 
+-import com.gluonhq.charm.glisten.control.BottomNavigation;
++//import com.gluonhq.charm.glisten.control.BottomNavigation;
+ import com.oracle.javafx.scenebuilder.kit.editor.EditorPlatform;
+-import com.gluonhq.charm.glisten.control.DropdownButton;
+-import com.gluonhq.charm.glisten.control.ExpansionPanel;
+-import com.gluonhq.charm.glisten.control.ToggleButtonGroup;
++//import com.gluonhq.charm.glisten.control.DropdownButton;
++//import com.gluonhq.charm.glisten.control.ExpansionPanel;
++//import com.gluonhq.charm.glisten.control.ToggleButtonGroup;
+ import com.oracle.javafx.scenebuilder.kit.editor.EditorPlatform;
+ import com.oracle.javafx.scenebuilder.kit.editor.images.ImageUtils;
+ import com.oracle.javafx.scenebuilder.kit.fxom.FXOMCollection;
+@@ -425,26 +425,26 @@
+         switch (accessory) {
+             case CONTENT:
+             case GRAPHIC:
+-                if (sceneGraphObject instanceof DialogPane == true || sceneGraphObject  instanceof ExpansionPanel.ExpandedPanel == true) {
++                if (sceneGraphObject instanceof DialogPane == true /*|| sceneGraphObject  instanceof ExpansionPanel.ExpandedPanel == true*/) {
+                     return false;
+                 }
+                 break;
+             case DP_CONTENT:
+             case DP_GRAPHIC:
+-                if (sceneGraphObject instanceof DialogPane == false || sceneGraphObject instanceof ExpansionPanel.ExpandedPanel == true) {
++                if (sceneGraphObject instanceof DialogPane == false /*|| sceneGraphObject instanceof ExpansionPanel.ExpandedPanel == true*/) {
+                     return false;
+                 }
+                 break;
+             case EXPANDABLE_CONTENT:
+             case COLLAPSED_CONTENT:
+-                if (sceneGraphObject instanceof ExpansionPanel == false) {
+-                    return false;
+-                }
++//                if (sceneGraphObject instanceof ExpansionPanel == false) {
++//                    return false;
++//                }
+                 break;
+             case EX_CONTENT:
+-                if (sceneGraphObject instanceof ExpansionPanel.ExpandedPanel == false) {
+-                    return false;
+-                }
++//                if (sceneGraphObject instanceof ExpansionPanel.ExpandedPanel == false) {
++//                    return false;
++//                }
+                 break;
+             default:
+                 break;
+@@ -1063,10 +1063,10 @@
+                 && ! (fxomObject.getSceneGraphObject() instanceof MenuButton
+                         || fxomObject.getSceneGraphObject() instanceof MenuBar
+                         || fxomObject.getSceneGraphObject() instanceof ToolBar
+-                        || fxomObject.getSceneGraphObject() instanceof ExpansionPanel.ExpandedPanel
++                        /*|| fxomObject.getSceneGraphObject() instanceof ExpansionPanel.ExpandedPanel
+                         || fxomObject.getSceneGraphObject() instanceof DropdownButton
+                         || fxomObject.getSceneGraphObject() instanceof BottomNavigation
+                         || fxomObject.getSceneGraphObject() instanceof ExpansionPanel.CollapsedPanel
+-                        || fxomObject.getSceneGraphObject() instanceof ToggleButtonGroup); // Jerome
++                        || fxomObject.getSceneGraphObject() instanceof ToggleButtonGroup*/); // Jerome
+     }
+ }
