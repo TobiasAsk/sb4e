@@ -139,9 +139,9 @@ public class FXMLEditor extends EditorPart {
 		// make sure the other controllers have their references set before setting the input file
 		// for the editor controller so they can react to the update
 		try {
+			editorController.setLibrary(new CustomClassLoaderLibrary(new EclipseProjectsClassLoader()));
 			editorController.setFxmlTextAndLocation(FXOMDocument
 					.readContentFromURL(fxmlUrl), fxmlUrl);
-			editorController.setLibrary(new CustomClassLoaderLibrary(new EclipseProjectsClassLoader()));
 			
 			FXOMObject root = editorController.getFxomDocument().getFxomRoot();
 			String controllerName = null;
