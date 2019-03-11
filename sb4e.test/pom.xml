@@ -27,13 +27,13 @@
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<configuration>
-					<argLine>-Dosgi.framework.extensions=org.eclipse.fx.osgi --module-path="C:\Users\arneb\Downloads\Installasjoner\javafx-sdk-11.0.1\lib" --add-modules=javafx.base,javafx.controls,javafx.fxml,javafx.graphics,javafx.media,javafx.swing,javafx.web,javafx.swt</argLine>
+					<argLine>-Dosgi.framework.extensions=org.eclipse.fx.osgi -Defxclipse.java-modules.dir="C:\Users\tobiaas\Downloads\javafx-sdk-11.0.1\lib"</argLine>
 					<useUIHarness>false</useUIHarness>
 					<frameworkExtensions>
 						<frameworkExtension>
 							<groupId>at.bestsolution.efxclipse.rt</groupId>
 							<artifactId>org.eclipse.fx.osgi</artifactId>
-							<version>3.4.1.201809241043</version>
+							<version>3.5.0.201902220600</version>
 						</frameworkExtension>
 					</frameworkExtensions>
 				</configuration>
