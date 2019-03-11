@@ -1,21 +1,32 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><?pde version="3.8"?><target name="Oxygen runtime" sequenceNumber="249">
-<locations>
-<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
-<unit id="org.eclipse.e4.core.tools.feature.feature.group" version="4.10.0.v20181116-0958"/>
-<unit id="org.eclipse.jdt.feature.group" version="3.16.0.v20181206-1038"/>
-<unit id="org.eclipse.platform.feature.group" version="4.10.0.v20181206-0815"/>
-<repository location="http://download.eclipse.org/releases/2018-12"/>
-</location>
-<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
-<unit id="org.hamcrest" version="1.1.0.v20090501071000"/>
-<unit id="org.mockito" version="1.9.5.v201605172210"/>
-<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20180905201904/repository"/>
-</location>
-</locations>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?pde version="3.8"?><target name="2018-12 runtime" sequenceNumber="249">
 <environment>
 <os>win32</os>
 <ws>win32</ws>
 <arch>x86_64</arch>
 </environment>
 <targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk-11.0.1"/>
+	<locations>
+		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+			<unit id="org.eclipse.e4.core.tools.feature.source.feature.group" version="4.10.0.v20181116-0958"/>
+			<unit id="org.eclipse.sdk.feature.group" version="4.10.0.v20181206-1038"/>
+			<repository location="http://download.eclipse.org/releases/2018-12"/>
+		</location>
+		<location path="C:\Users\tobiaas\dev\scene-builder-plugin\sb4e.dependencies\sb4e-dependencies\target" type="Directory"/>
+		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+			<unit id="org.eclipse.fx.ide.feature.feature.group" version="3.5.0.201902220800"/>
+			<repository location="http://download.eclipse.org/efxclipse/updates-nightly/site"/>
+		</location>
+		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+			<unit id="org.mockito" version="1.9.5.v201605172210"/>
+			<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20190226160451/repository"/>
+		</location>
+		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+			<unit id="openjfx.media.feature.feature.group" version="11.0.0.201901231300"/>
+			<unit id="openjfx.standard.feature.feature.group" version="11.0.0.201901231300"/>
+			<unit id="openjfx.swing.feature.feature.group" version="11.0.0.201901231300"/>
+			<unit id="openjfx.swt.feature.feature.group" version="11.0.0.201901231300"/>
+			<unit id="openjfx.web.feature.feature.group" version="11.0.0.201901231300"/>
+			<repository location="http://downloads.efxclipse.bestsolution.at/p2-repos/openjfx-11/repository/"/>
+		</location>
+	</locations>
 </target>

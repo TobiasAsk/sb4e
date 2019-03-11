@@ -13,6 +13,14 @@
 		<maven.compile.target>11</maven.compile.target>
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>no.tobask.sb4e</groupId>
+			<artifactId>sb4e-dependencies</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+
 	<repositories>
 		<repository>
 			<id>orbit-2018-12</id>
@@ -23,6 +31,11 @@
 			<id>eclipse-2018-12</id>
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/releases/2018-12</url>
+		</repository>
+		<repository>
+			<id>openjfx</id>
+			<layout>p2</layout>
+			<url>http://downloads.efxclipse.bestsolution.at/p2-repos/openjfx-11/repository/</url>
 		</repository>
 	</repositories>
 
@@ -45,56 +58,56 @@
 							<groupId>org.openjfx</groupId>
 							<artifactId>javafx-base</artifactId>
 							<version>11</version>
-							<systemPath>C:\Users\arneb\Downloads\Installasjoner\javafx-sdk-11.0.1\lib\javafx.base.jar</systemPath>
+							<systemPath>C:\Users\tobiaas\Downloads\javafx-sdk-11.0.1\lib\javafx.base.jar</systemPath>
 							<scope>system</scope>
 						</extraClasspathElement>
 						<extraClasspathElement>
 							<groupId>org.openjfx</groupId>
 							<artifactId>javafx-controls</artifactId>
 							<version>11</version>
-							<systemPath>C:\Users\arneb\Downloads\Installasjoner\javafx-sdk-11.0.1\lib\javafx.controls.jar</systemPath>
+							<systemPath>C:\Users\tobiaas\Downloads\javafx-sdk-11.0.1\lib\javafx.controls.jar</systemPath>
 							<scope>system</scope>
 						</extraClasspathElement>
 						<extraClasspathElement>
 							<groupId>org.openjfx</groupId>
 							<artifactId>javafx-fxml</artifactId>
 							<version>11</version>
-							<systemPath>C:\Users\arneb\Downloads\Installasjoner\javafx-sdk-11.0.1\lib\javafx.fxml.jar</systemPath>
+							<systemPath>C:\Users\tobiaas\Downloads\javafx-sdk-11.0.1\lib\javafx.fxml.jar</systemPath>
 							<scope>system</scope>
 						</extraClasspathElement>
 						<extraClasspathElement>
 							<groupId>org.openjfx</groupId>
 							<artifactId>javafx-graphics</artifactId>
 							<version>11</version>
-							<systemPath>C:\Users\arneb\Downloads\Installasjoner\javafx-sdk-11.0.1\lib\javafx.graphics.jar</systemPath>
+							<systemPath>C:\Users\tobiaas\Downloads\javafx-sdk-11.0.1\lib\javafx.graphics.jar</systemPath>
 							<scope>system</scope>
 						</extraClasspathElement>
 						<extraClasspathElement>
 							<groupId>org.openjfx</groupId>
 							<artifactId>javafx-media</artifactId>
 							<version>11</version>
-							<systemPath>C:\Users\arneb\Downloads\Installasjoner\javafx-sdk-11.0.1\lib\javafx.media.jar</systemPath>
+							<systemPath>C:\Users\tobiaas\Downloads\javafx-sdk-11.0.1\lib\javafx.media.jar</systemPath>
 							<scope>system</scope>
 						</extraClasspathElement>
 						<extraClasspathElement>
 							<groupId>org.openjfx</groupId>
 							<artifactId>javafx-swing</artifactId>
 							<version>11</version>
-							<systemPath>C:\Users\arneb\Downloads\Installasjoner\javafx-sdk-11.0.1\lib\javafx.swing.jar</systemPath>
+							<systemPath>C:\Users\tobiaas\Downloads\javafx-sdk-11.0.1\lib\javafx.swing.jar</systemPath>
 							<scope>system</scope>
 						</extraClasspathElement>
 						<extraClasspathElement>
 							<groupId>org.openjfx</groupId>
 							<artifactId>javafx-web</artifactId>
 							<version>11</version>
-							<systemPath>C:\Users\arneb\Downloads\Installasjoner\javafx-sdk-11.0.1\lib\javafx.web.jar</systemPath>
+							<systemPath>C:\Users\tobiaas\Downloads\javafx-sdk-11.0.1\lib\javafx.web.jar</systemPath>
 							<scope>system</scope>
 						</extraClasspathElement>
 						<extraClasspathElement>
 							<groupId>org.openjfx</groupId>
 							<artifactId>javafx-swt</artifactId>
 							<version>11</version>
-							<systemPath>C:\Users\arneb\Downloads\Installasjoner\javafx-sdk-11.0.1\lib\javafx-swt.jar</systemPath>
+							<systemPath>C:\Users\tobiaas\Downloads\javafx-sdk-11.0.1\lib\javafx-swt.jar</systemPath>
 							<scope>system</scope>
 						</extraClasspathElement>
 					</extraClasspathElements>
@@ -121,6 +134,14 @@
 								<id>org.hamcrest</id>
 								<versionRange>0.0.0</versionRange>
 							</requirement>
+							<!-- <requirement> <type>eclipse-feature</type> <id>openjfx.media.feature</id> 
+								<versionRange>11.0.0</versionRange> </requirement> <requirement> <type>eclipse-feature</type> 
+								<id>openjfx.standard.feature</id> <versionRange>11.0.0</versionRange> </requirement> 
+								<requirement> <type>eclipse-feature</type> <id>openjfx.swing.feature</id> 
+								<versionRange>11.0.0</versionRange> </requirement> <requirement> <type>eclipse-feature</type> 
+								<id>openjfx.swt.feature</id> <versionRange>11.0.0</versionRange> </requirement> 
+								<requirement> <type>eclipse-feature</type> <id>openjfx.web.feature</id> <versionRange>11.0.0</versionRange> 
+								</requirement> -->
 						</extraRequirements>
 					</dependency-resolution>
 				</configuration>
