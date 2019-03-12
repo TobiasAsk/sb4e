@@ -1,50 +1,6 @@
-diff -u -b -r ./kit/editor/EditorPlatform.java ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/editor/EditorPlatform.java
---- ./kit/editor/EditorPlatform.java	2019-03-06 15:54:03.449059300 +0100
-+++ ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/editor/EditorPlatform.java	2019-03-08 17:47:08.296825500 +0100
-@@ -32,7 +32,7 @@
-  */
- package com.oracle.javafx.scenebuilder.kit.editor;
- 
--import com.gluonhq.charm.glisten.visual.GlistenStyleClasses;
-+//import com.gluonhq.charm.glisten.visual.GlistenStyleClasses;
- 
- import java.io.BufferedReader;
- import java.io.File;
-@@ -122,8 +122,8 @@
-      * Themes supported by Scene Builder Kit.
-      */
-     public enum Theme implements StylesheetProvider {
--        GLUON_MOBILE_LIGHT(GlistenStyleClasses.impl_loadResource("glisten.gls")),
--        GLUON_MOBILE_DARK(GlistenStyleClasses.impl_loadResource("glisten.gls")),
-+        GLUON_MOBILE_LIGHT(null),
-+        GLUON_MOBILE_DARK(null),
-         MODENA("com/sun/javafx/scene/control/skin/modena/modena.bss"),
-         MODENA_TOUCH("com/oracle/javafx/scenebuilder/kit/util/css/modena/modena-touch.css"),
-         MODENA_HIGH_CONTRAST_BLACK_ON_WHITE("com/oracle/javafx/scenebuilder/kit/util/css/modena/modena-highContrast-blackOnWhite.css"),
-@@ -193,7 +193,8 @@
- 
-         @Override
-         public String getStylesheetURL() {
--            return GlistenStyleClasses.impl_loadResource("swatch_" + name().toLowerCase(Locale.ROOT) + ".gls");
-+        	return null;
-+//            return GlistenStyleClasses.impl_loadResource("swatch_" + name().toLowerCase(Locale.ROOT) + ".gls");
-         }
- 
-         public Color getColor() {
-@@ -245,7 +246,8 @@
- 
-         @Override
-         public String getStylesheetURL() {
--            return GlistenStyleClasses.impl_loadResource("theme_" + name().toLowerCase(Locale.ROOT) + ".gls");
-+        	return null;
-+//            return GlistenStyleClasses.impl_loadResource("theme_" + name().toLowerCase(Locale.ROOT) + ".gls");
-         }
-     }
-
-diff -u -b -r ./kit/library/BuiltinLibrary.java ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/library/BuiltinLibrary.java
---- ./kit/library/BuiltinLibrary.java	2019-03-06 15:54:03.511094900 +0100
-+++ ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/library/BuiltinLibrary.java	2019-03-06 14:30:38.780383700 +0100
-@@ -119,42 +119,42 @@
+--- ./kit/library/BuiltinLibrary.java	2019-03-11 15:48:56.997131500 +0100
++++ ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/library/BuiltinLibrary.java	2019-03-12 14:07:52.980764500 +0100
+@@ -119,41 +119,41 @@
       * Private
       */
      
@@ -89,9 +45,7 @@ diff -u -b -r ./kit/library/BuiltinLibrary.java ../../../../../../../../../scene
  //        addCustomizedItem(com.gluonhq.charm.glisten.control.ListTile.class, TAG_GLUON);
  //        addCustomizedItem(com.gluonhq.charm.glisten.layout.layer.MenuPopupView.class, TAG_GLUON);
  //        addCustomizedItem(com.gluonhq.charm.glisten.layout.layer.MenuSidePopupView.class, TAG_GLUON);
--        addCustomizedItem(com.gluonhq.charm.glisten.layout.MobileLayoutPane.class, TAG_GLUON);
 -        addCustomizedItem(com.gluonhq.charm.glisten.control.NavigationDrawer.class, TAG_GLUON);
-+//        addCustomizedItem(com.gluonhq.charm.glisten.layout.MobileLayoutPane.class, TAG_GLUON);
 +//        addCustomizedItem(com.gluonhq.charm.glisten.control.NavigationDrawer.class, TAG_GLUON);
  //        addCustomizedItem(com.gluonhq.charm.glisten.layout.layer.PopupView.class, TAG_GLUON);
 -        addCustomizedItem(com.gluonhq.charm.glisten.control.ProgressBar.class, TAG_GLUON);
@@ -112,8 +66,49 @@ diff -u -b -r ./kit/library/BuiltinLibrary.java ../../../../../../../../../scene
  
          // Containers
          addCustomizedItem(javafx.scene.control.Accordion.class, TAG_CONTAINERS);
-		 
-diff -u -b -r ./kit/metadata/klass/ComponentClassMetadata.java ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/metadata/klass/ComponentClassMetadata.java
+
+--- ./kit/editor/EditorPlatform.java	2019-03-06 15:54:03.449059300 +0100
++++ ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/editor/EditorPlatform.java	2019-03-08 17:47:08.296825500 +0100
+@@ -32,7 +32,7 @@
+  */
+ package com.oracle.javafx.scenebuilder.kit.editor;
+ 
+-import com.gluonhq.charm.glisten.visual.GlistenStyleClasses;
++//import com.gluonhq.charm.glisten.visual.GlistenStyleClasses;
+ 
+ import java.io.BufferedReader;
+ import java.io.File;
+@@ -122,8 +122,8 @@
+      * Themes supported by Scene Builder Kit.
+      */
+     public enum Theme implements StylesheetProvider {
+-        GLUON_MOBILE_LIGHT(GlistenStyleClasses.impl_loadResource("glisten.gls")),
+-        GLUON_MOBILE_DARK(GlistenStyleClasses.impl_loadResource("glisten.gls")),
++        GLUON_MOBILE_LIGHT(null),
++        GLUON_MOBILE_DARK(null),
+         MODENA("com/sun/javafx/scene/control/skin/modena/modena.bss"),
+         MODENA_TOUCH("com/oracle/javafx/scenebuilder/kit/util/css/modena/modena-touch.css"),
+         MODENA_HIGH_CONTRAST_BLACK_ON_WHITE("com/oracle/javafx/scenebuilder/kit/util/css/modena/modena-highContrast-blackOnWhite.css"),
+@@ -193,7 +193,8 @@
+ 
+         @Override
+         public String getStylesheetURL() {
+-            return GlistenStyleClasses.impl_loadResource("swatch_" + name().toLowerCase(Locale.ROOT) + ".gls");
++        	return null;
++//            return GlistenStyleClasses.impl_loadResource("swatch_" + name().toLowerCase(Locale.ROOT) + ".gls");
+         }
+ 
+         public Color getColor() {
+@@ -245,7 +246,8 @@
+ 
+         @Override
+         public String getStylesheetURL() {
+-            return GlistenStyleClasses.impl_loadResource("theme_" + name().toLowerCase(Locale.ROOT) + ".gls");
++        	return null;
++//            return GlistenStyleClasses.impl_loadResource("theme_" + name().toLowerCase(Locale.ROOT) + ".gls");
+         }
+     }
+
 --- ./kit/metadata/klass/ComponentClassMetadata.java	2019-02-19 15:47:33.952538900 +0100
 +++ ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/metadata/klass/ComponentClassMetadata.java	2019-01-15 12:56:12.954671600 +0100
 @@ -201,20 +201,20 @@
@@ -152,9 +147,10 @@ diff -u -b -r ./kit/metadata/klass/ComponentClassMetadata.java ../../../../../..
              result = null;
          }
 
-diff -u -b -r ./kit/metadata/Metadata.java ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/metadata/Metadata.java
+
 --- ./kit/metadata/Metadata.java	2019-03-06 15:54:03.518099200 +0100
 +++ ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/metadata/Metadata.java	2019-03-05 16:38:22.200458800 +0100
+
 @@ -36,7 +36,7 @@
   * THIS CODE IS AUTOMATICALLY GENERATED !
   */
@@ -449,7 +445,6 @@ diff -u -b -r ./kit/metadata/Metadata.java ../../../../../../../../../scene-buil
          ToggleButtonMetadata.getProperties().add(accessibleRole_TOGGLE_BUTTON_PropertyMetadata);
          ToggleButtonMetadata.getProperties().add(alignment_CENTER_PropertyMetadata);
 
-diff -u -b -r ./kit/metadata/util/DesignHierarchyMask.java ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/metadata/util/DesignHierarchyMask.java
 --- ./kit/metadata/util/DesignHierarchyMask.java	2019-03-06 15:54:03.524104600 +0100
 +++ ../../../../../../../../../scene-builder-plugin/sb/src/main/java/com/oracle/javafx/scenebuilder/kit/metadata/util/DesignHierarchyMask.java	2019-01-15 12:56:13.019121200 +0100
 @@ -32,11 +32,11 @@
@@ -516,3 +511,4 @@ diff -u -b -r ./kit/metadata/util/DesignHierarchyMask.java ../../../../../../../
 +                        || fxomObject.getSceneGraphObject() instanceof ToggleButtonGroup*/); // Jerome
      }
  }
+ 

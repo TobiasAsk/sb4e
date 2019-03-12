@@ -19,12 +19,27 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-patch-plugin</artifactId>
 				<version>1.2</version>
-				<configuration>
-					<patchTargetDir>${project.build.sourceDirectory}\com\oracle\javafx\scenebuilder\kit</patchTargetDir>
-				</configuration>
 				<executions>
 					<execution>
-						<id>patch</id>
+						<id>java-patches</id>
+						<configuration>
+							<naturalOrderProcessing>true</naturalOrderProcessing>
+							<patchDirectory>src/main/patches/java</patchDirectory>
+							<patchTargetDir>${project.build.sourceDirectory}\com\oracle\javafx\scenebuilder</patchTargetDir>
+						</configuration>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>apply</goal>
+						</goals>
+					</execution>
+
+					<execution>
+						<id>resource-patches</id>
+						<configuration>
+							<naturalOrderProcessing>true</naturalOrderProcessing>	
+							<patchDirectory>src/main/patches/resources</patchDirectory>						
+							<patchTargetDir>${project.basedir}/src/main/resources/com/oracle/javafx/scenebuilder</patchTargetDir>
+						</configuration>
 						<phase>process-sources</phase>
 						<goals>
 							<goal>apply</goal>
@@ -33,7 +48,7 @@
 				</executions>
 			</plugin>
 		</plugins>
-		
+
 		<pluginManagement>
 			<plugins>
 				<plugin>
