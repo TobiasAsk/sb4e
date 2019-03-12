@@ -357,7 +357,7 @@ public abstract class AbstractPanelController {
     protected final void stopListeningToFxomDocumentCssRevision() {
     	editorController.getFxomDocument().cssRevisionProperty().removeListener(cssRevisionListener);
     }
-        
+    
     /**
      * Replaces oldStylesheet by the tool style sheet assigned to the editor
      * controller. This methods {@link EditorController#getToolStylesheet}.

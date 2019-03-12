@@ -215,7 +215,7 @@ public class InfoPanelController extends AbstractFxmlPanelController {
                 updateControllerAndControllerClassEditor(controllerClassEditor.getTextField().getText());
             }
         });
-        
+
         getEditorController().getGlossary().revisionProperty().addListener((ov, t, t1) -> {
         	resetSuggestedControllerClasses(getEditorController().getFxmlLocation());
         });

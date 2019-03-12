@@ -118,10 +118,10 @@ public class LineHandles extends AbstractCurveHandles<Line> {
         
         if (node == startHandle) {
             result = new EditCurveGesture(getContentPanelController(), 
-                    EditCurveGesture.Tunable.START);
+                    getFxomInstance(), EditCurveGesture.Tunable.START);
         } else if (node == endHandle) {
             result = new EditCurveGesture(getContentPanelController(), 
-                    EditCurveGesture.Tunable.END);
+                    getFxomInstance(), EditCurveGesture.Tunable.END);
         } else {
             result = null;
         }
@@ -142,7 +142,7 @@ public class LineHandles extends AbstractCurveHandles<Line> {
     private void setupHandleState(Circle handleCircle) {
         
         final String styleClass = isEnabled() ? SELECTION_HANDLES : SELECTION_HANDLES_DIM;
-        final Cursor cursor = isEnabled() ? Cursor.CROSSHAIR : Cursor.DEFAULT;
+        final Cursor cursor = isEnabled() ? Cursor.OPEN_HAND : Cursor.DEFAULT;
         
         handleCircle.getStyleClass().add(styleClass);
         handleCircle.setCursor(cursor);

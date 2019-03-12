@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Gluon and/or its affiliates.
+ * Copyright (c) 2016, 2018 Gluon and/or its affiliates.
  * Copyright (c) 2012, 2014, Oracle and/or its affiliates.
  * All rights reserved. Use is subject to license terms.
  *
@@ -48,6 +48,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -82,21 +83,28 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextFlow;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
+import javafx.stage.Window;
 
 import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorPlatform;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorPlatform.Theme;
 import com.oracle.javafx.scenebuilder.kit.editor.drag.source.AbstractDragSource;
 import com.oracle.javafx.scenebuilder.kit.editor.drag.target.AbstractDropTarget;
+import com.oracle.javafx.scenebuilder.kit.editor.panel.content.driver.SceneDriver;
+import com.oracle.javafx.scenebuilder.kit.editor.panel.content.driver.WindowDriver;
 import com.oracle.javafx.scenebuilder.kit.i18n.I18N;
 import com.oracle.javafx.scenebuilder.kit.editor.images.ImageUtils;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.content.driver.AbstractDriver;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.content.driver.BorderPaneDriver;
+import com.oracle.javafx.scenebuilder.kit.editor.panel.content.driver.CubicCurveDriver;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.content.driver.FlowPaneDriver;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.content.driver.GenericDriver;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.content.driver.GridPaneDriver;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.content.driver.HBoxDriver;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.content.driver.LineDriver;
+import com.oracle.javafx.scenebuilder.kit.editor.panel.content.driver.PolygonDriver;
+import com.oracle.javafx.scenebuilder.kit.editor.panel.content.driver.PolylineDriver;
+import com.oracle.javafx.scenebuilder.kit.editor.panel.content.driver.QuadCurveDriver;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.content.driver.SplitPaneDriver;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.content.driver.TabDriver;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.content.driver.TabPaneDriver;
@@ -124,6 +132,10 @@ import com.oracle.javafx.scenebuilder.kit.fxom.FXOMInstance;
 import com.oracle.javafx.scenebuilder.kit.fxom.FXOMObject;
 import com.oracle.javafx.scenebuilder.kit.metadata.util.DesignHierarchyMask;
 import javafx.scene.SubScene;
+import javafx.scene.shape.CubicCurve;
+import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Polyline;
+import javafx.scene.shape.QuadCurve;
 
 /**
  * This class creates and controls the <b>Content Panel</b> of Scene Builder Kit.
@@ -442,14 +454,7 @@ public class ContentPanelController extends AbstractFxmlPanelController
         
         if (isContentDisplayable()) {
             final FXOMDocument fxomDocument = getEditorController().getFxomDocument();
-            assert fxomDocument != null;
-            if ((fxomDocument.getFxomRoot() == null) 
-                    || excludes.contains(fxomDocument.getFxomRoot())) {
-                result = null;
-            } else {
-                assert fxomDocument.getFxomRoot().getSceneGraphObject() instanceof Node;
-                result = pick(fxomDocument.getFxomRoot(), sceneX, sceneY, excludes);
-            }
+            result = pick(fxomDocument, sceneX, sceneY, excludes);
         } else {
             result = null;
         }
@@ -457,6 +462,28 @@ public class ContentPanelController extends AbstractFxmlPanelController
         return result;
     }
     
+    public FXOMObject pick(FXOMDocument fxomDocument, double sceneX, double sceneY, Set<FXOMObject> excludes) {
+        assert fxomDocument != null;
+
+        if (fxomDocument.getFxomRoot() == null) {
+            return null;
+        }
+
+        Node displayNode = fxomDocument.getDisplayNode();
+        if (displayNode != null) {
+            FXOMObject startObject = fxomDocument.getFxomRoot().searchWithSceneGraphObject(displayNode);
+            if (startObject == null || excludes.contains(startObject)) {
+                return null;
+            }
+            return pick(startObject, sceneX, sceneY, excludes);
+        }
+
+        if (excludes.contains(fxomDocument.getFxomRoot())) {
+            return null;
+        }
+
+        return pick(fxomDocument.getFxomRoot(), sceneX, sceneY, excludes);
+    }
     
     /**
      * Returns the topmost FXOMObject at (sceneX, sceneY) but ignoring
@@ -713,7 +740,7 @@ public class ContentPanelController extends AbstractFxmlPanelController
         } else if (fxomDocument.getFxomRoot() == null) {
             result = true;
         } else {
-            result = fxomDocument.getFxomRoot().isNode()
+            result = fxomDocument.getDisplayNodeOrSceneGraphRoot() instanceof Node
                     && workspaceController.getLayoutException() == null;
         }
         
@@ -947,6 +974,14 @@ public class ContentPanelController extends AbstractFxmlPanelController
             result = new BorderPaneDriver(this);
         } else if (sceneGraphObject instanceof Line) {
             result = new LineDriver(this);
+        } else if (sceneGraphObject instanceof QuadCurve) {
+            result = new QuadCurveDriver(this);
+        } else if (sceneGraphObject instanceof CubicCurve) {
+            result = new CubicCurveDriver(this);
+        } else if (sceneGraphObject instanceof Polyline) {
+            result = new PolylineDriver(this);
+        } else if (sceneGraphObject instanceof Polygon) {
+            result = new PolygonDriver(this);
         } else if (sceneGraphObject instanceof FlowPane) {
             result = new FlowPaneDriver(this);
         } else if (sceneGraphObject instanceof TextFlow) {
@@ -969,6 +1004,10 @@ public class ContentPanelController extends AbstractFxmlPanelController
             result = new TreeTableColumnDriver(this);
         } else if (sceneGraphObject instanceof Node) {
             result = new GenericDriver(this);
+        } else if (sceneGraphObject instanceof Scene) {
+            result = new SceneDriver(this);
+        } else if (sceneGraphObject instanceof Window) {
+            result = new WindowDriver(this);
         } else {
             result = null;
         }

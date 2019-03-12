@@ -39,7 +39,9 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -52,6 +54,8 @@ import com.oracle.javafx.scenebuilder.kit.fxom.glue.GlueDocument;
 import com.oracle.javafx.scenebuilder.kit.fxom.sampledata.SampleDataGenerator;
 import com.oracle.javafx.scenebuilder.kit.util.Deprecation;
 import com.oracle.javafx.scenebuilder.kit.util.URLUtils;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.scene.Parent;
 
 /**
@@ -67,6 +71,8 @@ public class FXOMDocument {
     private SampleDataGenerator sampleDataGenerator;
     private FXOMObject fxomRoot;
     private Object sceneGraphRoot;
+    private Node displayNode;
+    private ArrayList<String> displayStylesheets = new ArrayList<>();
     private final SimpleIntegerProperty sceneGraphRevision = new SimpleIntegerProperty();
     private final SimpleIntegerProperty cssRevision = new SimpleIntegerProperty();
     private SceneGraphHolder sceneGraphHolder;
@@ -74,12 +80,14 @@ public class FXOMDocument {
 
     private boolean hasGluonControls;
     
+    private List<Class<?>> initialDeclaredClasses;
     
     public FXOMDocument(String fxmlText, URL location, ClassLoader classLoader, ResourceBundle resources, boolean normalize) throws IOException {
         this.glue = new GlueDocument(fxmlText);
         this.location = location;
         this.classLoader = classLoader;
         this.resources = resources;
+        initialDeclaredClasses = new ArrayList<>();
         if (this.glue.getRootElement() != null) {
             final FXOMLoader loader = new FXOMLoader(this);
             loader.load(fxmlText);
@@ -135,6 +143,10 @@ public class FXOMDocument {
         this.classLoader = classLoader;
         endUpdate();
     }    
+    
+    public List<Class<?>> getInitialDeclaredClasses() {
+        return initialDeclaredClasses;
+    }
 
     public ResourceBundle getResources() {
         return resources;
@@ -195,6 +207,8 @@ public class FXOMDocument {
             this.glue.setRootElement(this.fxomRoot.getGlueElement());
         }
         this.sceneGraphRoot = sceneGraphRoot;
+        this.displayNode = null;
+        this.displayStylesheets.clear();
     }
 
     public Object getSceneGraphRoot() {
@@ -203,6 +217,36 @@ public class FXOMDocument {
 
     void setSceneGraphRoot(Object sceneGraphRoot) {
         this.sceneGraphRoot = sceneGraphRoot;
+    }
+
+    /**
+     * Returns the Node that should be displayed in the editor instead of the scene graph root.
+     */
+    public Node getDisplayNode() {
+        return displayNode;
+    }
+
+    public List<String> getDisplayStylesheets() {
+        return Collections.unmodifiableList(displayStylesheets);
+    }
+
+    void setDisplayStylesheets(List<String> displayStylesheets) {
+        this.displayStylesheets.clear();
+        this.displayStylesheets.addAll(displayStylesheets);
+    }
+
+    /**
+     * Sets the Node that should be displayed in the editor instead of the scene graph root.
+     */
+    void setDisplayNode(Node displayNode) {
+        this.displayNode = displayNode;
+    }
+
+    /**
+     * Returns the display node if one is set, otherwise returns the scene graph root.
+     */
+    public Object getDisplayNodeOrSceneGraphRoot() {
+        return displayNode != null ? displayNode : sceneGraphRoot;
     }
 
     public String getFxmlText() {

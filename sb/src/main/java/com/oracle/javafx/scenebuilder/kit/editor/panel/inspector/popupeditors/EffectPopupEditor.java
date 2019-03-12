@@ -87,7 +87,7 @@ public class EffectPopupEditor extends PopupEditor {
     private void initialize(EditorController editorController) {
         this.editorController = editorController;
     }
-    
+
     public void reset(ValuePropertyMetadata propMeta, Set<Class<?>> selectedClasses,
     		EditorController editorController) {
     	super.reset(propMeta, selectedClasses);

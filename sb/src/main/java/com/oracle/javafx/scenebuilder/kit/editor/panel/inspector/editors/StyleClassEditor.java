@@ -77,7 +77,7 @@ public class StyleClassEditor extends InlineListEditor {
     private Map<String, String> cssClassesMap;
     private List<String> themeClasses;
     private EditorController editorController;
-    
+
     private ChangeListener<Theme> themeListener = (ov, t, t1) -> {
     	themeClasses = CssInternal.getThemeStyleClasses(editorController.getTheme());
     };
@@ -185,7 +185,7 @@ public class StyleClassEditor extends InlineListEditor {
         EditorController oldEditorController = this.editorController;
         if (oldEditorController != editorController) {
         	oldEditorController.themeProperty().removeListener(themeListener);
-        	this.editorController = editorController;
+        this.editorController = editorController;
         	editorController.themeProperty().addListener(themeListener);
         }
         cssClassesMap = null;
