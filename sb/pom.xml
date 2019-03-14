@@ -23,6 +23,7 @@
 					<execution>
 						<id>java-patches</id>
 						<configuration>
+							<skipApplication>true</skipApplication>
 							<naturalOrderProcessing>true</naturalOrderProcessing>
 							<patchDirectory>src/main/patches/java</patchDirectory>
 							<patchTargetDir>${project.build.sourceDirectory}\com\oracle\javafx\scenebuilder</patchTargetDir>
@@ -36,6 +37,7 @@
 					<execution>
 						<id>resource-patches</id>
 						<configuration>
+							<skipApplication>true</skipApplication>
 							<naturalOrderProcessing>true</naturalOrderProcessing>	
 							<patchDirectory>src/main/patches/resources</patchDirectory>						
 							<patchTargetDir>${project.basedir}/src/main/resources/com/oracle/javafx/scenebuilder</patchTargetDir>
