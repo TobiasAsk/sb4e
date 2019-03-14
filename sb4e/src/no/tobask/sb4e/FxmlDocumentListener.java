@@ -4,12 +4,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -31,7 +35,7 @@ public class FxmlDocumentListener implements IResourceChangeListener {
 
 	private Map<String, URL> controllers = new HashMap<>();
 	private boolean discoveryPerformed = false;
-	
+
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
 		try {
@@ -40,33 +44,54 @@ public class FxmlDocumentListener implements IResourceChangeListener {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private boolean visit(IResourceDelta delta) {
 		IResource resource = delta.getResource();
 		if (resource != null && resource.getType() == IResource.FILE) {
 			IFile file = (IFile) resource;
 			String extension = file.getFileExtension();
 			if (extension != null && extension.equals("fxml")) {
-				try {
-					updateControllers(file);
-				} catch (IOException e) {
-					e.printStackTrace();
+				if (delta.getKind() == IResourceDelta.REMOVED) {
+					stopTracking(file);
+					return false;
+				} else {
+					try {
+						updateControllers(file);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					return false;
 				}
-				return false;
 			}
 		}
 		return true;
 	}
-	
+
 	private void updateControllers(IFile fxmlFile) throws IOException {
 		String controller = getController(fxmlFile);
 		if (controller != null) {
-			if (fxmlFile.exists()) {
-				controllers.put(controller, fxmlFile.getLocationURI().toURL());
-			} else {
-				controllers.remove(controller);
+			controllers.put(controller, fxmlFile.getLocationURI().toURL());
+		}
+	}
+
+	private void stopTracking(IFile fxmlFile) {
+		String controller = null;
+		String fxmlFileName = fxmlFile.getName();
+		for (Entry<String, URL> ctrlMapping : controllers.entrySet()) {
+			String docName = getDocumentName(ctrlMapping.getValue());
+			if (fxmlFileName.equals(docName)) {
+				controller = ctrlMapping.getKey();
 			}
 		}
+		if (controller != null) {
+			controllers.remove(controller);
+		}
+	}
+	
+	private String getDocumentName(URL url) {
+		String path = url.getFile();
+		int start = path.lastIndexOf("/") + 1;
+		return path.substring(start);
 	}
 
 	private String getController(IFile fxmlFile) throws IOException {
@@ -84,7 +109,7 @@ public class FxmlDocumentListener implements IResourceChangeListener {
 		}
 		return null;
 	}
-	
+
 	public boolean isAssignedController(String controllerName) {
 		if (!discoveryPerformed) {
 			discoverControllers();
@@ -100,7 +125,7 @@ public class FxmlDocumentListener implements IResourceChangeListener {
 		}
 		return controllers.get(controllerName);
 	}
-	
+
 	private void discoverControllers() {
 		try {
 			for (IFile fxmlFile : getAllFxmlFilesInWorkspace()) {
@@ -140,7 +165,7 @@ public class FxmlDocumentListener implements IResourceChangeListener {
 		}
 		return files;
 	}
-	
+
 	private List<IFile> getFxmlFiles(IPackageFragment pkg) throws JavaModelException {
 		List<IFile> files = new ArrayList<>();
 		for (Object resource : pkg.getNonJavaResources()) {
