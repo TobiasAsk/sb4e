@@ -93,31 +93,27 @@
    </extension>
    <extension
          id="no.tobask.sb4e.fxcontrollerproblemmarker"
-         name="Fx controller problem"
+         name="Bobob"
          point="org.eclipse.core.resources.markers">
       <super
-            type="org.eclipse.jdt.core.problem">
+            type="org.eclipse.core.resources.problemmarker">
       </super>
+      <persistent
+            value="true">
+      </persistent>
    </extension>
    <extension
          point="org.eclipse.jdt.ui.quickFixProcessors">
       <quickFixProcessor
             class="no.tobask.sb4e.MissingFxIdsFixer"
-            id="no.tobask.sb4e.missingfxidsfixer"
-            name="Missing fxids fixer">
+            id="no.tobask.sb4e.quickFixProcessor"
+            name="Fixx">
          <handledMarkerTypes>
             <markerType
                   id="no.tobask.sb4e.fxcontrollerproblemmarker">
             </markerType>
          </handledMarkerTypes>
-         <enablement>
-            <with variable="projectNatures">
-                  <iterate operator="or">
-                  		<equals value="org.eclipse.jdt.core.javanature"/>
-                  </iterate>
-            </with>
-         </enablement>
       </quickFixProcessor>
    </extension>
-
+ 
 </plugin>

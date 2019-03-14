@@ -80,7 +80,7 @@ public class FxControllerProblem extends CategorizedProblem {
 
 	@Override
 	public int getCategoryID() {
-		return CAT_POTENTIAL_PROGRAMMING_PROBLEM;
+		return CAT_MEMBER;
 	}
 
 	@Override
