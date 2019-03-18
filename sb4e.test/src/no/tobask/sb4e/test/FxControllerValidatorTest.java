@@ -10,9 +10,9 @@ import org.junit.Test;
 import org.junit.rules.ExternalResource;
 import org.mockito.ArgumentCaptor;
 
-import no.tobask.sb4e.FxControllerProblem;
-import no.tobask.sb4e.FxControllerValidator;
-import no.tobask.sb4e.FxmlDocumentListener;
+import no.tobask.sb4e.coherence.FxControllerProblem;
+import no.tobask.sb4e.coherence.FxControllerValidator;
+import no.tobask.sb4e.coherence.FxmlDocumentListener;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;

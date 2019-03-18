@@ -1,4 +1,4 @@
-package no.tobask.sb4e;
+package no.tobask.sb4e.coherence;
 
 import java.io.IOException;
 import java.net.URL;
@@ -30,6 +30,9 @@ import com.oracle.javafx.scenebuilder.kit.fxom.FXOMDocument;
 import com.oracle.javafx.scenebuilder.kit.fxom.FXOMInstance;
 import com.oracle.javafx.scenebuilder.kit.fxom.FXOMObject;
 import com.oracle.javafx.scenebuilder.kit.i18n.I18N;
+
+import no.tobask.sb4e.Activator;
+import no.tobask.sb4e.FxControllerVisitor;
 
 public class FxControllerValidator extends CompilationParticipant {
 

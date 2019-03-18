@@ -1,4 +1,4 @@
-package no.tobask.sb4e;
+package no.tobask.sb4e.coherence;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -5,6 +5,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
+import no.tobask.sb4e.coherence.FxmlDocumentListener;
+
 public class Activator implements BundleActivator {
 
 	private static BundleContext context;

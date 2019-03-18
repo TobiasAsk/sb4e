@@ -83,7 +83,7 @@
    <extension
          point="org.eclipse.jdt.core.compilationParticipant">
       <compilationParticipant
-            class="no.tobask.sb4e.FxControllerValidator"
+            class="no.tobask.sb4e.coherence.FxControllerValidator"
             id="FxControllerValidator"
             createsProblems="true">
             <managedMarker
@@ -105,7 +105,7 @@
    <extension
          point="org.eclipse.jdt.ui.quickFixProcessors">
       <quickFixProcessor
-            class="no.tobask.sb4e.MissingFxIdsFixer"
+            class="no.tobask.sb4e.coherence.MissingFxIdsFixer"
             id="no.tobask.sb4e.quickFixProcessor"
             name="Fixx">
          <handledMarkerTypes>
