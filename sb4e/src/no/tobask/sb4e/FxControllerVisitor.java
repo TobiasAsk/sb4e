@@ -116,11 +116,11 @@ public class FxControllerVisitor extends ASTVisitor {
 		if (binding != null) {
 			ITypeBinding objectType = classType.getAST().resolveWellKnownType("java.lang.Object");
 			ITypeBinding type = binding;
-			while (type.getSuperclass() != objectType) {
-				type = type.getSuperclass();
+			while (type != objectType && type != null) {
 				if (type.getQualifiedName().startsWith(superClass)) {
 					return true;
 				}
+				type = type.getSuperclass();
 			}
 		}
 		return false;
