@@ -33,6 +33,10 @@ public class JavaProjectGlossary extends Glossary implements IElementChangedList
 		this.qualifiedControllerName = controllerClassName;
 		this.fxmlLocation = fxmlLocation;
 	}
+	
+	public void setFxmlLocation(URL fxmlLocation) {
+		this.fxmlLocation = fxmlLocation;
+	}
 
 	@Override
 	public List<String> queryControllerClasses(URL fxmlLocation) {
