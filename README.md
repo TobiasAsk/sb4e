@@ -1,5 +1,5 @@
 # sb4e
-sb4e is an integration of [Scene Builder](http://gluonhq.com/products/scene-builder/), a tool for editing JavaFX user interfaces defined in FXML, into the Eclipse IDE. It extends Eclipse with functionality to edit FXML files directly from the IDE, using a drag & drop user interface.
+sb4e is an open source integration of [Scene Builder](http://gluonhq.com/products/scene-builder/), a tool for editing JavaFX user interfaces defined in FXML, into the Eclipse IDE. It extends Eclipse with functionality to edit FXML files directly from the IDE, using a drag & drop user interface.
 
 ![](sb4e.parent/documentation/sb4e_example.png)
 
