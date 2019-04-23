@@ -27,14 +27,20 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.operations.RedoActionHandler;
 import org.eclipse.ui.operations.UndoActionHandler;
@@ -78,6 +84,7 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 	private RedoActionHandler redoActionHandler;
 	private String fxmlText = null;
 	private EditorInputWatcher inputWatcher;
+	private boolean saveWasInvoked;
 
 	private ChangeListener<Number> editorSelectionListener = (oV, oldNum, newNum) -> {
 		FXOMObject fxomRoot = editorController.getFxomDocument().getFxomRoot();
@@ -182,7 +189,7 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 
 	@Override
 	public boolean isSaveAsAllowed() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -192,6 +199,7 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 			String newFxmlText = editorController.getFxmlText();
 			byte[] fxmlBytes = newFxmlText.getBytes("UTF-8");
 			updateDirtyStatus(false);
+			saveWasInvoked = true;
 			file.setContents(new ByteArrayInputStream(fxmlBytes), IResource.FORCE, monitor);
 			this.fxmlText = newFxmlText;
 		} catch (UnsupportedEncodingException | CoreException e) {
@@ -202,8 +210,28 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 
 	@Override
 	public void doSaveAs() {
-		// TODO Auto-generated method stub
-
+		Shell shell = PlatformUI.getWorkbench().getModalDialogShellProvider().getShell();
+		SaveAsDialog dialog = new SaveAsDialog(shell);
+		dialog.setOriginalFile(((IFileEditorInput) getEditorInput()).getFile());
+		if (dialog.open() == Window.CANCEL) {
+			return;
+		}
+		IPath path = dialog.getResult();
+		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+		String newFxmlText = editorController.getFxmlText();
+		byte[] fxmlBytes = newFxmlText.getBytes();
+		try {
+			file.create(new ByteArrayInputStream(fxmlBytes), IResource.FORCE, null);
+			FileEditorInput newInput = new FileEditorInput(file);
+			executeOnUiThread(() -> {
+				setInputWithNotify(newInput);
+				setPartName(newInput.getName());
+			});
+			inputWatcher.setInput(file);
+			updateDirtyStatus(false);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -334,17 +362,28 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 		}
 	}
 
+	private void executeOnUiThread(Runnable runnable) {
+		Display display = PlatformUI.getWorkbench().getDisplay();
+		display.asyncExec(runnable);
+	}
+
 	@Override
 	public void inputRemoved() {
-		Display display = getSite().getShell().getDisplay();
-		display.asyncExec(() -> getSite().getPage().closeEditor(FXMLEditor.this, false));
+		if (dirty) {
+			executeOnUiThread(() -> doSaveAs());
+		} else {
+			executeOnUiThread(() -> getSite().getPage().closeEditor(FXMLEditor.this, false));
+		}
 	}
 
 	@Override
 	public void inputContentChanged() {
+		if (saveWasInvoked) {
+			saveWasInvoked = false;
+			return;
+		}
 		if (dirty) {
-			Display display = getSite().getShell().getDisplay();
-			display.asyncExec(() -> {
+			executeOnUiThread(() -> {
 				boolean reload = (Dialog.OK != MessageDialog.open(MessageDialog.WARNING, getSite().getShell(),
 						"Reload data?",
 						getEditorInput().getName() + " has changed outside editor, would you like to reload it?",
@@ -364,8 +403,7 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 		FileEditorInput newInput = new FileEditorInput(file);
 		try {
 			loadFxml(file.getLocationURI().toURL());
-			Display display = getSite().getShell().getDisplay();
-			display.asyncExec(() -> {
+			executeOnUiThread(() -> {
 				setInputWithNotify(newInput);
 				setPartName(newInput.getName());
 			});
