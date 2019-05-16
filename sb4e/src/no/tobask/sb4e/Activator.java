@@ -12,7 +12,6 @@ public class Activator implements BundleActivator {
 	private static BundleContext context;
 	private static FxmlDocumentListener fxmlDocumentListener =
 			new FxmlDocumentListener();
-	private static EclipseProjectsClassLoader classLoader = new EclipseProjectsClassLoader();
 
 	public static BundleContext getContext() {
 		return context;
@@ -22,10 +21,6 @@ public class Activator implements BundleActivator {
 		return fxmlDocumentListener;
 	}
 	
-	public static EclipseProjectsClassLoader getClassLoader() {
-		return classLoader;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)

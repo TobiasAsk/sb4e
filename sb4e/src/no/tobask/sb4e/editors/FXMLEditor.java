@@ -11,6 +11,7 @@ import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.commands.operations.OperationHistoryFactory;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -57,8 +58,9 @@ import com.oracle.javafx.scenebuilder.kit.fxom.FXOMObject;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.embed.swt.FXCanvas;
+import javafx.fxml.FXMLLoader;
 import no.tobask.sb4e.CustomClassLoaderLibrary;
-import no.tobask.sb4e.EclipseProjectsClassLoader;
+import no.tobask.sb4e.EclipseProjectClassLoader;
 import no.tobask.sb4e.JavaModelUtils;
 import no.tobask.sb4e.JavaProjectGlossary;
 import no.tobask.sb4e.handlers.SceneBuilderControlActionHandler;
@@ -155,7 +157,15 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 		// input file
 		// for the editor controller so they can react to the update
 		try {
-			editorController.setLibrary(new CustomClassLoaderLibrary(new EclipseProjectsClassLoader()));
+			ClassLoader classLoader = new EclipseProjectClassLoader(getProject());
+			try {
+				((EclipseProjectClassLoader) classLoader).init();
+			} catch (CoreException e) {
+				e.printStackTrace();
+				classLoader = FXMLLoader.getDefaultClassLoader();
+			}
+			editorController.setLibrary(new CustomClassLoaderLibrary(classLoader));
+			
 			fxmlText = FXOMDocument.readContentFromURL(fxmlUrl);
 			editorController.setFxmlTextAndLocation(fxmlText, fxmlUrl);
 
@@ -180,6 +190,12 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private IJavaProject getProject() {
+		IFileEditorInput input = (IFileEditorInput) getEditorInput();
+		IProject project = input.getFile().getProject();
+		return JavaCore.create(project);
 	}
 
 	@Override
