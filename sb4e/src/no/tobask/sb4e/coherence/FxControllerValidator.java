@@ -4,32 +4,25 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.core.resources.IMarker;
+import javax.xml.stream.XMLStreamException;
+
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.compiler.BuildContext;
 import org.eclipse.jdt.core.compiler.CategorizedProblem;
 import org.eclipse.jdt.core.compiler.CompilationParticipant;
 import org.eclipse.jdt.core.compiler.ReconcileContext;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import com.oracle.javafx.scenebuilder.kit.fxom.FXOMDocument;
-import com.oracle.javafx.scenebuilder.kit.fxom.FXOMInstance;
-import com.oracle.javafx.scenebuilder.kit.fxom.FXOMObject;
-import com.oracle.javafx.scenebuilder.kit.i18n.I18N;
 
 import no.tobask.sb4e.Activator;
 import no.tobask.sb4e.FxControllerVisitor;
@@ -37,6 +30,7 @@ import no.tobask.sb4e.FxControllerVisitor;
 public class FxControllerValidator extends CompilationParticipant {
 
 	FxmlDocumentListener documentListener;
+	private SimpleFxmlParser parser = new SimpleFxmlParser();
 
 	public FxControllerValidator() {
 		documentListener = Activator.getFxmlDocumentListener();
@@ -101,16 +95,16 @@ public class FxControllerValidator extends CompilationParticipant {
 		ICompilationUnit clazz = context.getWorkingCopy();
 		String className = clazz.findPrimaryType().getFullyQualifiedName();
 		if (documentListener.isAssignedController(className)) {
-			URL documentLocation = documentListener.getDocument(className);
 			try {
-				String fxmlContent = FXOMDocument.readContentFromURL(documentLocation);
-				FXOMDocument document = new FXOMDocument(fxmlContent, documentLocation, Activator.getClassLoader(),
-						I18N.getBundle());
-				CategorizedProblem[] problems = getProblems(context.getAST(AST.JLS11), document);
+				URL documentLocation = documentListener.getDocument(className).getLocationURI().toURL();
+				parser.setDocumentLocation(documentLocation);
+				parser.parseDocument();
+				CategorizedProblem[] problems = getProblems(context.getAST(AST.JLS11), parser.getEventHandlers(),
+						parser.getFxIds(), documentListener.getDocument(className).getName());
 				if (problems != null) {
 					context.putProblems("no.tobask.sb4e.fxcontrollerproblemmarker", problems);
 				}
-			} catch (IOException | JavaModelException e) {
+			} catch (IOException | JavaModelException | XMLStreamException e) {
 				e.printStackTrace();
 			}
 		}
@@ -176,20 +170,20 @@ public class FxControllerValidator extends CompilationParticipant {
 //		return String.join("|", missingIds);
 //	}
 
-	private CategorizedProblem[] getProblems(CompilationUnit ast, FXOMDocument document) {
-		String documentName = getDocumentName(document.getLocation());
+	private CategorizedProblem[] getProblems(CompilationUnit ast, List<String> eventHandlers,
+			Map<String, String> documentIds, String documentName) {
 		FxControllerVisitor visitor = new FxControllerVisitor(documentName, ast.getJavaElement().getElementName());
 		ast.accept(visitor);
 		Map<String, List<String>> controllerIds = visitor.getFxIds();
-		Map<String, FXOMObject> documentIds = document.collectFxIds();
-		List<String> missingIds = new ArrayList<>();
-		for (Entry<String, FXOMObject> docId : documentIds.entrySet()) {
-			FXOMInstance instance = (FXOMInstance) docId.getValue();
-			String componentType = instance.getDeclaredClass().getSimpleName();
+		List<String> missingIds = new ArrayList<>(); // ids in view missing from controller
+		for (Entry<String, String> docId : documentIds.entrySet()) {
 			String id = docId.getKey();
-			List<String> idsForInstanceType = controllerIds.get(componentType);
-			if (idsForInstanceType == null || !idsForInstanceType.contains(id)) {
-				missingIds.add(id + ";" + instance.getDeclaredClass().getName());
+			String componentType = docId.getValue();
+			String[] typeNameParts = componentType.split("\\.");
+			String simpleTypeName = typeNameParts[typeNameParts.length - 1];
+			List<String> idsForType = controllerIds.get(simpleTypeName);
+			if (idsForType == null || !idsForType.contains(id)) {
+				missingIds.add(id + ";" + componentType);
 			}
 		}
 
