@@ -1,0 +1,3 @@
+[submodule "scenebuilder"]
+	path = scenebuilder
+	url = https://github.com/gluonhq/scenebuilder.git
