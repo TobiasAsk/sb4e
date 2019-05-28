@@ -55,7 +55,7 @@ public class ViewEventHandlerChange extends ResourceChange {
 					.findFirst();
 			if (handler.isPresent()) {
 				handler.get().setValue("#" + newName);
-				InputStream stream = new ByteArrayInputStream(view.getFxmlText().getBytes("UTF-8"));
+				InputStream stream = new ByteArrayInputStream(view.getFxmlText(false).getBytes("UTF-8"));
 				IFile viewFile = ResourcesPlugin.getWorkspace().getRoot()
 						.findFilesForLocationURI(view.getLocation().toURI())[0];
 				viewFile.setContents(stream, IResource.FORCE, pm);

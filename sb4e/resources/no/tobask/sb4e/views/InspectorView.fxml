@@ -52,7 +52,7 @@
 	</children>
 	<stylesheets>
 		<URL
-			value="platform:/plugin/com.oracle.javafx.scenebuilder/com/oracle/javafx/scenebuilder/app/css/DocumentWindow.css" />
+			value="platform:/plugin/com.oracle.javafx.scenebuilder.kit/com/oracle/javafx/scenebuilder/kit/css/Base.css" />
 	</stylesheets>
 </VBox>
 

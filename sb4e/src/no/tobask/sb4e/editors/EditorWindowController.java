@@ -1,12 +1,11 @@
 package no.tobask.sb4e.editors;
 
-import com.oracle.javafx.scenebuilder.app.info.InfoPanelController;
-import com.oracle.javafx.scenebuilder.app.message.MessageBarController;
-import com.oracle.javafx.scenebuilder.app.preferences.PreferencesController;
+import com.oracle.javafx.scenebuilder.kit.editor.panel.info.InfoPanelController;
+import com.oracle.javafx.scenebuilder.kit.editor.panel.message.MessageBarController;
 import com.oracle.javafx.scenebuilder.kit.selectionbar.SelectionBarController;
 import com.oracle.javafx.scenebuilder.kit.editor.EditorController;
 import com.oracle.javafx.scenebuilder.kit.i18n.I18N;
-import com.oracle.javafx.scenebuilder.kit.preferences.PreferencesControllerBase;
+import com.oracle.javafx.scenebuilder.kit.preferences.MavenPreferences;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.content.ContentPanelController;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.hierarchy.HierarchyPanelController;
 import com.oracle.javafx.scenebuilder.kit.editor.panel.library.LibraryPanelController;
@@ -47,7 +46,7 @@ public class EditorWindowController extends AbstractFxmlWindowController {
 		this.editorController = editorController;
 		contentPanelController = new ContentPanelController(editorController);
 		libraryPanelController = new LibraryPanelController(editorController,
-				PreferencesController.getSingleton().getMavenPreferences());
+				new MavenPreferences());
 		selectionBarController = new SelectionBarController(editorController);
 		hierarchyPanelController = new HierarchyPanelController(editorController);
 		infoPanelController = new InfoPanelController(editorController);

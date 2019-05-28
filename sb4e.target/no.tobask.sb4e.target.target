@@ -25,7 +25,7 @@
 			<repository location="http://downloads.efxclipse.bestsolution.at/p2-repos/openjfx-11/repository/"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<unit id="org.eclipse.fx.ide.feature.feature.group" version="3.5.0.201903121259"/>
+			<unit id="org.eclipse.fx.ide.feature.feature.group" version="3.5.0.201905280309"/>
 			<repository location="http://download.eclipse.org/efxclipse/updates-nightly/site"/>
 		</location>
 	</locations>

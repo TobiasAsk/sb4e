@@ -150,6 +150,7 @@
 	</build>
 
 	<modules>
+		<module>../scenebuilder/kit</module>
 		<module>../sb</module>
 		<module>../sb4e</module>
 		<module>../sb4e.feature</module>

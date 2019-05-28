@@ -212,7 +212,7 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 	public void doSave(IProgressMonitor monitor) {
 		IFile file = ((FileEditorInput) getEditorInput()).getFile();
 		try {
-			String newFxmlText = editorController.getFxmlText();
+			String newFxmlText = editorController.getFxmlText(false);
 			byte[] fxmlBytes = newFxmlText.getBytes("UTF-8");
 			updateDirtyStatus(false);
 			saveWasInvoked = true;
@@ -234,7 +234,7 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 		}
 		IPath path = dialog.getResult();
 		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-		String newFxmlText = editorController.getFxmlText();
+		String newFxmlText = editorController.getFxmlText(false);
 		byte[] fxmlBytes = newFxmlText.getBytes();
 		try {
 			file.create(new ByteArrayInputStream(fxmlBytes), IResource.FORCE, null);
@@ -301,7 +301,7 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 	private void setupUndoRedo() {
 		JobManager jobManager = editorController.getJobManager();
 		jobManager.revisionProperty().addListener((observable, oldValue, newValue) -> {
-			String newFxmlText = editorController.getFxmlText();
+			String newFxmlText = editorController.getFxmlText(false);
 			updateDirtyStatus(!newFxmlText.equals(this.fxmlText));
 
 			if (!jobManager.canRedo()) {

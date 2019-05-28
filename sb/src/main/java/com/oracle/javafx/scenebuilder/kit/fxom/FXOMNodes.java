@@ -260,6 +260,10 @@ public class FXOMNodes {
         result.beginUpdate();
         result.setLocation(sourceDocument.getLocation());
         result.setClassLoader(sourceDocument.getClassLoader());
+        String controller = sourceDocument.getFxomRoot().getFxController();
+        if (controller != null) {
+        	sourceClone.setFxController(controller);
+        }
         result.setFxomRoot(sourceClone);
         if (result.getFxomRoot() instanceof FXOMInstance) {
             trimStaticProperties((FXOMInstance) result.getFxomRoot());
