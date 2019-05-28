@@ -16,7 +16,9 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.compiler.BuildContext;
 import org.eclipse.jdt.core.compiler.CategorizedProblem;
 import org.eclipse.jdt.core.compiler.CompilationParticipant;
 import org.eclipse.jdt.core.compiler.ReconcileContext;
@@ -40,24 +42,27 @@ public class FxControllerValidator extends CompilationParticipant {
 		this.documentListener = documentListener;
 	}
 
-//	@Override
-//	public void buildStarting(BuildContext[] files, boolean isBatch) {
-//		for (BuildContext file : files) {
-//			ICompilationUnit clazz = (ICompilationUnit) JavaCore.create(file.getFile());
-//			String className = clazz.findPrimaryType().getFullyQualifiedName();
-//			if (documentListener.isAssignedController(className)) {
-//				URL documentLocation = documentListener.getDocument(className);
-//				try {
-//					String fxmlContent = FXOMDocument.readContentFromURL(documentLocation);
-//					FXOMDocument document = new FXOMDocument(fxmlContent, documentLocation,
-//							Activator.getClassLoader(), I18N.getBundle());
-//					file.recordNewProblems(getProblems(clazz, document));
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
-//	}
+	@Override
+	public void buildStarting(BuildContext[] files, boolean isBatch) {
+		for (BuildContext file : files) {
+			ICompilationUnit clazz = (ICompilationUnit) JavaCore.create(file.getFile());
+			String className = clazz.findPrimaryType().getFullyQualifiedName();
+			if (documentListener.isAssignedController(className)) {
+				try {
+					URL documentLocation = documentListener.getDocument(className).getLocationURI().toURL();
+					parser.setDocumentLocation(documentLocation);
+					parser.parseDocument();
+					CategorizedProblem[] problems = getProblems(getAst(clazz), parser.getEventHandlers(),
+							parser.getFxIds(), documentListener.getDocument(className).getName());
+					if (problems != null) {
+						file.recordNewProblems(problems);
+					}
+				} catch (IOException | XMLStreamException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
 //	@Override
 //	public void buildFinished(IJavaProject project) {
@@ -90,25 +95,25 @@ public class FxControllerValidator extends CompilationParticipant {
 //		}
 //	}
 
-	@Override
-	public void reconcile(ReconcileContext context) {
-		ICompilationUnit clazz = context.getWorkingCopy();
-		String className = clazz.findPrimaryType().getFullyQualifiedName();
-		if (documentListener.isAssignedController(className)) {
-			try {
-				URL documentLocation = documentListener.getDocument(className).getLocationURI().toURL();
-				parser.setDocumentLocation(documentLocation);
-				parser.parseDocument();
-				CategorizedProblem[] problems = getProblems(context.getAST(AST.JLS11), parser.getEventHandlers(),
-						parser.getFxIds(), documentListener.getDocument(className).getName());
-				if (problems != null) {
-					context.putProblems("no.tobask.sb4e.fxcontrollerproblemmarker", problems);
-				}
-			} catch (IOException | JavaModelException | XMLStreamException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+//	@Override
+//	public void reconcile(ReconcileContext context) {
+//		ICompilationUnit clazz = context.getWorkingCopy();
+//		String className = clazz.findPrimaryType().getFullyQualifiedName();
+//		if (documentListener.isAssignedController(className)) {
+//			try {
+//				URL documentLocation = documentListener.getDocument(className).getLocationURI().toURL();
+//				parser.setDocumentLocation(documentLocation);
+//				parser.parseDocument();
+//				CategorizedProblem[] problems = getProblems(context.getAST(AST.JLS11), parser.getEventHandlers(),
+//						parser.getFxIds(), documentListener.getDocument(className).getName());
+//				if (problems != null) {
+//					context.putProblems("no.tobask.sb4e.fxcontrollerproblemmarker", problems);
+//				}
+//			} catch (IOException | JavaModelException | XMLStreamException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
 
 	private List<ICompilationUnit> getCompUnits(IJavaProject project) throws JavaModelException {
 		List<ICompilationUnit> units = new ArrayList<>();
