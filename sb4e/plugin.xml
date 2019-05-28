@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="no.tobask.sb4e.library.providers" name="External Item Providers" schema="schema/externalItemProviders.exsd"/>
 
    <extension
          point="org.eclipse.ui.editors">

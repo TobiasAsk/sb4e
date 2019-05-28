@@ -340,21 +340,26 @@ public class LibraryPanelController extends AbstractFxmlPanelController {
     
     final ListChangeListener<LibraryItem> libraryItemListener = change -> libraryDidChange(null);
     
-    private final ChangeListener<Library> libraryListener = (ov, t, t1) -> {
+    private final ChangeListener<Library> libraryListener = (ov, oldLibrary, newLibrary) -> {
         // When a jar is imported this listener is called two times.
         // First the UserLibrary is turned into BuiltinLibrary, then it is
         // turned back into a UserLibrary with the up to date library dir
         // content.
 //            System.out.println("libraryListener called - t " + t + " - t1 " + t1);
-        if (t instanceof UserLibrary) {
-            t.getItems().removeListener(libraryItemListener);
-            t.getItems().clear();
-        }
-        if (t1 instanceof UserLibrary) {
-            t1.getItems().addListener(libraryItemListener);
-            if (sectionNameToKeepOpened != null) {
-                sectionNameToKeepOpened = null;
-            }
+//        if (t instanceof UserLibrary) {
+//            t.getItems().removeListener(libraryItemListener);
+//            t.getItems().clear();
+//        }
+//        if (t1 instanceof UserLibrary) {
+//            t1.getItems().addListener(libraryItemListener);
+//            if (sectionNameToKeepOpened != null) {
+//                sectionNameToKeepOpened = null;
+//            }
+//        }
+        oldLibrary.getItems().removeListener(libraryItemListener);
+        newLibrary.getItems().addListener(libraryItemListener);
+        if (sectionNameToKeepOpened != null) {
+        	sectionNameToKeepOpened = null;
         }
         // libraryDidChange might not be called by several listeners.
         // Silencing the one below means I dunno how to get the selected index.
