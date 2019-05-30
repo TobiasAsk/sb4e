@@ -4,15 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -23,7 +20,6 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -31,11 +27,9 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
-import no.tobask.sb4e.JavaModelUtils;
-
 public class FxmlDocumentListener implements IResourceChangeListener {
 
-	private Map<String, IFile> controllers = new HashMap<>(); // controller -> view
+	private Map<IFile, String> controllers = new HashMap<>(); // view -> controller
 	private boolean discoveryPerformed = false;
 
 	@Override
@@ -62,19 +56,23 @@ public class FxmlDocumentListener implements IResourceChangeListener {
 	}
 
 	private void checkErrors() {
-		for (Entry<String, IFile> ctrlerViewPair : controllers.entrySet()) {
-			IFile viewDocument = ctrlerViewPair.getValue();
-			String controllerName = ctrlerViewPair.getKey();
-			try {
-				ICompilationUnit controllerClass = JavaModelUtils.getClass(viewDocument.getLocationURI().toURL(),
-						controllerName);
-				if (controllerClass == null) {
-					int a = 2;
-				}
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			}
-		}
+//		for (Entry<IFile, String> ctrlerViewPair : controllers.entrySet()) {
+//			IFile viewDocument = ctrlerViewPair.getKey();
+//			String controllerName = simpleControllerNameWithExtension(ctrlerViewPair.getValue());
+//			IJavaProject project = JavaCore.create(viewDocument.getProject());
+//			try {
+//				if (!JavaModelUtils.containsClass(controllerName, project)) {
+//					int a = 2;
+//				}
+//			} catch (JavaModelException e) {
+//				e.printStackTrace();
+//			}
+//		}
+	}
+
+	private String simpleControllerNameWithExtension(String qualifiedName) {
+		String[] nameParts = qualifiedName.split("\\.");
+		return nameParts[nameParts.length - 1] + ".java";
 	}
 
 	private IFile getFile(IResourceDelta delta) {
@@ -93,7 +91,7 @@ public class FxmlDocumentListener implements IResourceChangeListener {
 		if (fxmlFile.exists()) {
 			String controller = getController(fxmlFile);
 			if (controller != null) {
-				controllers.put(controller, fxmlFile);
+				controllers.put(fxmlFile, controller);
 			}
 		} else {
 			stopTracking(fxmlFile);
@@ -101,18 +99,7 @@ public class FxmlDocumentListener implements IResourceChangeListener {
 	}
 
 	private void stopTracking(IFile fxmlFile) {
-		String fxmlFileName = fxmlFile.getName();
-		Set<String> documentNames = controllers.values().stream().map(IFile::getName).collect(Collectors.toSet());
-		if (documentNames.contains(fxmlFileName)) {
-			String controller = null;
-			for (Entry<String, IFile> ctrlMapping : controllers.entrySet()) {
-				String docName = ctrlMapping.getValue().getName();
-				if (fxmlFileName.equals(docName)) {
-					controller = ctrlMapping.getKey();
-				}
-			}
-			controllers.remove(controller);
-		}
+		controllers.remove(fxmlFile);
 	}
 
 	private String getController(IFile fxmlFile) throws IOException {
@@ -136,7 +123,7 @@ public class FxmlDocumentListener implements IResourceChangeListener {
 			discoverControllers();
 			discoveryPerformed = true;
 		}
-		return controllers.containsKey(controllerName);
+		return controllers.containsValue(controllerName);
 	}
 
 	public IFile getDocument(String controllerName) {
@@ -144,7 +131,12 @@ public class FxmlDocumentListener implements IResourceChangeListener {
 			discoverControllers();
 			discoveryPerformed = true;
 		}
-		return controllers.get(controllerName);
+		for (Entry<IFile, String> viewCtrlerEntry : controllers.entrySet()) {
+			if (viewCtrlerEntry.getValue().equals(controllerName)) {
+				return viewCtrlerEntry.getKey();
+			}
+		}
+		return null;
 	}
 
 	private void discoverControllers() {

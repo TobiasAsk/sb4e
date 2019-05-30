@@ -35,6 +35,7 @@ Import-Package: com.oracle.javafx.scenebuilder.kit.editor,
  org.eclipse.jdt.launching,
  org.eclipse.jdt.ui.text.java,
  org.eclipse.jdt.ui.text.java.correction,
+ org.eclipse.jdt.ui.wizards,
  org.eclipse.jface.action,
  org.eclipse.text.edits,
  org.eclipse.ui.part

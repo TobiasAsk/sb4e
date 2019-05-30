@@ -11,11 +11,6 @@
 			<unit id="org.eclipse.sdk.feature.group" version="4.10.0.v20181206-1038"/>
 			<repository location="http://download.eclipse.org/releases/2018-12"/>
 		</location>
-		<location path="C:\Users\tobiaas\dev\scene-builder-plugin\sb4e.dependencies\sb4e-dependencies\target" type="Directory"/>
-		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<unit id="org.mockito" version="1.9.5.v201605172210"/>
-			<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20190226160451/repository"/>
-		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 			<unit id="openjfx.media.feature.feature.group" version="11.0.0.201901231300"/>
 			<unit id="openjfx.standard.feature.feature.group" version="11.0.0.201901231300"/>
@@ -24,8 +19,13 @@
 			<unit id="openjfx.web.feature.feature.group" version="11.0.0.201901231300"/>
 			<repository location="http://downloads.efxclipse.bestsolution.at/p2-repos/openjfx-11/repository/"/>
 		</location>
+		<location path="C:\dev\scene-builder-plugin\sb4e.dependencies\sb4e-dependencies\target" type="Directory"/>
 		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<unit id="org.eclipse.fx.ide.feature.feature.group" version="3.5.0.201903121259"/>
+			<unit id="org.mockito" version="2.23.0.v20181106-1534"/>
+			<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20190226160451/repository"/>
+		</location>
+		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+			<unit id="org.eclipse.fx.ide.feature.feature.group" version="3.5.0.201905280309"/>
 			<repository location="http://download.eclipse.org/efxclipse/updates-nightly/site"/>
 		</location>
 	</locations>
