@@ -78,6 +78,7 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 	private RedoActionHandler redoActionHandler;
 	private String fxmlText = null;
 	private EditorInputWatcher inputWatcher;
+	private boolean saveWasInvoked = false;
 
 	private ChangeListener<Number> editorSelectionListener = (oV, oldNum, newNum) -> {
 		FXOMObject fxomRoot = editorController.getFxomDocument().getFxomRoot();
@@ -191,9 +192,10 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 		try {
 			String newFxmlText = editorController.getFxmlText();
 			byte[] fxmlBytes = newFxmlText.getBytes("UTF-8");
-			updateDirtyStatus(false);
+			saveWasInvoked = true;
 			file.setContents(new ByteArrayInputStream(fxmlBytes), IResource.FORCE, monitor);
 			this.fxmlText = newFxmlText;
+			updateDirtyStatus(false);
 		} catch (UnsupportedEncodingException | CoreException e) {
 			e.printStackTrace();
 			updateDirtyStatus(true);
@@ -342,6 +344,11 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 
 	@Override
 	public void inputContentChanged() {
+		if (saveWasInvoked) {
+			// a save invocation triggered the call - no need to update the model
+			saveWasInvoked = false;
+			return;
+		}
 		if (dirty) {
 			Display display = getSite().getShell().getDisplay();
 			display.asyncExec(() -> {
