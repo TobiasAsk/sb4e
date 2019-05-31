@@ -27,7 +27,7 @@
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<configuration>
-					<argLine>-Dosgi.framework.extensions=org.eclipse.fx.osgi -Defxclipse.java-modules.dir="C:\Users\arneb\Downloads\Installasjoner\javafx-sdk-11.0.1\lib"</argLine>
+					<argLine>-Dosgi.framework.extensions=org.eclipse.fx.osgi -Defxclipse.java-modules.dir="C:\Users\tobiaas\Downloads\javafx-sdk-11.0.1\lib"</argLine>
 					<useUIHarness>false</useUIHarness>
 					<frameworkExtensions>
 						<frameworkExtension>
