@@ -66,12 +66,73 @@
                      </visibleWhen>
                </command>
          </menuContribution>
+         <menuContribution
+               locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
+            <command
+                  commandId="no.tobask.sb4e.addRemoveFxNature"
+                  label="Disable Fx project builder"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="selection">
+                     <count
+                           value="1">
+                     </count>
+                     <iterate>
+                        <adapt
+                              type="org.eclipse.core.resources.IProject">
+                           <test
+                                 property="org.eclipse.core.resources.projectNature"
+                                 value="no.tobask.sb4e.fxNature">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="no.tobask.sb4e.addRemoveFxNature"
+                  label="Enable Fx project builder"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="selection">
+                     <count
+                           value="1">
+                     </count>
+                     <iterate>
+                        <adapt
+                              type="org.eclipse.core.resources.IProject">
+                           <not>
+                              <test
+                                    property="org.eclipse.core.resources.projectNature"
+                                    value="no.tobask.sb4e.fxNature">
+                              </test>
+                           </not>
+                        </adapt>
+                     </iterate>
+                  </with>
+               </visibleWhen>
+            </command>
+         </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
          <command
                id="no.tobask.sb4e.includefxml"
                name="Include fxml">
+         </command>
+         <category
+               id="no.tobask.sb4e.fxNature.category"
+               name="Fx Project Nature commands">
+         </category>
+         <command
+               categoryId="no.tobask.sb4e.fxNature.category"
+               defaultHandler="no.tobask.sb4e.builder.AddRemoveFxNatureHandler"
+               id="no.tobask.sb4e.addRemoveFxNature"
+               name="Add/RemoveFx Project Nature">
          </command>
    </extension>
    <extension
@@ -116,6 +177,49 @@
          </handledMarkerTypes>
       </quickFixProcessor>
    </extension>
+   <extension
+         id="fxProjectBuilder"
+         name="Fx Project Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="no.tobask.sb4e.builder.FxProjectBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         id="fxNature"
+         name="Fx Project Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="no.tobask.sb4e.builder.FxNature">
+         </run>
+      </runtime>
+      <builder
+            id="no.tobask.sb4e.fxProjectBuilder">
+      </builder>
+   </extension>
+   <extension
+         id="fxProblem"
+         name="JavaFX Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+            class="no.tobask.sb4e.builder.Resolver"
+            markerType="no.tobask.sb4e.fxProblem">
+      </markerResolutionGenerator>
+   </extension>
+   
    <extension
          point="org.eclipse.ltk.core.refactoring.renameParticipants">
       <renameParticipant
