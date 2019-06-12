@@ -10,6 +10,7 @@
             contributorClass="no.tobask.sb4e.editors.FXMLEditorContributor"
             default="false"
             extensions="fxml"
+            icon="icons/SceneBuilderLogo@2x.png"
             id="sb4e.editors.FXMLEditor"
             name="Scene Builder FXML Editor">
       </editor>

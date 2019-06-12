@@ -44,6 +44,9 @@ public class EditorInputWatcher implements IResourceChangeListener {
 			default:
 				break;
 			}
+			if (delta.getMarkerDeltas().length > 0) {
+				listener.inputMarkersChanged();
+			}
 		}
 	}
 

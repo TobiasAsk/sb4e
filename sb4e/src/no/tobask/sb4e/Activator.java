@@ -2,12 +2,13 @@ package no.tobask.sb4e;
 
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import no.tobask.sb4e.coherence.FxmlDocumentListener;
 
-public class Activator implements BundleActivator {
+public class Activator extends AbstractUIPlugin {
 
 	private static BundleContext context;
 	private static FxmlDocumentListener fxmlDocumentListener =

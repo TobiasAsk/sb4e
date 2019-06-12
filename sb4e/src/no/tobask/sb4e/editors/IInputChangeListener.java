@@ -7,5 +7,6 @@ public interface IInputChangeListener {
 	public void inputRemoved();
 	public void inputContentChanged();
 	public void inputMoved(IPath newLocation);
+	public void inputMarkersChanged();
 
 }

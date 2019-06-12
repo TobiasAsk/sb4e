@@ -25,11 +25,14 @@ import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.ui.ProblemsLabelDecorator;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -59,6 +62,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.embed.swt.FXCanvas;
 import javafx.fxml.FXMLLoader;
+import no.tobask.sb4e.Activator;
 import no.tobask.sb4e.CustomClassLoaderLibrary;
 import no.tobask.sb4e.EclipseProjectClassLoader;
 import no.tobask.sb4e.JavaModelUtils;
@@ -87,6 +91,7 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 	private String fxmlText = null;
 	private EditorInputWatcher inputWatcher;
 	private boolean saveWasInvoked;
+	private ProblemsLabelDecorator decorator = new ProblemsLabelDecorator();
 
 	private ChangeListener<Number> editorSelectionListener = (oV, oldNum, newNum) -> {
 		FXOMObject fxomRoot = editorController.getFxomDocument().getFxomRoot();
@@ -165,7 +170,7 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 				classLoader = FXMLLoader.getDefaultClassLoader();
 			}
 			editorController.setLibrary(new CustomClassLoaderLibrary(classLoader));
-			
+
 			fxmlText = FXOMDocument.readContentFromURL(fxmlUrl);
 			editorController.setFxmlTextAndLocation(fxmlText, fxmlUrl);
 
@@ -182,6 +187,20 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 			cutHandler = new SceneBuilderEditActionHandler(editorController, EditAction.CUT);
 			pasteHandler = new SceneBuilderEditActionHandler(editorController, EditAction.PASTE);
 			deleteHandler = new SceneBuilderEditActionHandler(editorController, EditAction.DELETE);
+
+			IResource input = ((FileEditorInput) getEditorInput()).getFile();
+			try {
+				IMarker[] problemMarkers = input.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_ZERO);
+				if (problemMarkers.length > 0) {
+					ImageDescriptor descriptor = Activator.imageDescriptorFromPlugin("no.tobask.sb4e",
+							"icons/SceneBuilderLogo@2x.png");
+					Image editorIcon = (Image) descriptor.createResource(PlatformUI.getWorkbench().getDisplay());
+					setTitleImage(decorator.decorateImage(editorIcon, input));
+					firePropertyChange(PROP_TITLE);
+				}
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
 
 			setupUndoRedo();
 			editorController.startFileWatching();
@@ -427,6 +446,19 @@ public class FXMLEditor extends EditorPart implements IInputChangeListener {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void inputMarkersChanged() {
+		IResource input = ((FileEditorInput) getEditorInput()).getFile();
+		ImageDescriptor descriptor = Activator.imageDescriptorFromPlugin("no.tobask.sb4e",
+				"icons/SceneBuilderLogo@2x.png");
+		Display display = PlatformUI.getWorkbench().getDisplay();
+		Image editorIcon = (Image) descriptor.createResource(display);
+		display.asyncExec(() -> {
+			setTitleImage(decorator.decorateImage(editorIcon, input));
+			firePropertyChange(PROP_TITLE);
+		});
 	}
 
 }
